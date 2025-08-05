@@ -6,11 +6,19 @@ provider:
 
 functions:
   hello-world:
-    handler: handler.hello
+    handler: ./src/category/handlers/getUser.hello
     events:
       - http:
           path: hello
           method: GET
+  
+  # getCategoriesNameImageCount:
+  #   handler: src/category/handlers/getCategoriesNameImageCount.handler
+  #   events:
+  #     - http:
+  #         path: categorias-imagen-cantidad
+  #         method: get
+  #         cors: true
 
 plugins:
   - serverless-offline

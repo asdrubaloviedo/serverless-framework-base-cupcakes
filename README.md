@@ -21,7 +21,7 @@ serverless offline start
 
 ## Contenido
 
-serverless, serverless framework, serverless-offline, lambda, api-gateway
+serverless, serverless framework, serverless-offline, lambda, api-gateway, module-alias
 
 ## Autores
 
