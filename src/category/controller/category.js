@@ -6,10 +6,10 @@ class CategoryController {
     this.categoryModel = categoryModel;
   }
 
-  getAllNameImageCount = async (req, res) => {
-    const { email } = req.query;
-    const result = await this.getAllNameImageCountRaw(email);
-    res.status(200).json(result);
+  getAllNameImageCount = async (email) => {
+    // const result = await this.getAllNameImageCountRaw(email);
+    const result = 'Test';
+    // res.status(200).json(result);
   };
 
   getAllNameImageCountRaw = async (email) => {

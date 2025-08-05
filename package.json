@@ -9,13 +9,15 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "module-alias": "^2.2.3",
     "serverless": "^3.21.0",
-    "serverless-offline": "^14.3.2",
-    "module-alias": "^2.2.3"
+    "serverless-offline": "^14.3.2"
   },
   "_moduleAliases": {
     "@models": "models",
     "@server": "server",
+    "@db": "db",
+    "@environment": "environment",
     "@src": "src",
     "@category": "src/category"
   },
@@ -23,5 +25,9 @@
     "serverless-offline": {
       "serverless": "$serverless"
     }
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "pg-promise": "^11.15.0"
   }
 }

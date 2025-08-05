@@ -1,4 +1,4 @@
-const db = require('./db');
+const db = require('@db/db');
 
 class CategoryModel {
   static async getAllNameImageCount({ query }) {

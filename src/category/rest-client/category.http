@@ -13,5 +13,3 @@ GET {{rootUrl}}/{{appName}}/{{categoryModule}}/categorias-imagen-cantidad
 ### GET Nombre, imagen principal y cantidad de los Registros de la tabla cupcake_categorias que este disponibles para un usuario por id */
 GET {{rootUrl}}/{{appName}}/{{categoryModule}}/categorias-imagen-cantidad/usuario?email=asdrubaloviedo@gmail.com
 
-### GET Nombre, imagen principal y cantidad de los Registros de la tabla cupcake_categorias.
-GET http://localhost:4566/restapis/grw0ygvrud/dev/_user_request_/categorias-imagen-cantidad?email=asdrubaloviedo@gmail.com

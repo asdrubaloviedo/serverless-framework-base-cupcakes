@@ -4,3 +4,4 @@
 .serverless
 .env
 /dist
+/undefined

@@ -12,13 +12,13 @@ functions:
           path: hello
           method: GET
   
-  # getCategoriesNameImageCount:
-  #   handler: src/category/handlers/getCategoriesNameImageCount.handler
-  #   events:
-  #     - http:
-  #         path: categorias-imagen-cantidad
-  #         method: get
-  #         cors: true
+  getCategoriesNameImageCount:
+    handler: ./src/category/handlers/getCategoriesNameImageCount.handler
+    events:
+      - http:
+          path: categorias-imagen-cantidad
+          method: get
+          cors: true
 
 plugins:
   - serverless-offline
