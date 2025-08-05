@@ -1,22 +1,18 @@
 // src/category/handlers/getCategoriesNameImageCount.js
 require('module-alias/register');
 const CategoryController = require('@category/controller/category');
-const categoryModel = require('@category/models/category');
-
-const controller = new CategoryController({ categoryModel });
 
 const handler = async (event) => {
   try {
     const email = event.queryStringParameters?.email || null;
     console.log('📨 Email recibido:', email);
-    const result = await controller.getAllNameImageCount(email);
+    const result = await CategoryController.getAllNameImageCount(email);
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         email,
-        result,
-        categoryModel
+        result
       })
     };
 

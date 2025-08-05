@@ -1,10 +1,8 @@
 "use strict"
 
-class CategoryRepository {
-    constructor(categoryModel) {
-        this.categoryModel = categoryModel;
-    }
+const { CategoryModel } = require("@category/models/category");
 
+class CategoryRepository {
     async getAllNameImageCount() {
         const query = 
             `
@@ -24,7 +22,7 @@ class CategoryRepository {
                 LEFT JOIN imagenes im ON c.imagen_id = im.imagen_id
                 GROUP BY c.categoria_id, c.descripcion, im.codigo, count_items;
             `;
-        return this.categoryModel.getAllNameImageCount({ query });
+        return CategoryModel.getAllNameImageCount({ query }); 
     }
 
     async getAllNameImageCountWithEmail({ lowerCaseEmail }) {
