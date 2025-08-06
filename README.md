@@ -13,15 +13,31 @@ npm install
 
 ## Levantamiento
 
-1.- Ambiente de desarrollo
+1.- Ambiente local
 
 ```bash
-serverless offline start
+npm run start 
 ```
+Url resultante: http://localhost:3000/dev/categorias-imagen-cantidad
+
+2.- Ambiente de desarrollo
+
+```bash
+sls deploy --stage dev
+```
+Url resultante: https://...amazonaws.com/dev/categorias-imagen-cantidad
+
+3.- Ambiente de produccion
+
+```bash
+serverless create_domain --stage prod
+sls deploy --stage prod
+```
+Url resultante: https://thecupcakelife.com/categorias-imagen-cantidad
 
 ## Contenido
 
-serverless, serverless framework, serverless-offline, lambda, api-gateway, module-alias
+serverless, serverless framework, serverless-offline, serverless-domain-manager, lambda, api-gateway, module-alias
 
 ## Autores
 

@@ -11,6 +11,8 @@
   "devDependencies": {
     "module-alias": "^2.2.3",
     "serverless": "^3.21.0",
+    "serverless-domain-manager": "^8.0.0",
+    "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^14.3.2"
   },
   "_moduleAliases": {

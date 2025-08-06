@@ -3,7 +3,7 @@ service: hello-world
 provider:
   name: aws
   runtime: nodejs18.x
-  stage: dev
+  stage: ${opt:stage, 'dev'}  # Usa 'dev' por defecto si no se especifica
 
 functions:
   hello-world:
@@ -17,13 +17,26 @@ functions:
     handler: ./src/category/handlers/getCategoriesNameImageCount.handler
     events:
       - http:
-          path: categorias-imagen-cantidad
+          path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad
           method: get
           cors: true
       - http:
-          path: categorias-imagen-cantidad/usuario
+          path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad/usuario
           method: get
           cors: true
 
 plugins:
   - serverless-offline
+  - serverless-domain-manager
+  - serverless-dotenv-plugin
+
+custom:
+  endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}    # Por defecto usa 'cupcakeslife' si no encuentra el .env
+  categoryModule: ${env:CATEGORY_MODULE, 'categorias'}  # Por defecto usa 'categorias' si no encuentra el .env
+  customDomain:
+    domainName: thecupcakelife.com
+    basePath: ''                         # No agrega /prod en la ruta
+    stage: prod                          # Solo aplica en 'prod'
+    createRoute53Record: true            # (opcional) crea el registro DNS
+    endpointType: 'regional'             # Puede ser 'edge' o 'regional'
+    securityPolicy: tls_1_2

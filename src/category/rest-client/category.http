@@ -1,5 +1,6 @@
 ### Variables de prueba ###
-@rootUrl = http://localhost:3007
+@rootUrl = http://localhost:3000
+@stageDev = dev
 @appName = cupcakeslife
 @categoryModule = categorias
 
@@ -8,8 +9,8 @@ GET https://postman-echo.com/get?rootUrl={{rootUrl}}
 ### Variables de prueba ###
 
 ### GET Nombre, imagen principal y cantidad de los Registros de la tabla cupcake_categorias.
-GET {{rootUrl}}/{{appName}}/{{categoryModule}}/categorias-imagen-cantidad
+GET {{rootUrl}}/{{stageDev}}/{{appName}}/{{categoryModule}}/categorias-imagen-cantidad
 
 ### GET Nombre, imagen principal y cantidad de los Registros de la tabla cupcake_categorias que este disponibles para un usuario por id */
-GET {{rootUrl}}/{{appName}}/{{categoryModule}}/categorias-imagen-cantidad/usuario?email=asdrubaloviedo@gmail.com
+GET {{rootUrl}}/{{stageDev}}/{{appName}}/{{categoryModule}}/categorias-imagen-cantidad/usuario?email=asdrubaloviedo@gmail.com
 
