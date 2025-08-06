@@ -3,6 +3,7 @@ service: hello-world
 provider:
   name: aws
   runtime: nodejs18.x
+  stage: dev
 
 functions:
   hello-world:
@@ -17,6 +18,10 @@ functions:
     events:
       - http:
           path: categorias-imagen-cantidad
+          method: get
+          cors: true
+      - http:
+          path: categorias-imagen-cantidad/usuario
           method: get
           cors: true
 

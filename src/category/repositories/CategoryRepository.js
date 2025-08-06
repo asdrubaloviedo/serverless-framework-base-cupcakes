@@ -58,7 +58,7 @@ class CategoryRepository {
                 GROUP BY c.categoria_id, c.descripcion, im.codigo, count_items;
             `;
         const params = [lowerCaseEmail];
-        return this.categoryModel.getAllNameImageCountWithEmail({ query, params });
+        return CategoryModel.getAllNameImageCountWithEmail({ query, params });
     }
 }
 
