@@ -3,7 +3,11 @@ service: hello-world
 provider:
   name: aws
   runtime: nodejs18.x
+  region: us-east-2
   stage: ${opt:stage, 'dev'}  # Usa 'dev' por defecto si no se especifica
+  environment: # Variables disponibles dentro del código de tus funciones Lambda
+    ENDPOINT_ROOT: ${env:ENDPOINT_ROOT, 'cupcakeslife'}
+    CATEGORY_MODULE: ${env:CATEGORY_MODULE, 'categorias'}
 
 functions:
   hello-world:
@@ -13,14 +17,14 @@ functions:
           path: hello
           method: GET
   
-  getCategoriesNameImageCount:
+  getCategoriesNameImageCount: # Funcion Lambda
     handler: ./src/category/handlers/getCategoriesNameImageCount.handler
     events:
-      - http:
+      - http: # Endpoint en API Gateway REST
           path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad
           method: get
           cors: true
-      - http:
+      - http: # Endpoint en API Gateway REST
           path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad/usuario
           method: get
           cors: true
@@ -31,7 +35,7 @@ plugins:
   - serverless-dotenv-plugin
 
 custom:
-  endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}    # Por defecto usa 'cupcakeslife' si no encuentra el .env
+  endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}    # Variables disponibles en rutas o configuraciones dentro del archivo YAML
   categoryModule: ${env:CATEGORY_MODULE, 'categorias'}  # Por defecto usa 'categorias' si no encuentra el .env
   customDomain:
     domainName: thecupcakelife.com
