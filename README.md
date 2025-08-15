@@ -37,7 +37,7 @@ Url resultante: https://thecupcakelife.com/categorias-imagen-cantidad
 
 ## Contenido
 
-serverless, serverless framework, serverless-offline, serverless-domain-manager, lambda, api-gateway, module-alias
+serverless, serverless framework, serverless-offline, serverless-domain-manager, serverless-rds, lambda, api-gateway, module-alias
 
 ## Autores
 

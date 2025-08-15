@@ -8,6 +8,55 @@ provider:
   environment: # Variables disponibles dentro del código de tus funciones Lambda
     ENDPOINT_ROOT: ${env:ENDPOINT_ROOT, 'cupcakeslife'}
     CATEGORY_MODULE: ${env:CATEGORY_MODULE, 'categorias'}
+    DB_HOST: ${opt:endpoint, 'myPostgresDBInstance.c8k2hjq9x9w7.us-east-2.rds.amazonaws.com'}  # Dirección de la base de datos
+    DB_USER: "postgres"  # Usuario de la base de datos
+    DB_PASSWORD: "postgres"  # Contraseña de la base de datos
+    DB_NAME: "cupcakes"  # Nombre de la base de datos
+
+resources:
+  Resources:
+    MyPostgresDB:                       # Nombre de la instancia de la base de datos
+      Type: AWS::RDS::DBInstance
+      Properties:
+        DBInstanceClass: db.t3.micro  # El tipo de instancia, ajustable según tus necesidades
+        Engine: postgres
+        EngineVersion: "13.3"  # La versión de PostgreSQL
+        DBInstanceIdentifier: myPostgresDBInstance
+        MasterUsername: ${self:custom.db.username}  # Usuario maestro
+        MasterUserPassword: ${self:custom.db.password}  # Contraseña
+        DBName: ${self:custom.db.dbName}  # Nombre de la base de datos
+        AllocatedStorage: 20  # Tamaño del almacenamiento en GB
+        StorageType: gp2  # Tipo de almacenamiento
+        PubliclyAccessible: true  # Necesario para acceder desde tu máquina local
+        VPCSecurityGroups:
+          - Ref: MySecurityGroup
+        MultiAZ: false  # Desactivar Multi-AZ si no lo necesitas
+
+    MySecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: "Allow access to Postgres DB"
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: '5432'  # Puerto de PostgreSQL
+            ToPort: '5432'
+            CidrIp: "38.43.130.101/32"  # Sustituye con tu IPLocal/32 para permitir acceso desde PgAdmin
+
+custom:
+  db:
+    dbEndpoint: ${opt:endpoint, 'myPostgresDBInstance.c8k2hjq9x9w7.us-east-2.rds.amazonaws.com'}  # Esto toma el valor de dbEndpoint pero asigna tambien un valor por defecto si no se pasa la opción   
+    username: "postgres"              # Usuario
+    password: "postgres"              # Contraseña
+    dbName: "cupcakes"                # Nombre de la base de datos
+  endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}    # Variables disponibles en rutas o configuraciones dentro del archivo YAML
+  categoryModule: ${env:CATEGORY_MODULE, 'categorias'}  # Por defecto usa 'categorias' si no encuentra el .env
+  customDomain:
+    domainName: thecupcakelife.com
+    basePath: ''                         # No agrega /prod en la ruta
+    stage: prod                          # Solo aplica en 'prod'
+    createRoute53Record: true            # (opcional) crea el registro DNS
+    endpointType: 'regional'             # Puede ser 'edge' o 'regional'
+    securityPolicy: tls_1_2
 
 functions:
   hello-world:
@@ -33,14 +82,3 @@ plugins:
   - serverless-offline
   - serverless-domain-manager
   - serverless-dotenv-plugin
-
-custom:
-  endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}    # Variables disponibles en rutas o configuraciones dentro del archivo YAML
-  categoryModule: ${env:CATEGORY_MODULE, 'categorias'}  # Por defecto usa 'categorias' si no encuentra el .env
-  customDomain:
-    domainName: thecupcakelife.com
-    basePath: ''                         # No agrega /prod en la ruta
-    stage: prod                          # Solo aplica en 'prod'
-    createRoute53Record: true            # (opcional) crea el registro DNS
-    endpointType: 'regional'             # Puede ser 'edge' o 'regional'
-    securityPolicy: tls_1_2
