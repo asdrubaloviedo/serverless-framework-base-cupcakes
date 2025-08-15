@@ -6,7 +6,7 @@ const environment = require('@environment/environment');
 console.log('📡 DB connecting to:', {
   host: environment.DB_HOST,
   user: environment.DB_USER,
-  database: environment.DB_NAME ?? environment.DB_DATABASE,
+  database: environment.DB_NAME,
   port: environment.DB_PORT
 });
 
@@ -15,7 +15,7 @@ const config = {
   user: environment.DB_USER,
   port: environment.DB_PORT,
   password: environment.DB_PASSWORD,
-  database: environment.DB_NAME ?? environment.DB_DATABASE,
+  database: environment.DB_NAME,
   port: parseInt(environment.DB_PORT || '5432', 10)
   // SSL desactivado en local; para RDS luego debe activarse.
 };
