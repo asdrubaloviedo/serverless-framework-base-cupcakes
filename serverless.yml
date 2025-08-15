@@ -8,7 +8,8 @@ provider:
   environment: # Variables disponibles dentro del código de tus funciones Lambda
     ENDPOINT_ROOT: ${env:ENDPOINT_ROOT, 'cupcakeslife'}
     CATEGORY_MODULE: ${env:CATEGORY_MODULE, 'categorias'}
-    DB_HOST: ${opt:endpoint, 'myPostgresDBInstance.c8k2hjq9x9w7.us-east-2.rds.amazonaws.com'}  # Dirección de la base de datos
+    DB_HOST: ${env:DB_HOST, '127.0.0.1'}   # <-- usa .env en local
+    # DB_HOST: ${opt:endpoint, 'myPostgresDBInstance.c8k2hjq9x9w7.us-east-2.rds.amazonaws.com'}  # Dirección de la base de datos # <-- usa .env en dev en aws
     DB_USER: "postgres"  # Usuario de la base de datos
     DB_PASSWORD: "postgres"  # Contraseña de la base de datos
     DB_NAME: "cupcakes"  # Nombre de la base de datos
