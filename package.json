@@ -4,7 +4,11 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "start": "serverless offline start"
+    "start": "serverless offline start",
+    "start:local": "serverless offline start --stage local",
+    "deploy:dev": "serverless deploy --stage dev",
+    "remove:dev": "serverless remove --stage dev",
+    "print": "serverless print --stage local"
   },
   "author": "",
   "license": "ISC",

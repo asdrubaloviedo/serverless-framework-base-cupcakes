@@ -23,7 +23,7 @@ Url resultante: http://localhost:3000/dev/categorias-imagen-cantidad
 2.- Ambiente de desarrollo
 
 ```bash
-sls deploy --stage dev
+npm run deploy:dev
 ```
 Url resultante: https://...amazonaws.com/dev/categorias-imagen-cantidad
 

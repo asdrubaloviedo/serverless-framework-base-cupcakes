@@ -1,63 +1,50 @@
 service: hello-world
 
+custom:
+  # Stage activo (por defecto "local")
+  stage: ${opt:stage, 'local'}
+
+  # Carga .env según el stage (.env.local / .env.dev)
+  dotenv:
+    path: .env.${self:custom.stage}
+
+  # Variables de app
+  endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}
+  categoryModule: ${env:CATEGORY_MODULE, 'categorias'}
+
+  # Credenciales DB por env
+  db:
+    username: ${env:DB_USER, 'postgres'}
+    password: ${env:DB_PASSWORD, 'postgres'}
+    dbName: ${env:DB_NAME, 'cupcakes'}
+
+  # Domain manager deshabilitado por defecto (evita warnings)
+  customDomain:
+    enabled: false
+    domainName: thecupcakelife.com
+    basePath: ''
+    stage: prod
+    createRoute53Record: true
+    endpointType: regional
+    securityPolicy: tls_1_2
+
 provider:
   name: aws
   runtime: nodejs18.x
   region: us-east-2
-  stage: ${opt:stage, 'dev'}  # Usa 'dev' por defecto si no se especifica
-  environment: # Variables disponibles dentro del código de tus funciones Lambda
-    ENDPOINT_ROOT: ${env:ENDPOINT_ROOT, 'cupcakeslife'}
-    CATEGORY_MODULE: ${env:CATEGORY_MODULE, 'categorias'}
-    DB_HOST: ${env:DB_HOST, '127.0.0.1'}   # <-- usa .env en local
-    # DB_HOST: ${opt:endpoint, 'myPostgresDBInstance.c8k2hjq9x9w7.us-east-2.rds.amazonaws.com'}  # Dirección de la base de datos # <-- usa .env en dev en aws
-    DB_USER: "postgres"  # Usuario de la base de datos
-    DB_PASSWORD: "postgres"  # Contraseña de la base de datos
-    DB_NAME: "cupcakes"  # Nombre de la base de datos
+  stage: ${self:custom.stage}
 
-resources:
-  Resources:
-    MyPostgresDB:                       # Nombre de la instancia de la base de datos
-      Type: AWS::RDS::DBInstance
-      Properties:
-        DBInstanceClass: db.t3.micro  # El tipo de instancia, ajustable según tus necesidades
-        Engine: postgres
-        EngineVersion: "13.3"  # La versión de PostgreSQL
-        DBInstanceIdentifier: myPostgresDBInstance
-        MasterUsername: ${self:custom.db.username}  # Usuario maestro
-        MasterUserPassword: ${self:custom.db.password}  # Contraseña
-        DBName: ${self:custom.db.dbName}  # Nombre de la base de datos
-        AllocatedStorage: 20  # Tamaño del almacenamiento en GB
-        StorageType: gp2  # Tipo de almacenamiento
-        PubliclyAccessible: true  # Necesario para acceder desde tu máquina local
-        VPCSecurityGroups:
-          - Ref: MySecurityGroup
-        MultiAZ: false  # Desactivar Multi-AZ si no lo necesitas
+  environment:
+    # App
+    ENDPOINT_ROOT: ${self:custom.endpointRoot}
+    CATEGORY_MODULE: ${self:custom.categoryModule}
 
-    MySecurityGroup:
-      Type: AWS::EC2::SecurityGroup
-      Properties:
-        GroupDescription: "Allow access to Postgres DB"
-        SecurityGroupIngress:
-          - IpProtocol: tcp
-            FromPort: '5432'  # Puerto de PostgreSQL
-            ToPort: '5432'
-            CidrIp: "38.43.130.101/32"  # Sustituye con tu IPLocal/32 para permitir acceso desde PgAdmin
-
-custom:
-  db:
-    dbEndpoint: ${opt:endpoint, 'myPostgresDBInstance.c8k2hjq9x9w7.us-east-2.rds.amazonaws.com'}  # Esto toma el valor de dbEndpoint pero asigna tambien un valor por defecto si no se pasa la opción   
-    username: "postgres"              # Usuario
-    password: "postgres"              # Contraseña
-    dbName: "cupcakes"                # Nombre de la base de datos
-  endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}    # Variables disponibles en rutas o configuraciones dentro del archivo YAML
-  categoryModule: ${env:CATEGORY_MODULE, 'categorias'}  # Por defecto usa 'categorias' si no encuentra el .env
-  customDomain:
-    domainName: thecupcakelife.com
-    basePath: ''                         # No agrega /prod en la ruta
-    stage: prod                          # Solo aplica en 'prod'
-    createRoute53Record: true            # (opcional) crea el registro DNS
-    endpointType: 'regional'             # Puede ser 'edge' o 'regional'
-    securityPolicy: tls_1_2
+    # DB (usamos SIEMPRE .env para no romper offline)
+    DB_HOST: ${env:DB_HOST, '127.0.0.1'}
+    DB_PORT: ${env:DB_PORT, '5432'}
+    DB_USER: ${env:DB_USER, 'postgres'}
+    DB_PASSWORD: ${env:DB_PASSWORD, 'postgres'}
+    DB_NAME: ${env:DB_NAME, 'cupcakes'}
 
 functions:
   hello-world:
@@ -66,15 +53,15 @@ functions:
       - http:
           path: hello
           method: GET
-  
-  getCategoriesNameImageCount: # Funcion Lambda
+
+  getCategoriesNameImageCount:
     handler: ./src/category/handlers/getCategoriesNameImageCount.handler
     events:
-      - http: # Endpoint en API Gateway REST
+      - http:
           path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad
           method: get
           cors: true
-      - http: # Endpoint en API Gateway REST
+      - http:
           path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad/usuario
           method: get
           cors: true
@@ -83,3 +70,45 @@ plugins:
   - serverless-offline
   - serverless-domain-manager
   - serverless-dotenv-plugin
+
+resources:
+  Conditions:
+    IsDev:
+      Fn::Equals:
+        - ${self:custom.stage}
+        - dev
+
+  Resources:
+    # RDS SOLO en dev
+    MyPostgresDB:
+      Type: AWS::RDS::DBInstance
+      Condition: IsDev
+      Properties:
+        DBInstanceClass: db.t3.micro
+        Engine: postgres
+        EngineVersion: "17.6"
+        DBInstanceIdentifier: ${self:service}-${self:custom.stage}-db
+        MasterUsername: ${self:custom.db.username}
+        MasterUserPassword: ${self:custom.db.password}
+        DBName: ${self:custom.db.dbName}
+        AllocatedStorage: 20
+        StorageType: gp2
+        PubliclyAccessible: true
+        VPCSecurityGroups:
+          - Ref: MySecurityGroup
+        MultiAZ: false
+        DeletionProtection: false
+        BackupRetentionPeriod: 1
+        AutoMinorVersionUpgrade: true
+
+    MySecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Condition: IsDev
+      Properties:
+        GroupDescription: "Allow access to Postgres DB (dev)"
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 5432
+            ToPort: 5432
+            # ⚠️ Reemplaza por tu IP pública en /32 para dev
+            CidrIp: "38.43.130.101/32"

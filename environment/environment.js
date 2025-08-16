@@ -9,5 +9,6 @@ module.exports = {
   DB_NAME: process.env.DB_NAME,
   DB_PORT: process.env.DB_PORT,
   APP_PORT: process.env.APP_PORT,
-  ENDPOINT_ROOT: process.env.ENDPOINT_ROOT
+  ENDPOINT_ROOT: process.env.ENDPOINT_ROOT,
+  CATEGORY_MODULE: process.env.CATEGORY_MODULE
 };

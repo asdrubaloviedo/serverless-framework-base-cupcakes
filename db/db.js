@@ -18,6 +18,7 @@ const config = {
   database: environment.DB_NAME,
   port: parseInt(environment.DB_PORT || '5432', 10)
   // SSL desactivado en local; para RDS luego debe activarse.
+  // ssl: { rejectUnauthorized: false }
 };
 
 const db = pgp(config);
