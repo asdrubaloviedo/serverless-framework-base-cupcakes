@@ -25,7 +25,7 @@ Url resultante: http://localhost:3000/dev/categorias-imagen-cantidad
 ```bash
 npm run deploy:dev
 ```
-Url resultante: https://...amazonaws.com/dev/categorias-imagen-cantidad
+Url resultante: https://4s12t4rvt4.execute-api.us-east-2.amazonaws.com/dev/cupcakeslife/categorias/categorias-imagen-cantidad
 
 3.- Ambiente de produccion
 
