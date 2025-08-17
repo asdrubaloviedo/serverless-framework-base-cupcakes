@@ -11,8 +11,10 @@ console.log('📡 DB connecting to:', {
 });
 
 // Habilitar SSL cuando corremos en Lambda o si lo fuerzas con PGSSLMODE=require
-const shouldUseSSL =
-  (process.env.PGSSLMODE || '').toLowerCase() === 'require' || !!process.env.AWS_REGION; // típico en Lambda
+const ssl =
+  (process.env.PGSSLMODE || environment.PGSSLMODE) === 'require'
+    ? { rejectUnauthorized: false }
+    : false;
 
 const config = {
   host: environment.DB_HOST,
@@ -20,7 +22,7 @@ const config = {
   password: environment.DB_PASSWORD,
   database: environment.DB_NAME,
   port: parseInt(environment.DB_PORT || '5432', 10),
-  ssl: shouldUseSSL ? { rejectUnauthorized: false } : false
+  ssl
   // Para prod estricto, usa el CA de RDS y pon: ssl: { ca: fs.readFileSync('rds-combined-ca-bundle.pem'), rejectUnauthorized: true }
 };
 

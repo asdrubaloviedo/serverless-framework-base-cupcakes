@@ -1,6 +1,3 @@
-// Cargar dotenv y especificar la ruta del archivo .env(Si estuviera en la raiz no seria necesario el config)
-require('dotenv').config();
-
 // Dejamos publico todas las variables del ambiente de trabajo
 module.exports = {
   DB_HOST: process.env.DB_HOST,

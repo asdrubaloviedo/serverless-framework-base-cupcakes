@@ -1,4 +1,5 @@
 service: hello-world
+useDotenv: true  # Carga .env y .env.<stage> automáticamente
 
 params:
   dev:
@@ -7,41 +8,20 @@ params:
     SubnetIdB: subnet-09747a532ca000dc2
 
 custom:
-  # Stage activo (por defecto "local")
   stage: ${opt:stage, 'local'}
-
-  # Cargar .env según el stage (.env.local / .env.dev)
-  dotenv:
-    path: .env.${self:custom.stage}
-
-  # Variables de app
   endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}
   categoryModule: ${env:CATEGORY_MODULE, 'categorias'}
-
-  # Credenciales DB unificadas
   db:
     username: ${env:DB_USER, 'postgres'}
     password: ${env:DB_PASSWORD, 'postgres'}
     dbName:    ${env:DB_NAME, 'cupcakes'}
 
-  # Domain manager deshabilitado por defecto
-  customDomain:
-    enabled: false
-    domainName: thecupcakelife.com
-    basePath: ''
-    stage: prod
-    createRoute53Record: true
-    endpointType: regional
-    securityPolicy: tls_1_2
-
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs22.x
   region: us-east-2
   stage: ${self:custom.stage}
 
-  # En DEV, las Lambdas se ejecutarán dentro de la VPC indicada.
-  # Para que "local" no se rompa, dejamos defaults inofensivos.
   vpc:
     securityGroupIds:
       - Ref: MyLambdaSecurityGroup
@@ -50,17 +30,14 @@ provider:
       - ${param:SubnetIdB, 'subnet-00000000000000000'}
 
   environment:
-    # App
     ENDPOINT_ROOT: ${self:custom.endpointRoot}
     CATEGORY_MODULE: ${self:custom.categoryModule}
-
-    # DB (usamos .env para ambos stages)
     DB_HOST: ${env:DB_HOST, '127.0.0.1'}
     DB_PORT: ${env:DB_PORT, '5432'}
     DB_USER: ${env:DB_USER, 'postgres'}
     DB_PASSWORD: ${env:DB_PASSWORD, 'postgres'}
     DB_NAME: ${env:DB_NAME, 'cupcakes'}
-    PGSSLMODE: require
+    PGSSLMODE: ${env:PGSSLMODE, 'require'}
 
 functions:
   hello-world:
@@ -84,8 +61,8 @@ functions:
 
 plugins:
   - serverless-offline
-  - serverless-domain-manager
-  - serverless-dotenv-plugin
+  # - serverless-domain-manager # Desabilitado hasta que lo necesite
+  # (ya NO usamos serverless-dotenv-plugin por que node 22 lo maneja de forma nativa)
 
 resources:
   Conditions:
@@ -95,46 +72,39 @@ resources:
         - dev
 
   Resources:
-    # Subnet Group para RDS (usa 2 subnets en AZ distintas)
     MyDbSubnetGroup:
       Type: AWS::RDS::DBSubnetGroup
       Condition: IsDev
       Properties:
         DBSubnetGroupDescription: "Subnet group RDS (dev)"
         SubnetIds:
-          - ${param:SubnetIdA}
-          - ${param:SubnetIdB}
+          - ${param:SubnetIdA, 'subnet-00000000000000000'}
+          - ${param:SubnetIdB, 'subnet-00000000000000000'}
 
-    # SG para las Lambdas dentro de la VPC
     MyLambdaSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Condition: IsDev
       Properties:
         GroupDescription: "Lambda SG (dev)"
-        VpcId: ${param:VpcId}
+        VpcId: ${param:VpcId, 'vpc-00000000000000000'}
 
-    # SG de la RDS: permite desde tu IP y desde el SG de Lambda
     MySecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Condition: IsDev
       Properties:
         GroupDescription: "Allow access to Postgres DB (dev)"
-        VpcId: ${param:VpcId}
+        VpcId: ${param:VpcId, 'vpc-00000000000000000'}
         SecurityGroupIngress:
-          # Acceso directo desde tu IP pública (para pruebas desde tu PC)
           - IpProtocol: tcp
             FromPort: 5432
             ToPort: 5432
-            # ⚠️ Reemplaza por tu IP pública /32
             CidrIp: "38.43.130.101/32"
-          # Acceso desde las Lambdas en la VPC (SG -> SG)
           - IpProtocol: tcp
             FromPort: 5432
             ToPort: 5432
             SourceSecurityGroupId:
               Ref: MyLambdaSecurityGroup
 
-    # Instancia RDS PostgreSQL
     MyPostgresDB:
       Type: AWS::RDS::DBInstance
       Condition: IsDev
