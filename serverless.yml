@@ -1,10 +1,16 @@
 service: hello-world
 
+params:
+  dev:
+    VpcId: vpc-02b24c56982844a6f
+    SubnetIdA: subnet-0e533b15b927c27d5
+    SubnetIdB: subnet-09747a532ca000dc2
+
 custom:
   # Stage activo (por defecto "local")
   stage: ${opt:stage, 'local'}
 
-  # Carga .env según el stage (.env.local / .env.dev)
+  # Cargar .env según el stage (.env.local / .env.dev)
   dotenv:
     path: .env.${self:custom.stage}
 
@@ -12,13 +18,13 @@ custom:
   endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}
   categoryModule: ${env:CATEGORY_MODULE, 'categorias'}
 
-  # Credenciales DB por env
+  # Credenciales DB unificadas
   db:
     username: ${env:DB_USER, 'postgres'}
     password: ${env:DB_PASSWORD, 'postgres'}
-    dbName: ${env:DB_NAME, 'cupcakes'}
+    dbName:    ${env:DB_NAME, 'cupcakes'}
 
-  # Domain manager deshabilitado por defecto (evita warnings)
+  # Domain manager deshabilitado por defecto
   customDomain:
     enabled: false
     domainName: thecupcakelife.com
@@ -34,17 +40,27 @@ provider:
   region: us-east-2
   stage: ${self:custom.stage}
 
+  # En DEV, las Lambdas se ejecutarán dentro de la VPC indicada.
+  # Para que "local" no se rompa, dejamos defaults inofensivos.
+  vpc:
+    securityGroupIds:
+      - Ref: MyLambdaSecurityGroup
+    subnetIds:
+      - ${param:SubnetIdA, 'subnet-00000000000000000'}
+      - ${param:SubnetIdB, 'subnet-00000000000000000'}
+
   environment:
     # App
     ENDPOINT_ROOT: ${self:custom.endpointRoot}
     CATEGORY_MODULE: ${self:custom.categoryModule}
 
-    # DB (usamos SIEMPRE .env para no romper offline)
+    # DB (usamos .env para ambos stages)
     DB_HOST: ${env:DB_HOST, '127.0.0.1'}
     DB_PORT: ${env:DB_PORT, '5432'}
     DB_USER: ${env:DB_USER, 'postgres'}
     DB_PASSWORD: ${env:DB_PASSWORD, 'postgres'}
     DB_NAME: ${env:DB_NAME, 'cupcakes'}
+    PGSSLMODE: require
 
 functions:
   hello-world:
@@ -79,7 +95,46 @@ resources:
         - dev
 
   Resources:
-    # RDS SOLO en dev
+    # Subnet Group para RDS (usa 2 subnets en AZ distintas)
+    MyDbSubnetGroup:
+      Type: AWS::RDS::DBSubnetGroup
+      Condition: IsDev
+      Properties:
+        DBSubnetGroupDescription: "Subnet group RDS (dev)"
+        SubnetIds:
+          - ${param:SubnetIdA}
+          - ${param:SubnetIdB}
+
+    # SG para las Lambdas dentro de la VPC
+    MyLambdaSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Condition: IsDev
+      Properties:
+        GroupDescription: "Lambda SG (dev)"
+        VpcId: ${param:VpcId}
+
+    # SG de la RDS: permite desde tu IP y desde el SG de Lambda
+    MySecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Condition: IsDev
+      Properties:
+        GroupDescription: "Allow access to Postgres DB (dev)"
+        VpcId: ${param:VpcId}
+        SecurityGroupIngress:
+          # Acceso directo desde tu IP pública (para pruebas desde tu PC)
+          - IpProtocol: tcp
+            FromPort: 5432
+            ToPort: 5432
+            # ⚠️ Reemplaza por tu IP pública /32
+            CidrIp: "38.43.130.101/32"
+          # Acceso desde las Lambdas en la VPC (SG -> SG)
+          - IpProtocol: tcp
+            FromPort: 5432
+            ToPort: 5432
+            SourceSecurityGroupId:
+              Ref: MyLambdaSecurityGroup
+
+    # Instancia RDS PostgreSQL
     MyPostgresDB:
       Type: AWS::RDS::DBInstance
       Condition: IsDev
@@ -94,21 +149,17 @@ resources:
         AllocatedStorage: 20
         StorageType: gp2
         PubliclyAccessible: true
+        MultiAZ: false
+        AutoMinorVersionUpgrade: true
+        BackupRetentionPeriod: 1
+        DBSubnetGroupName:
+          Ref: MyDbSubnetGroup
         VPCSecurityGroups:
           - Ref: MySecurityGroup
-        MultiAZ: false
-        DeletionProtection: false
-        BackupRetentionPeriod: 1
-        AutoMinorVersionUpgrade: true
 
-    MySecurityGroup:
-      Type: AWS::EC2::SecurityGroup
+  Outputs:
+    RdsEndpoint:
       Condition: IsDev
-      Properties:
-        GroupDescription: "Allow access to Postgres DB (dev)"
-        SecurityGroupIngress:
-          - IpProtocol: tcp
-            FromPort: 5432
-            ToPort: 5432
-            # ⚠️ Reemplaza por tu IP pública en /32 para dev
-            CidrIp: "38.43.130.101/32"
+      Description: "RDS endpoint (host)"
+      Value:
+        Fn::GetAtt: [ MyPostgresDB, Endpoint.Address ]
