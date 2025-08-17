@@ -16,7 +16,7 @@ npm install
 1.- Ambiente local
 
 ```bash
-npm run start 
+npm run start:local
 ```
 Url resultante: http://localhost:3000/dev/categorias-imagen-cantidad
 
