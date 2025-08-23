@@ -21,7 +21,7 @@ GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{categoryModule}}/categorias-imagen
 
 ### GET Nombre, imagen principal y cantidad de los Registros de la tabla cupcake_categorias que este disponibles para un usuario por id */
 ### Local
-GET {{rootUrlLocal}}/{{stageDev}}/{{appName}}/{{categoryModule}}/categorias-imagen-cantidad/usuario?email=asdrubaloviedo@gmail.com
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{categoryModule}}/categorias-imagen-cantidad/usuario?email=asdrubaloviedo@gmail.com
 ### Desarrollo
 GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{categoryModule}}/categorias-imagen-cantidad/usuario?email=asdrubaloviedo@gmail.com
 
