@@ -1,4 +1,3 @@
-// src/category/handlers/getCategoriesNameImageCount.js
 require('module-alias/register');
 const CategoryController = require('@category/controller/category');
 

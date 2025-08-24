@@ -1,0 +1,17 @@
+hello-world:
+  handler: ./src/category/handlers/helloWord.hello
+  events:
+    - http:
+        path: hello
+        method: GET
+category:
+  handler: ./src/category/handlers/category.handler
+  events:
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad
+        method: get
+        cors: true
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad/usuario
+        method: get
+        cors: true

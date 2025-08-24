@@ -1,0 +1,2 @@
+hello-world: ${file(./src/category/lambda/category.yml):hello-world}
+category: ${file(./src/category/lambda/category.yml):category}

@@ -11,6 +11,12 @@ custom:
   stage: ${opt:stage, 'local'}
   endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}
   categoryModule: ${env:CATEGORY_MODULE, 'categorias'}
+  cupcakeModule: ${env:CUPCAKE_MODULE, 'cupcakes'}
+  festivityModule: ${env:FESTIVITY_MODULE, 'festividades'}
+  ingredientModule: ${env:INGREDIENT_MODULE, 'ingredientes'}
+  packageModule: ${env:PACKAGE_MODULE, 'paquetes'}
+  recipeModule: ${env:RECIPE_MODULE, 'recipes'}
+  userModule: ${env:USER_MODULE, 'usuarios'}
   db:
     username: ${env:DB_USER, 'postgres'}
     password: ${env:DB_PASSWORD, 'postgres'}
@@ -32,6 +38,12 @@ provider:
   environment:
     ENDPOINT_ROOT: ${self:custom.endpointRoot}
     CATEGORY_MODULE: ${self:custom.categoryModule}
+    CUPCAKE_MODULE: ${self:custom.cupcakeModule}
+    FESTIVITY_MODULE: ${self:custom.festivityModule}
+    INGREDIENT_MODULE: ${self:custom.ingredientModule}
+    PACKAGE_MODULE: ${self:custom.packageModule}
+    RECIPE_MODULE: ${self:custom.recipeModule}
+    USER_MODULE: ${self:custom.userModule}
     DB_HOST: ${env:DB_HOST, '127.0.0.1'}
     DB_PORT: ${env:DB_PORT, '5432'}
     DB_USER: ${env:DB_USER, 'postgres'}
@@ -39,25 +51,7 @@ provider:
     DB_NAME: ${env:DB_NAME, 'cupcakes'}
     PGSSLMODE: ${env:PGSSLMODE, 'require'}
 
-functions:
-  hello-world:
-    handler: ./src/category/handlers/helloWord.hello
-    events:
-      - http:
-          path: hello
-          method: GET
-
-  category:
-    handler: ./src/category/handlers/category.handler
-    events:
-      - http:
-          path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad
-          method: get
-          cors: true
-      - http:
-          path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad/usuario
-          method: get
-          cors: true
+functions: ${file(./functions.yml)}
 
 plugins:
   - serverless-offline

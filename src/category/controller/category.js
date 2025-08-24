@@ -1,4 +1,3 @@
-// src/category/controller/category.js
 const { GetAllCategoriesNameImageCountCategory } = require('@category/services/category');
 
 class CategoryController {
