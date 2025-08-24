@@ -1,32 +1,22 @@
 require('module-alias/register');
 const CategoryController = require('@category/controller/category');
 
-const handler = async (event) => {
-  try {
-    const email = event.queryStringParameters?.email || null;
-    console.log('📨 Email recibido:', email);
-    const result = await CategoryController.getAllNameImageCount(email);
+const ok = (body, code = 200) => ({ statusCode: code, body: JSON.stringify(body) });
+const fail = (err) => ({ statusCode: 500, body: JSON.stringify({ message: 'Error interno del servidor', error: err?.message || String(err) }) });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        email,
-        result
-      })
-    };
-
-  } catch (error) {
-    console.error('Error en el handler:', error);
-
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: 'Error interno del servidor',
-        error: error.message || error
-      })
-    };
-  }
+const withHandler = (fn) => async (event) => {
+  try { return ok(await fn(event)); }
+  catch (e) { console.error(e); return fail(e); }
 };
+
+const handler = withHandler(async (event) => {
+  const email = event.queryStringParameters?.email || null;
+  const result = await CategoryController.getAllNameImageCount(email);
+
+  return {
+    email, result
+  };
+});
 
 module.exports = {
   handler
