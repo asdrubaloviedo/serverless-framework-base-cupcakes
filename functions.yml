@@ -1,3 +1,3 @@
 hello-world: ${file(./src/category/lambda/category.yml):hello-world}
 category: ${file(./src/category/lambda/category.yml):category}
-# cupcake: ${file(./src/cupcake/lambda/cupcake.yml):cupcake}
+cupcake: ${file(./src/cupcake/lambda/cupcake.yml):cupcake}

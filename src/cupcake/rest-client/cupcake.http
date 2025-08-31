@@ -1,0 +1,184 @@
+### Variables de prueba ###
+@rootUrlLocal = http://localhost:3000
+@rootUrlDev = https://4s12t4rvt4.execute-api.us-east-2.amazonaws.com
+@stageLocal = local
+@stageDev = dev
+@appName = cupcakeslife
+@cupcakeModule = cupcakes
+
+### Comprobar variables
+### Local
+GET https://postman-echo.com/get?rootUrl={{rootUrlLocal}}
+### Desarrollo
+GET https://postman-echo.com/get?rootUrl={{rootUrlDev}}
+### Variables de prueba ###
+
+### Prueba para ver si funciona todo el flujo.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/test
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/test
+
+### GET Registros de la tabla cupcakes.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}
+
+### GET Registros de la tabla cupcakes disponibles para un usuario por email.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/usuario?email=asdrubaloviedo@gmail.com
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/usuario?email=asdrubaloviedo@gmail.com
+
+### GET Registros de la tabla cupcakes que coincidan con los parametros especificados.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/busqueda?tiempo=33&dificultad=1&festividad=1&predominante=rosado&secundario=azul
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/busqueda?tiempo=33&dificultad=1&festividad=1&predominante=rosado&secundario=azul
+
+### GET Nombre e imagen principal de los Registros de la tabla cupcakes.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image
+
+### GET Nombre e imagen principal de los Registros de la tabla cupcakes, para un id de categoria especifico.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-categoria?categoria=4
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-categoria?categoria=4
+
+### GET Nombre e imagen principal de los Registros de la tabla cupcakes, para un id de categoria especifico que este disponibles para un usuario por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-categoria/usuario?email=asdrubaloviedo@gmail.com&categoria=4
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-categoria/usuario?email=asdrubaloviedo@gmail.com&categoria=4
+
+### GET Nombre e imagen principal de los Registros de la tabla cupcakes, para un id de usuario especifico y un estado de cupcake especifico.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-estado?email=asdrubaloviedo@gmail.com&estado=3
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-estado?email=asdrubaloviedo@gmail.com&estado=3
+
+### GET Nombre e imagen principal de los Registros de la tabla cupcakes disponibles para un usuario por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image/usuario?email=asdrubaloviedo@gmail.com
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image/usuario?email=asdrubaloviedo@gmail.com
+
+### GET Nombre e imagen principal de los Registros de la tabla cupcakes, para un id de festividad especifico.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-festividad?festividad=4
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-festividad?festividad=4
+
+### GET Nombre e imagen principal de los Registros de la tabla cupcakes, para un id de festividad especifico que este disponibles para un usuario por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-festividad/usuario?email=asdrubaloviedo@gmail.com&festividad=4
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-festividad/usuario?email=asdrubaloviedo@gmail.com&festividad=4
+
+### GET Nombre e imagen principal de los Registros de la tabla cupcakes, que pertenezcan a una pelicula.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-peliculas
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-peliculas
+
+### GET Nombre e imagen principal de los Registros de la tabla cupcakes, que pertenezcan a una pelicula que este disponibles para un usuario por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-peliculas?email=asdrubaloviedo@gmail.com
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-peliculas?email=asdrubaloviedo@gmail.com
+
+### GET Info del cupcake por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/cupcake?id=1
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/cupcake?id=1
+
+### GET Registros de la tabla cupcakes que coincidan con los parametros especificados que esten disponibles para un usuario por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/busqueda/usuario?email=asdrubaloviedo@gmail.com&tiempo=33&dificultad=1&festividad=1&predominante=rosado&secundario=azul
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/busqueda/usuario?email=asdrubaloviedo@gmail.com&tiempo=33&dificultad=1&festividad=1&predominante=rosado&secundario=azul
+
+### GET Id de 1 Registro aleatorio de la tabla cupcakes que este disponibles para un usuario por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/ramdom/usuario?email=asdrubaloviedo@gmail.com
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/ramdom/usuario?email=asdrubaloviedo@gmail.com
+
+### GET Info e imagen principal de cupcake por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/all-image?id=1
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/all-image?id=1
+
+### GET Estados de cupcake por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/estados?id=1&&email=asdrubaloviedo@gmail.com
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/estados?id=1&&email=asdrubaloviedo@gmail.com
+
+### GET Logros(cupcake_usuario_estados con estado_id=2(Hechos) y valor=true) para un id de usuario especifico.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/logros?email=asdrubaloviedo@gmail.com
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/logros?email=asdrubaloviedo@gmail.com
+
+###  POST Si el usuario, cupcake y estado no existe en la tabla cupcake_usuario_estados entonces se lo inserta con el estado false.
+### Local
+POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/insertar-cupcake-estados
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo2@gmail.com",
+  "cupcake": 11,
+  "estado": 1
+}
+
+### Desarrollo
+POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/insertar-cupcake-estados
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo2@gmail.com",
+  "cupcake": 11,
+  "estado": 1
+}
+
+### PATCH Actualizacion de estados de cupcake por usuario_id, cupcake_id y estado_id.
+### Local
+PATCH {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/actualizar-cupcake-estados
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo2@gmail.com",
+  "cupcake": 11,
+  "estado": 1,
+  "valor": false
+}
+
+### Desarrollo
+PATCH {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/actualizar-cupcake-estados
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo2@gmail.com",
+  "cupcake": 11,
+  "estado": 1,
+  "valor": false
+}
+
+### GET Id de 1 Registro aleatorio de la tabla cupcakes.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/ramdom
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/ramdom
+
+### GET Nombre e imagen principal de los Registros de la tabla cupcakes, para un id de usuario especifico y filtros especificos.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-filtros?tiempo=150&dificultad=todas&festividad=todas&colorpredominante=todos&colorsecundario=todos
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-filtros?tiempo=150&dificultad=todas&festividad=todas&colorpredominante=todos&colorsecundario=todos

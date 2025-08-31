@@ -58,6 +58,10 @@ plugins:
   # - serverless-domain-manager # Desabilitado hasta que lo necesite
   # (ya NO usamos serverless-dotenv-plugin por que node 22 lo maneja de forma nativa)
 
+package:
+  patterns:
+    - package.json
+
 resources:
   Conditions:
     IsDev:

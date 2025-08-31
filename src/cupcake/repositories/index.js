@@ -1,7 +1,9 @@
 "use strict";
 
-const CategoryRepository = require("@category/repositories/CategoryRepository");
+const CupcakeRepository = require("@cupcake/repositories/CupcakeRepository");
+const CupcakeUserStateRepository = require("@cupcake/repositories/CupcakeUserStateRepository");
 
 module.exports = {
-    CategoryRepository
+    CupcakeRepository,
+    CupcakeUserStateRepository
 }

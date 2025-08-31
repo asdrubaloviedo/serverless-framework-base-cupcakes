@@ -1,5 +1,7 @@
-const ServiceCategory = require ("@category/services/category");
+const ServiceCupcake = require ("@cupcake/services/cupcake");
+// const ServiceCupcakeUserState = require ("@cupcake/services/cupcakeUserState");
 
 module.exports = {
-    ServiceCategory
+    ServiceCupcake,
+    // ServiceCupcakeUserState
 }

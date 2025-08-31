@@ -2,6 +2,10 @@ cupcake:
   handler: ./src/cupcake/handlers/cupcake.handler
   events:
     - http:
+        path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/test
+        method: get
+        cors: true
+    - http:
         path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}
         method: get
         cors: true

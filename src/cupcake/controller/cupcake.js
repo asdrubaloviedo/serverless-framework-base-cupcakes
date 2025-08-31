@@ -1,11 +1,17 @@
-// src/category/controller/category.js
-const { GetAllCategoriesNameImageCountCategory } = require('@category/services/category');
+// const { DoTestCupcake, GetAllCupcake, GetAllNameImageCupcake, GetAllNameImageMoviesCupcake, GetByIdCupcake, GetByIdInfoImageCupcake, GetAllRamdomCupcake, GetAllNameImageFiltrosCupcake } = require('@cupcake/services/cupcake');
+// const { GetByIdCupcakeUserStateCupcake, CreateOneCupcakeUserStateCupcake, PatchOneCupcakeUserStateCupcake } = require('@cupcake/services/cupcakeUserState');
 
-class CategoryController {
+const { DoTestCupcake } = require('@cupcake/services/cupcake');
 
-  static async getAllNameImageCount(email) {
-    return GetAllCategoriesNameImageCountCategory.execute(email);
+class CupcakeController {
+
+  static async doTest() {
+    return DoTestCupcake.execute(); 
   };
+
+  // static async getAllNameImageCount(email) {
+  //   return GetAllCategoriesNameImageCountCupcake.execute(email);
+  // };
 }
 
-module.exports = CategoryController;
+module.exports = CupcakeController;

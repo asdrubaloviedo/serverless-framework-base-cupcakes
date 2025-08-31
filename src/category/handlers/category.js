@@ -1,4 +1,3 @@
-// src/category/handlers/category.handler.js
 require('module-alias/register');
 const CategoryController = require('@category/controller/category');
 
