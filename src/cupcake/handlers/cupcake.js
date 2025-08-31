@@ -37,9 +37,11 @@ const normalize = (event) => {
   return p;
 };
 
+const qs = (e) => e.queryStringParameters || {};
+
 const routes = {
   'GET /test':                    (e) => CupcakeController.doTest(null),
-  // 'GET /':                     (e) => CupcakeController.getAll(e.queryStringParameters),
+  'GET /':                        (e) => CupcakeController.getAll(qs(e)),
   // 'GET /usuario':              (e) => CupcakeController.getByUser(e.queryStringParameters?.email || null),
   // 'GET /busqueda':             (e) => CupcakeController.search(e.queryStringParameters?.q || ''),
   // 'GET /name-image':           ()  => CupcakeController.getAllNameImage(),
