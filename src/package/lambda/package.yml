@@ -1,0 +1,7 @@
+package:
+  handler: ./src/package/handlers/package.handler
+  events:
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.packageModule}/usuario-paquetes-faltantes
+        method: get
+        cors: true

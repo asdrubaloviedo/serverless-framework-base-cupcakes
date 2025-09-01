@@ -1,0 +1,20 @@
+### Variables de prueba ###
+@rootUrlLocal = http://localhost:3000
+@rootUrlDev = https://4s12t4rvt4.execute-api.us-east-2.amazonaws.com
+@stageLocal = local
+@stageDev = dev
+@appName = cupcakeslife
+@packageModule = paquetes
+
+### Comprobar variables
+### Local
+GET https://postman-echo.com/get?rootUrl={{rootUrlLocal}}
+### Desarrollo
+GET https://postman-echo.com/get?rootUrl={{rootUrlDev}}
+### Variables de prueba ###
+
+### GET Listado de paquetes que el usuario no a comprado junto con su habilitacion e imagen para un usuario por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{packageModule}}/usuario-paquetes-faltantes?email=asdrubaloviedo@gmail.com
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{packageModule}}/usuario-paquetes-faltantes?email=asdrubaloviedo@gmail.com
