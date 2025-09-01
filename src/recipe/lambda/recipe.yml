@@ -1,0 +1,7 @@
+recipe:
+  handler: ./src/recipe/handlers/recipe.handler
+  events:
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.recipeModule}/receta
+        method: get
+        cors: true
