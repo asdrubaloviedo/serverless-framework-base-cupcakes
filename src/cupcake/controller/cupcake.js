@@ -44,6 +44,45 @@ class CupcakeController {
     if (result) return result;
     return { message: 'Cupcake not found' };
   };
+
+  static async getByIdInfoImage(params = {}) {
+    const { id } = params;
+    const result = await GetByIdInfoImageCupcake.execute({ id });
+    if (result) return result;
+    return { message: 'Info and image not found' };
+  };
+
+  static async getByIdCupcakeUserState(params = {}) {
+    const { email, id } = params;
+    const result = await GetByIdCupcakeUserStateCupcake.execute({ email, id });
+    if (result) return result;
+    return { message: 'Cupcake user states were not found' };
+  };
+
+  static async createOneCupcakeUserState(params = {}) {
+    const { email, cupcake, estado } = params;
+    return CreateOneCupcakeUserStateCupcake.execute({ email, cupcake, estado });
+  };
+  
+  static async patchOneCupcakeUserState(params = {}) {
+    const { email, cupcake, estado, valor } = params;
+    return PatchOneCupcakeUserStateCupcake.execute({ email, cupcake, estado, valor });
+  };
+  
+  static async getAllRamdom() {
+    return GetAllRamdomCupcake.execute();
+  };
+  
+  static async getAllNameImageFiltros(params = {}) {
+    const {
+      tiempo,
+      dificultad,
+      festividad,
+      colorpredominante,
+      colorsecundario
+    } = params;
+    return GetAllNameImageFiltrosCupcake.execute({tiempo, dificultad, festividad, colorpredominante, colorsecundario });
+  };
 }
 
 module.exports = CupcakeController;

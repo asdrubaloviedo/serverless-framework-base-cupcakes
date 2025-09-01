@@ -39,6 +39,12 @@ const normalize = (event) => {
 
 const qs = (e) => e.queryStringParameters || {};
 
+const json = (e) => {
+  if (!e?.body) return {};
+  try { return typeof e.body === 'string' ? JSON.parse(e.body) : e.body; }
+  catch { throw { statusCode: 400, message: 'JSON inválido' }; }
+};
+
 const routes = {
   'GET /test':                          (e) => CupcakeController.doTest(null),
   'GET /':                              (e) => CupcakeController.getAll(qs(e)),
@@ -56,6 +62,13 @@ const routes = {
   'GET /cupcake':                       (e) => CupcakeController.getById(qs(e)),
   'GET /busqueda/usuario':              (e) => CupcakeController.getById(qs(e)),
   'GET /ramdom/usuario':                (e) => CupcakeController.getById(qs(e)),
+  'GET /all-image':                     (e) => CupcakeController.getByIdInfoImage(qs(e)),
+  'GET /estados':                       (e) => CupcakeController.getByIdCupcakeUserState(qs(e)),
+  'GET /logros':                        (e) => CupcakeController.getByIdCupcakeUserState(qs(e)),
+  'POST /insertar-cupcake-estados':     (e) => CupcakeController.createOneCupcakeUserState(json(e)),
+  'PATCH /actualizar-cupcake-estados':  (e) => CupcakeController.patchOneCupcakeUserState(json(e)),
+  'GET /ramdom':                        (e) => CupcakeController.getAllRamdom(qs(e)),
+  'GET /name-image-filtros':            (e) => CupcakeController.getAllNameImageFiltros(qs(e)),
 };
 
 const handler = withHandler(async (event) => {
