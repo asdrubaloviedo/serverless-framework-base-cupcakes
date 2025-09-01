@@ -2,3 +2,4 @@ hello-world: ${file(./src/category/lambda/category.yml):hello-world}
 category: ${file(./src/category/lambda/category.yml):category}
 cupcake: ${file(./src/cupcake/lambda/cupcake.yml):cupcake}
 festivity: ${file(./src/festivity/lambda/festivity.yml):festivity}
+ingredient: ${file(./src/ingredient/lambda/ingredient.yml):ingredient}

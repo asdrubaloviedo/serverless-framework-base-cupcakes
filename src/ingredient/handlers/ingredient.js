@@ -1,5 +1,5 @@
 require('module-alias/register');
-const FestivityController = require('@festivity/controller/festivity');
+const IngredientController = require('@ingredient/controller/ingredient');
 
 const ok = (body, code = 200) => ({ statusCode: code, body: JSON.stringify(body) });
 const fail = (err) => {
@@ -28,8 +28,8 @@ const normalize = (event) => {
   const root = ensureSlash(process.env.ENDPOINT_ROOT);
   p = strip(p, root);
 
-  // 3) módulo festividades (ej: /festividades)
-  const mod = ensureSlash(process.env.FESTIVITY_MODULE || 'festividades');
+  // 3) módulo ingredientes (ej: /ingredientes)
+  const mod = ensureSlash(process.env.INGREDIENT_MODULE || 'ingredientes');
   p = strip(p, mod);
 
   if (!p.startsWith('/')) p = `/${p}`;
@@ -40,12 +40,7 @@ const normalize = (event) => {
 const qs = (e) => e.queryStringParameters || {};
 
 const routes = {
-  'GET /festividades-imagen-cantidad': () => FestivityController.getAllNameImageCount(),
-  'GET /festividades-imagen-cantidad/usuario': (e) => {
-    const email = e.queryStringParameters?.email;
-    if (!email) throw { statusCode: 400, message: 'email requerido' };
-    return FestivityController.getAllNameImageCount(email);
-  },
+  'GET /ingredientes': (e) => IngredientController.getById(qs(e))
 };
 
 const handler = withHandler(async (event) => {

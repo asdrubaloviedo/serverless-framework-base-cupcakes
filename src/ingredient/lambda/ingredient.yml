@@ -1,0 +1,7 @@
+ingredient:
+  handler: ./src/ingredient/handlers/ingredient.handler
+  events:
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.ingredientModule}/ingredientes
+        method: get
+        cors: true

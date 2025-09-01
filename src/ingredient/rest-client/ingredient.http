@@ -1,0 +1,21 @@
+### Variables de prueba ###
+@rootUrlLocal = http://localhost:3000
+@rootUrlDev = https://4s12t4rvt4.execute-api.us-east-2.amazonaws.com
+@stageLocal = local
+@stageDev = dev
+@appName = cupcakeslife
+@ingredientModule = ingredientes
+
+### Comprobar variables
+### Local
+GET https://postman-echo.com/get?rootUrl={{rootUrlLocal}}
+### Desarrollo
+GET https://postman-echo.com/get?rootUrl={{rootUrlDev}}
+### Variables de prueba ###
+
+### GET Ingredientes de cupcake por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{ingredientModule}}/ingredientes?id=1
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{ingredientModule}}/ingredientes?id=1
+
