@@ -2,8 +2,9 @@ const { GetAllCategoriesNameImageCountCategory } = require('@category/services/c
 
 class CategoryController {
 
-  static async getAllNameImageCount(email) {
-    return GetAllCategoriesNameImageCountCategory.execute(email);
+  static async getAllNameImageCount(params = {}) {
+    const { email } = params;
+    return GetAllCategoriesNameImageCountCategory.execute({ email });
   };
 }
 

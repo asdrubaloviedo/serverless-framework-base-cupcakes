@@ -2,7 +2,7 @@ const { CategoryRepository } = require("@category/repositories/index");
 
 // GET Nombre, imagen principal y cantidad de los Registros de las categorias bajo diferentes parametros de filtrado
 class GetAllCategoriesNameImageCountCategory {
-    static async execute(email) {
+    static async execute({ email }) {
         const categoryRepository = new CategoryRepository();
 
         // API: '/categorias-imagen-cantidad/usuario'

@@ -37,13 +37,11 @@ const normalize = (event) => {
   return p;
 };
 
+const qs = (e) => e.queryStringParameters || {};
+
 const routes = {
-  'GET /categorias-imagen-cantidad': () => CategoryController.getAllNameImageCount(),
-  'GET /categorias-imagen-cantidad/usuario': (e) => {
-    const email = e.queryStringParameters?.email;
-    if (!email) throw { statusCode: 400, message: 'email requerido' };
-    return CategoryController.getAllNameImageCount(email);
-  },
+  'GET /categorias-imagen-cantidad': (e) => CategoryController.getAllNameImageCount(qs(e)),
+  'GET /categorias-imagen-cantidad/usuario': (e) => CategoryController.getAllNameImageCount(qs(e))
 };
 
 const handler = withHandler(async (event) => {
