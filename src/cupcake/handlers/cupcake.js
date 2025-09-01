@@ -40,13 +40,22 @@ const normalize = (event) => {
 const qs = (e) => e.queryStringParameters || {};
 
 const routes = {
-  'GET /test':                    (e) => CupcakeController.doTest(null),
-  'GET /':                        (e) => CupcakeController.getAll(qs(e)),
-  // 'GET /usuario':              (e) => CupcakeController.getByUser(e.queryStringParameters?.email || null),
-  // 'GET /busqueda':             (e) => CupcakeController.search(e.queryStringParameters?.q || ''),
-  // 'GET /name-image':           ()  => CupcakeController.getAllNameImage(),
-  // 'GET /name-image-categoria': ()  => CupcakeController.getAllNameImageCount(null),
-  // 'GET /name-image-categoria/usuario': (e) => CupcakeController.getAllNameImageCount(e.queryStringParameters?.email || null),
+  'GET /test':                          (e) => CupcakeController.doTest(null),
+  'GET /':                              (e) => CupcakeController.getAll(qs(e)),
+  'GET /usuario':                       (e) => CupcakeController.getAll(qs(e)),
+  'GET /busqueda':                      (e) => CupcakeController.getAll(qs(e)),
+  'GET /name-image':                    (e) => CupcakeController.getAllNameImage(qs(e)),
+  'GET /name-image-categoria':          (e) => CupcakeController.getAllNameImage(qs(e)),
+  'GET /name-image-categoria/usuario':  (e) => CupcakeController.getAllNameImage(qs(e)),
+  'GET /name-image-estado':             (e) => CupcakeController.getAllNameImage(qs(e)),
+  'GET /name-image/usuario':            (e) => CupcakeController.getAllNameImage(qs(e)),
+  'GET /name-image-festividad':         (e) => CupcakeController.getAllNameImage(qs(e)),
+  'GET /name-image-festividad/usuario': (e) => CupcakeController.getAllNameImage(qs(e)),
+  'GET /name-image-peliculas':          (e) => CupcakeController.getAllNameImageMovies(qs(e)),
+  'GET /name-image-peliculas/usuario':  (e) => CupcakeController.getAllNameImageMovies(qs(e)),
+  'GET /cupcake':                       (e) => CupcakeController.getById(qs(e)),
+  'GET /busqueda/usuario':              (e) => CupcakeController.getById(qs(e)),
+  'GET /ramdom/usuario':                (e) => CupcakeController.getById(qs(e)),
 };
 
 const handler = withHandler(async (event) => {
