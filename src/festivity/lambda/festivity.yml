@@ -1,0 +1,11 @@
+festivity:
+  handler: ./src/festivity/handlers/festivity.handler
+  events:
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.festivityModule}/festividades-imagen-cantidad
+        method: get
+        cors: true
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.festivityModule}/festividades-imagen-cantidad/usuario
+        method: get
+        cors: true
