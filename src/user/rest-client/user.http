@@ -1,0 +1,77 @@
+### Variables de prueba ###
+@rootUrlLocal = http://localhost:3000
+@rootUrlDev = https://4s12t4rvt4.execute-api.us-east-2.amazonaws.com
+@stageLocal = local
+@stageDev = dev
+@appName = cupcakeslife
+@userModule = usuarios
+
+### Comprobar variables
+### Local
+GET https://postman-echo.com/get?rootUrl={{rootUrlLocal}}
+### Desarrollo
+GET https://postman-echo.com/get?rootUrl={{rootUrlDev}}
+### Variables de prueba ###
+
+### POST Si el usuario no existe en la tabla usuario_medallas entonces se le inserta un registro por medalla con 0 requisitos alcanzados y con el estado false.
+### Local
+POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{userModule}}/insertar-usuario-medalla
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo9@gmail.com",
+  "medalla": 3
+}
+
+### Desarrollo
+POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{userModule}}/insertar-usuario-medalla
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo9@gmail.com",
+  "medalla": 3
+}
+
+# ### PATCH Actualizacion de requisitos de la tabla usuario_medalla.
+# PATCH {{rootUrl}}/{{appName}}/{{userModule}}/actualizar-cupcake-estados
+# Content-Type: application/json
+
+# {
+#   ??? pendiente
+# }
+
+### POST Adicion de paquetes para usuarios.
+### Local
+POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{userModule}}/insertar-usuario-paquete
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo9@gmail.com",
+  "paquete": 4
+}
+
+### Desarrollo
+POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{userModule}}/insertar-usuario-paquete
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo9@gmail.com",
+  "paquete": 4
+}
+
+### POST Adicion de usuarios nuevos a la tabla usuarios.
+### Local
+POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{userModule}}/insertar-usuario-nuevo
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo9@gmail.com"
+}
+
+### Desarrollo
+POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{userModule}}/insertar-usuario-nuevo
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo9@gmail.com"
+}
