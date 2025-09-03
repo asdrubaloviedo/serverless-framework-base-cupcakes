@@ -1,60 +1,59 @@
-// Realizaremos las validaciones con Zod
+// src/user/schema/user.js
 const z = require('zod');
 
-// const cupcakeSchema = z.object({
-//   nombre: z.string({
-//     invalid_type_error: 'Cupcake nombre must be a string',
-//     required_error: 'Cupcake nombre is required.'
-//   }),
-//   dificultad_id: z.number().int().min(1),
-//   colorPredominante: z.string({
-//     invalid_type_error: 'Cupcake colorPredominante must be a string',
-//     required_error: 'Cupcake colorPredominante is required.'
-//   }),
-//   colorSecundario: z.string({
-//     invalid_type_error: 'Cupcake colorSecundario must be a string',
-//     required_error: 'Cupcake colorSecundario is required.'
-//   }),
-//   porciones: z.number().int().min(1),
-//   tiempo: z.number().int().min(1),
-//   festividad_id: z.number().int().min(1),
-//   pelicula: z.boolean(),
-//   cupcake_acceso_id: z.number().int().min(1),
-//   paquete_id: z.number().int().min(1)
-//   // Todos los campos que no se especifican seran ignorados para evitar inyeccion de sql e intentos de modificacion del id
-// });
+// Email: trata undefined/null como vacío para forzar "required"
+const emailRequired = z.preprocess(
+  (v) => (v == null ? '' : v),
+  z.string({
+    required_error: 'User email is required.',
+    invalid_type_error: 'User email must be a string'
+  })
+    .trim()
+    .min(1, 'User email is required.')
+    .email('User email is invalid.')
+);
 
-// function validateCupcake(object) {
-//   // "safeParse" utiliza el objeto cupcakeSchema para validar todas las reglas establecidas
-//   return cupcakeSchema.safeParse(object);
-// }
+// Ids numéricos comunes
+const idRequired = (name) =>
+  z.coerce.number({ required_error: `${name} is required.` })
+    .int(`${name} must be an integer.`)
+    .min(1, `${name} must be >= 1.`);
 
-// function validatePartialCupcake(object) {
-//   // "partial" hace que los campos de cupcakeSchema no sean requeridos(Excelente para los Patch)
-//   return cupcakeSchema.partial().safeParse(object);
-// }
-
-const cupcakeUserStateSchema = z.object({
-  email: z.string({
-    invalid_type_error: 'User email must be a string',
-    required_error: 'User email is required.'
-  }),
-  cupcake: z.number().int().min(1),
-  estado: z.number().int().min(1),
-  valor: z.boolean().optional()
+// -------- Schemas por endpoint --------
+const createUserMedalSchema = z.object({
+  email: emailRequired,
+  medalla: idRequired('medalla')
 });
 
-function validateCupcakeUserState(object) {
-  return cupcakeUserStateSchema.safeParse(object);
-}
+const patchUserMedalSchema = z.object({
+  email: emailRequired,
+  cupcake: idRequired('cupcake').optional(),
+  estado:  idRequired('estado').optional(),
+  valor:   z.coerce.boolean().optional()
+})
+.refine(
+  (d) => d.cupcake !== undefined || d.estado !== undefined || d.valor !== undefined,
+  { message: 'At least one field to update is required.', path: ['update'] }
+);
 
-function validatePartialCupcakeUserState(object) {
-  return cupcakeUserStateSchema.partial().safeParse(object);
-}
+const createUserPackageSchema = z.object({
+  email: emailRequired,
+  paquete: idRequired('paquete')
+});
+
+const createUserSchema = z.object({
+  email: emailRequired
+});
+
+// -------- Export de validadores (safeParse) --------
+const validateCreateUserMedalLeage  = (o) => createUserMedalSchema.safeParse(o);
+const validatePatchUserMedalLeage   = (o) => patchUserMedalSchema.safeParse(o);
+const validateCreateUserPackage     = (o) => createUserPackageSchema.safeParse(o);
+const validateCreateUser            = (o) => createUserSchema.safeParse(o);
 
 module.exports = {
-  // validateCupcake,
-  // validatePartialCupcake,
-  validateCupcakeUserState,
-  validatePartialCupcakeUserState
+  validateCreateUserMedalLeage,
+  validatePatchUserMedalLeage,
+  validateCreateUserPackage,
+  validateCreateUser
 };

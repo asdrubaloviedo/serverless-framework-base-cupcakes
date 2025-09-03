@@ -1,5 +1,11 @@
 require('module-alias/register');
 const UserController = require('@user/controller/user');
+const {
+  validateCreateUserMedalLeage,
+  validatePatchUserMedalLeage,
+  validateCreateUserPackage,
+  validateCreateUser
+} = require('@user/schema/user');
 
 const ok = (body, code = 200) => ({ statusCode: code, body: JSON.stringify(body) });
 const fail = (err) => {
@@ -45,11 +51,27 @@ const json = (e) => {
   catch { throw { statusCode: 400, message: 'JSON inválido' }; }
 };
 
+// helper para el uso de validaciones con ZOD
+const validBody = (e, validator) => {
+  const data = json(e);
+  const res = validator(data);
+  if (!res.success) {
+    const i = res.error.issues?.[0];
+    const field = i?.path?.join('.');
+    // Uniforma mensajes "undefined"
+    const msg = (i?.code === 'invalid_type' && i?.received === 'undefined')
+      ? (field === 'email' ? 'User email is required.' : 'Field is required.')
+      : (i?.message || 'Parámetros inválidos');
+    throw { statusCode: 400, message: msg, field };
+  }
+  return res.data; // datos saneados
+};
+
 const routes = {
-  'POST /insertar-usuario-medalla':     (e) => UserController.createOneUserMedalLeage(json(e)),
-  'PATCH /actualizar-usuario-medalla':  (e) => UserController.patchOneUserMedalLeage(json(e)),
-  'POST /insertar-usuario-paquete':     (e) => UserController.createOneUserPackage(json(e)),
-  'POST /insertar-usuario-nuevo':       (e) => UserController.createOneUser(json(e)),
+  'POST /insertar-usuario-medalla':     (e) => UserController.createOneUserMedalLeage(validBody(e, validateCreateUserMedalLeage)),
+  'PATCH /actualizar-usuario-medalla':  (e) => UserController.patchOneUserMedalLeage(validBody(e, validatePatchUserMedalLeage)),
+  'POST /insertar-usuario-paquete':     (e) => UserController.createOneUserPackage(validBody(e, validateCreateUserPackage)),
+  'POST /insertar-usuario-nuevo':       (e) => UserController.createOneUser(validBody(e, validateCreateUser)),
 };
 
 const handler = withHandler(async (event) => {
