@@ -1,5 +1,9 @@
 require('module-alias/register');
 const CupcakeController = require('@cupcake/controller/cupcake');
+const {
+  validateCupcakeUserState,
+  validatePartialCupcakeUserState
+} = require('@cupcake/schema/cupcake');
 
 const ok = (body, code = 200) => ({ statusCode: code, body: JSON.stringify(body) });
 const fail = (err) => {
@@ -45,6 +49,22 @@ const json = (e) => {
   catch { throw { statusCode: 400, message: 'JSON inválido' }; }
 };
 
+// helper para el uso de validaciones con ZOD
+const validBody = (e, validator) => {
+  const data = json(e);
+  const res = validator(data);
+  if (!res.success) {
+    const i = res.error.issues?.[0];
+    const field = i?.path?.join('.');
+    // Uniforma mensajes “undefined” a “required”
+    const msg = (i?.code === 'invalid_type' && i?.received === 'undefined')
+      ? 'User email is required.'
+      : (i?.message || 'Parámetros inválidos');
+    throw { statusCode: 400, message: msg, field };
+  }
+  return res.data;
+};
+
 const routes = {
   'GET /test':                          (e) => CupcakeController.doTest(null),
   'GET /':                              (e) => CupcakeController.getAll(qs(e)),
@@ -65,8 +85,8 @@ const routes = {
   'GET /all-image':                     (e) => CupcakeController.getByIdInfoImage(qs(e)),
   'GET /estados':                       (e) => CupcakeController.getByIdCupcakeUserState(qs(e)),
   'GET /logros':                        (e) => CupcakeController.getByIdCupcakeUserState(qs(e)),
-  'POST /insertar-cupcake-estados':     (e) => CupcakeController.createOneCupcakeUserState(json(e)),
-  'PATCH /actualizar-cupcake-estados':  (e) => CupcakeController.patchOneCupcakeUserState(json(e)),
+  'POST /insertar-cupcake-estados':     (e) => CupcakeController.createOneCupcakeUserState(validBody(e, validateCupcakeUserState)),
+  'PATCH /actualizar-cupcake-estados':  (e) => CupcakeController.patchOneCupcakeUserState(validBody(e, validatePartialCupcakeUserState)),
   'GET /ramdom':                        (e) => CupcakeController.getAllRamdom(qs(e)),
   'GET /name-image-filtros':            (e) => CupcakeController.getAllNameImageFiltros(qs(e)),
 };

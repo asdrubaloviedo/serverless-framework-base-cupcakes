@@ -34,14 +34,22 @@ const z = require('zod');
 //   return cupcakeSchema.partial().safeParse(object);
 // }
 
+const emailRequired = z.preprocess(
+  (v) => (v === undefined || v === null ? '' : v),
+  z.string({
+    required_error: 'User email is required.',
+    invalid_type_error: 'User email must be a string'
+  })
+    .trim()
+    .min(1, 'User email is required.')
+    .email('User email is invalid.')
+);
+
 const cupcakeUserStateSchema = z.object({
-  email: z.string({
-    invalid_type_error: 'User email must be a string',
-    required_error: 'User email is required.'
-  }),
-  cupcake: z.number().int().min(1),
-  estado: z.number().int().min(1),
-  valor: z.boolean().optional()
+  email: emailRequired,
+  cupcake: z.coerce.number().int().min(1),
+  estado:  z.coerce.number().int().min(1),
+  valor:   z.coerce.boolean().optional()
 });
 
 function validateCupcakeUserState(object) {
