@@ -1,15 +1,30 @@
 -- Limpieza previa
-BEGIN;
-
--- Limpia en orden inverso de dependencias
-DROP TABLE IF EXISTS receta_segmentos, imagenes_cupcakes, imagenes, ingredientes,
-                      cupcakes, paquetes, cupcake_accesos, dificultades, festividades
-                      CASCADE;
-
-DROP SEQUENCE IF EXISTS receta_segmentos_id, imagen_cupcake_id, imagen_id, ingrediente_id,
-                      cupcake_id, paquete_id, cupcake_acceso_id, dificultad_id, festividad_id;
-
-COMMIT;
+drop table festividades cascade;
+drop table dificultades cascade;
+drop table cupcake_accesos cascade;
+drop table paquetes cascade;
+drop table cupcakes cascade;
+drop table ingredientes cascade;
+drop table imagenes cascade;
+drop table imagenes_cupcakes cascade;
+drop table receta_segmentos cascade;
+drop table categorias cascade;
+drop table imagenes_categorias cascade;
+drop table imagenes_festividades cascade;
+drop table imagenes_paquetes cascade;
+drop table propiedades cascade;
+drop table roles cascade;
+drop table usuario_estados cascade;
+drop table usuarios cascade;
+drop table cupcake_categorias cascade;
+drop table lugares cascade;
+drop table cupcake_estados cascade;
+drop table cupcake_usuario_estados cascade;
+drop table ligas cascade;
+drop table medallas cascade;
+drop table medallas_liga cascade;
+drop table usuario_medallas_liga cascade;
+drop table usuario_paquetes cascade;
 -- Fin de la Limpieza previa
 
 CREATE SEQUENCE festividad_id;
