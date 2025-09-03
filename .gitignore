@@ -1,7 +1,33 @@
-/node_modules
-/serverless
-/.serverless
-.serverless
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Serverless / builds
+.serverless/
+.webpack/
+dist/
+build/
+.tmp/
+temp/
+tmp/
+
+# Coverage / cache
+coverage/
+.nyc_output/
+.jest/
+jest-stare/
+jest-html-reporters-*.html
+
+# Env / credenciales
 .env
-/dist
-/undefined
+.env.*
+*.pem
+*.key
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

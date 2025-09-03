@@ -10,14 +10,18 @@
     "remove:dev": "serverless remove --stage dev",
     "print": "serverless print",
     "print:local": "serverless print --stage local",
-    "print:dev": "serverless print --stage dev"
+    "print:dev": "serverless print --stage dev",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "serverless": "^4.18.0",
     "serverless-domain-manager": "^8.0.0",
-    "serverless-offline": "^14.4.0"
+    "serverless-offline": "^14.4.0",
+    "jest": "^30.0.4"
   },
   "_moduleAliases": {
     "@models": "models",

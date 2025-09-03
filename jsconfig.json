@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@environment/*": ["environment/*"],
+      "@src/*": ["src/*"],
+      "@category/*": ["src/category/*"],
+      "@cupcake/*": ["src/cupcake/*"],
+      "@festivity/*": ["src/festivity/*"],
+      "@ingredient/*": ["src/ingredient/*"],
+      "@package/*": ["src/package/*"],
+      "@recipe/*": ["src/recipe/*"],
+      "@user/*": ["src/user/*"]
+    }
+  },
+  "include": ["src", "environment"]
+}
