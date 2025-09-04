@@ -1,4 +1,4 @@
-const ServiceFestivity = requiere ("@festivity/services/festivity");
+const ServiceFestivity = require ("@festivity/services/festivity");
 
 module.exports = {
     ServiceFestivity
