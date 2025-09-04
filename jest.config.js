@@ -21,7 +21,8 @@ module.exports = {
   collectCoverageFrom: [
     'src/category/**/*.js',
     'src/category/handlers/helloWord.js',
-    'src/festivity/**/*.js'
+    'src/festivity/**/*.js',
+    'src/ingredient/**/*.js'
   ],
   coverageReporters: ['text', 'lcov'],
   coverageThreshold: {
