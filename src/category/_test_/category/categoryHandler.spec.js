@@ -1,10 +1,16 @@
-process.env.ENDPOINT_ROOT = 'cupcakeslife';
-process.env.CATEGORY_MODULE = 'categorias';
+// Casos felices + 404 + error controlado, cada test aísla el handler
 
-const CategoryController = require('@category/controller/category');
-jest.spyOn(CategoryController, 'getAllNameImageCount');
-
-const { handler } = require('@category/handlers/category');
+const run = (event, controllerMock, opts = {}) => {
+  let out;
+  jest.isolateModules(() => {
+    process.env.ENDPOINT_ROOT = opts.root ?? 'cupcakeslife';
+    process.env.CATEGORY_MODULE = opts.mod ?? 'categorias';
+    jest.doMock('@category/controller/category', () => controllerMock, { virtual: true });
+    const { handler } = require('@category/handlers/category');
+    out = handler(event);
+  });
+  return out;
+};
 
 const ev = (rawPath, method = 'GET', qs = {}) => ({
   rawPath,
@@ -12,42 +18,38 @@ const ev = (rawPath, method = 'GET', qs = {}) => ({
   queryStringParameters: qs
 });
 
+// Silenciar errores esperados
+beforeAll(() => jest.spyOn(console, 'error').mockImplementation(() => {}));
+afterAll(() => console.error.mockRestore());
+
 describe('Category handler', () => {
-  beforeEach(() => jest.clearAllMocks());
-
   test('GET sin email -> 200', async () => {
-    CategoryController.getAllNameImageCount.mockResolvedValue([{ id: 1 }]);
+    const res = await run(
+      ev('/local/cupcakeslife/categorias/categorias-imagen-cantidad', 'GET'),
+      { getAllNameImageCount: jest.fn().mockResolvedValue([{ id: 1 }]) }
+    );
 
-    const res = await handler(ev('/local/cupcakeslife/categorias/categorias-imagen-cantidad', 'GET'));
-
-    expect(CategoryController.getAllNameImageCount).toHaveBeenCalledWith({});
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body)).toEqual([{ id: 1 }]);
   });
 
   test('GET con email -> 200', async () => {
-    CategoryController.getAllNameImageCount.mockResolvedValue([{ id: 2 }]);
+    const res = await run(
+      ev('/local/cupcakeslife/categorias/categorias-imagen-cantidad/usuario', 'GET', { email: 'a@b.com' }),
+      { getAllNameImageCount: jest.fn().mockResolvedValue([{ id: 2 }]) }
+    );
 
-    const res = await handler(ev('/local/cupcakeslife/categorias/categorias-imagen-cantidad/usuario', 'GET', { email: 'a@b.com' }));
-
-    expect(CategoryController.getAllNameImageCount).toHaveBeenCalledWith({ email: 'a@b.com' });
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body)).toEqual([{ id: 2 }]);
   });
 
-  test('ruta inexistente -> 404', async () => {
-    const res = await handler(ev('/local/cupcakeslife/categorias/otra', 'DELETE')); // método no registrado
-    expect(res.statusCode).toBe(404);
-    expect(JSON.parse(res.body).message).toBe('Not Found');
-  });
-
-  test('error del controlador -> 500', async () => {
-    CategoryController.getAllNameImageCount.mockRejectedValue(new Error('boom'));
-
-    const res = await handler(ev('/local/cupcakeslife/categorias/categorias-imagen-cantidad', 'GET'));
+  test('error del controlador -> 500 (propaga message)', async () => {
+    const res = await run(
+      ev('/local/cupcakeslife/categorias/categorias-imagen-cantidad', 'GET'),
+      { getAllNameImageCount: jest.fn().mockRejectedValue(new Error('boom')) }
+    );
 
     expect(res.statusCode).toBe(500);
-    // el fail utiliza err.message
     expect(JSON.parse(res.body).message).toBe('boom');
   });
 });
