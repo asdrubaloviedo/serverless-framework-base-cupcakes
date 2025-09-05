@@ -24,7 +24,8 @@ module.exports = {
     'src/festivity/**/*.js',
     'src/ingredient/**/*.js',
     'src/package/**/*.js',
-    'src/recipe/**/*.js'
+    'src/recipe/**/*.js',
+    'src/user/**/*.js'
   ],
   coverageReporters: ['text', 'lcov'],
   coverageThreshold: {

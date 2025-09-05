@@ -1,6 +1,6 @@
-const ServiceUserMedalLeage = requiere ("@user/services/userMedalLeage");
-const ServiceUserPackage = requiere ("@user/services/userPackage");
-const ServiceUser = requiere ("@user/services/user");
+const ServiceUserMedalLeage = require ("@user/services/userMedalLeage");
+const ServiceUserPackage = require ("@user/services/userPackage");
+const ServiceUser = require ("@user/services/user");
 
 module.exports = {
     ServiceUserMedalLeage,
