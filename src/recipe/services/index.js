@@ -1,4 +1,4 @@
-const ServiceRecipe = requiere ("@recipe/services/recipe");
+const ServiceRecipe = require ("@recipe/services/recipe");
 
 module.exports = {
     ServiceRecipe

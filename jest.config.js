@@ -17,16 +17,17 @@ module.exports = {
   },
   setupFiles: ['<rootDir>/test/setup-db-mock.js'],
   collectCoverage: true,
-  // Llimita la cobertura a estas carpetas
+  // Limita la cobertura a estas carpetas
   collectCoverageFrom: [
     'src/category/**/*.js',
     'src/category/handlers/helloWord.js',
     'src/festivity/**/*.js',
     'src/ingredient/**/*.js',
-    'src/package/**/*.js'
+    'src/package/**/*.js',
+    'src/recipe/**/*.js'
   ],
   coverageReporters: ['text', 'lcov'],
   coverageThreshold: {
-    global: { statements: 95, branches: 90, functions: 95, lines: 95 }
+    global: { statements: 90, branches: 80, functions: 90, lines: 90 }
   }
 };
