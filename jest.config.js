@@ -21,6 +21,7 @@ module.exports = {
   collectCoverageFrom: [
     'src/category/**/*.js',
     'src/category/handlers/helloWord.js',
+    'src/cupcake/**/*.js',
     'src/festivity/**/*.js',
     'src/ingredient/**/*.js',
     'src/package/**/*.js',
