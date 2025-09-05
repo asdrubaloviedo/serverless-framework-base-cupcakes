@@ -22,7 +22,8 @@ module.exports = {
     'src/category/**/*.js',
     'src/category/handlers/helloWord.js',
     'src/festivity/**/*.js',
-    'src/ingredient/**/*.js'
+    'src/ingredient/**/*.js',
+    'src/package/**/*.js'
   ],
   coverageReporters: ['text', 'lcov'],
   coverageThreshold: {
