@@ -1,53 +1,81 @@
-name: CI – Node + Jest
+# .github/workflows/ci.yml
+name: CI – Serverless (Node + Jest)
 
 on:
   push:
-    branches: [development, 'feature/**']
+    branches:
+      - development
+      - 'feature/**'
   pull_request:
-    branches: [development]
-  workflow_dispatch:
+    branches:
+      - development
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-latest
-    env:
-      CI: true
-      FORCE_COLOR: 1
-      NODE_ENV: test
-      NPM_CONFIG_LOGLEVEL: error
+    timeout-minutes: 20
+
     steps:
-      - name: 🧰 Checkout
+      - name: ⬇️ Checkout
         uses: actions/checkout@v4
 
-      - name: 🔧 Setup Node
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: 18.x
+          cache: npm
 
-      - name: ⬇️ Install dependencies
+      - name: 📦 Install deps
         run: |
-          echo "::group::Install"
-          npm ci --silent --no-progress
+          echo "::group::npm install"
+          npm ci || npm install
           echo "::endgroup::"
 
       - name: 🧪 Run tests (Jest)
+        env:
+          CI: "true"
         run: |
-          echo "::group::Jest Output"
-          npm test --silent -- --color --verbose
+          echo "::group::jest"
+          npm test --silent -- --coverage
           echo "::endgroup::"
 
-      - name: 📊 Coverage summary
-        if: always()
-        run: |
-          if [ -f coverage/coverage-summary.json ]; then
-            node -e "const s=require('./coverage/coverage-summary.json').total; console.log('::notice title=Coverage::Statements '+s.statements.pct+'% • Branches '+s.branches.pct+'% • Functions '+s.functions.pct+'% • Lines '+s.lines.pct+'%');"
-          fi
-
-      - name: ⬆️ Upload coverage artifact
+      - name: 📈 Upload coverage artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage/
           if-no-files-found: ignore
+          retention-days: 7
+
+      - name: 🧰 Install Serverless CLI
+        run: npm i -g serverless
+
+      - name: 🧱 Serverless package (compile CFN)
+        run: |
+          echo "::group::serverless package"
+          npx serverless package --stage dev
+          echo "::endgroup::"
+
+      # ---------- Optional deploy to DEV on push to development ----------
+      - name: 🔐 Configure AWS credentials
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: 🚀 Deploy (dev)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
+        run: |
+          echo "::group::serverless deploy (dev)"
+          npx serverless deploy --stage dev
+          echo "::endgroup::"
