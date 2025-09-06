@@ -10,7 +10,7 @@
 ## Instalación
 
 ```bash
-npm install
+npm install 
 ```
 
 ## Levantamiento
