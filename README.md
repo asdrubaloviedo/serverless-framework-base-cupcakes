@@ -1,3 +1,5 @@
+[![CI](https://github.com/<TU_ORG>/<TU_REPO>/actions/workflows/ci.yml/badge.svg?branch=development)](https://github.com/<TU_ORG>/<TU_REPO>/actions/workflows/ci.yml)
+
 ## Tabla de Contenidos
 
 1. [Instalación](#instalación)
