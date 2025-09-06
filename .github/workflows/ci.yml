@@ -3,12 +3,9 @@ name: CI – Serverless (Node + Jest)
 
 on:
   push:
-    branches:
-      - development
-      - 'feature/**'
+    branches: [development, 'feature/**']
   pull_request:
-    branches:
-      - development
+    branches: [development]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -55,16 +52,16 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: 🧰 Install Serverless CLI
-        run: npm i -g serverless
+      - name: 🧰 Install Serverless CLI v3 (no login)
+        run: npm i -g serverless@3
 
-      - name: 🧱 Serverless package (compile CFN)
+      - name: 🧱 Serverless package (dev)
         run: |
           echo "::group::serverless package"
-          npx serverless package --stage dev
+          serverless package --stage dev
           echo "::endgroup::"
 
-      # ---------- Optional deploy to DEV on push to development ----------
+      # Deploy sólo si haces push a development
       - name: 🔐 Configure AWS credentials
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
         uses: aws-actions/configure-aws-credentials@v4
@@ -77,5 +74,5 @@ jobs:
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
         run: |
           echo "::group::serverless deploy (dev)"
-          npx serverless deploy --stage dev
+          serverless deploy --stage dev
           echo "::endgroup::"

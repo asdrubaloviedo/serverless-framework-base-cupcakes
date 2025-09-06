@@ -1,4 +1,5 @@
 service: hello-world
+frameworkVersion: '3'
 useDotenv: true  # Carga .env y .env.<stage> automáticamente
 
 params:
