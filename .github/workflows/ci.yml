@@ -70,9 +70,9 @@ jobs:
       #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       #     aws-region: us-east-2
 
-      - name: 🚀 Deploy (dev)
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
-        run: |
-          echo "::group::serverless deploy (dev)"
-          serverless deploy --stage dev
-          echo "::endgroup::"
+      # - name: 🚀 Deploy (dev)
+      #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
+      #   run: |
+      #     echo "::group::serverless deploy (dev)"
+      #     serverless deploy --stage dev
+      #     echo "::endgroup::"
