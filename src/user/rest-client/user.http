@@ -1,6 +1,6 @@
 ### Variables de prueba ###
 @rootUrlLocal = http://localhost:3000
-@rootUrlDev = https://4s12t4rvt4.execute-api.us-east-2.amazonaws.com
+@rootUrlDev = https://api.thecupcakelife.com
 @stageLocal = local
 @stageDev = dev
 @appName = cupcakeslife

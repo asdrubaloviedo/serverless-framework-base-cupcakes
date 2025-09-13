@@ -13,7 +13,9 @@
     "print:dev": "serverless print --stage dev",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "create-domain:dev": "serverless create_domain --stage dev",
+    "delete-domain:dev": "serverless delete_domain --stage dev"
   },
   "author": "",
   "license": "ISC",

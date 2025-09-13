@@ -4,16 +4,16 @@ user:
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/insertar-usuario-medalla
         method: post
-        cors: true
+        cors: ${self:custom.corsCommon}
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/actualizar-usuario-medalla
         method: patch
-        cors: true
+        cors: ${self:custom.corsCommon}
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/insertar-usuario-paquete
         method: post
-        cors: true
+        cors: ${self:custom.corsCommon}
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/insertar-usuario-nuevo
         method: post
-        cors: true
+        cors: ${self:custom.corsCommon}

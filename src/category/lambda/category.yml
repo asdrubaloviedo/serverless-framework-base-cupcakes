@@ -10,8 +10,8 @@ category:
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad
         method: get
-        cors: true
+        cors: ${self:custom.corsCommon}
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.categoryModule}/categorias-imagen-cantidad/usuario
         method: get
-        cors: true
+        cors: ${self:custom.corsCommon}

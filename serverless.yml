@@ -1,6 +1,6 @@
 service: hello-world
-frameworkVersion: '3'
-useDotenv: true  # Carga .env y .env.<stage> automáticamente
+frameworkVersion: "3"
+useDotenv: true
 
 params:
   dev:
@@ -10,6 +10,7 @@ params:
 
 custom:
   stage: ${opt:stage, 'local'}
+
   endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}
   categoryModule: ${env:CATEGORY_MODULE, 'categorias'}
   cupcakeModule: ${env:CUPCAKE_MODULE, 'cupcakes'}
@@ -18,14 +19,49 @@ custom:
   packageModule: ${env:PACKAGE_MODULE, 'paquetes'}
   recipeModule: ${env:RECIPE_MODULE, 'recipes'}
   userModule: ${env:USER_MODULE, 'usuarios'}
+
   db:
     username: ${env:DB_USER, 'postgres'}
     password: ${env:DB_PASSWORD, 'postgres'}
     dbName:    ${env:DB_NAME, 'cupcakes'}
 
+  # basePath por stage
+  basePathByStage:
+    local: local
+    dev: dev
+    prod: ""
+
+  # crear registro DNS solo en entornos remotos
+  createRecord:
+    local: false
+    dev: true
+    prod: true
+
+  # Dominio personalizado (API Gateway + CloudFront edge)
+  customDomain:
+    domainName: api.thecupcakelife.com
+    basePath: ${self:custom.basePathByStage.${self:custom.stage}}
+    stage: ${self:custom.stage}
+    endpointType: edge        # Edge requiere REST (events:http)
+    apiType: rest
+    createRoute53Record: ${self:custom.createRecord.${self:custom.stage}}
+    securityPolicy: tls_1_2
+    certificateArn: arn:aws:acm:us-east-1:823999505065:certificate/67ca50d3-f7a6-4c45-943d-b58276c70451
+
+  # CORS reusable
+  corsCommon:
+    origins:
+      - https://www.thecupcakelife.com
+      - https://thecupcakelife.com
+    headers:
+      - Content-Type
+      - Authorization
+    allowCredentials: false
+    cacheControl: 'max-age=600'
+
 provider:
   name: aws
-  runtime: nodejs22.x
+  runtime: nodejs20.x
   region: us-east-2
   stage: ${self:custom.stage}
 
@@ -56,8 +92,7 @@ functions: ${file(./functions.yml)}
 
 plugins:
   - serverless-offline
-  # - serverless-domain-manager # Desabilitado hasta que lo necesite
-  # (ya NO usamos serverless-dotenv-plugin por que node 22 lo maneja de forma nativa)
+  - serverless-domain-manager
 
 package:
   patterns:

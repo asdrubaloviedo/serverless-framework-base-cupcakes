@@ -4,4 +4,4 @@ package:
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.packageModule}/usuario-paquetes-faltantes
         method: get
-        cors: true
+        cors: ${self:custom.corsCommon}

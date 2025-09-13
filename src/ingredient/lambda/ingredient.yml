@@ -4,4 +4,4 @@ ingredient:
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.ingredientModule}/ingredientes
         method: get
-        cors: true
+        cors: ${self:custom.corsCommon}

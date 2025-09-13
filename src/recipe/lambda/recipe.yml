@@ -4,4 +4,4 @@ recipe:
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.recipeModule}/receta
         method: get
-        cors: true
+        cors: ${self:custom.corsCommon}
