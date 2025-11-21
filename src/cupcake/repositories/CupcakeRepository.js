@@ -389,57 +389,65 @@ class CupcakeRepository {
     }
 
     async getByFilters({ email, tiempo, dificultad, festividad, predominante, secundario }) {
-        let count = 2;
+        // params siempre debe seguir el mismo orden que los $n del query
+        const params = [email, tiempo]; // $1, $2
+        let count = params.length;      // ahora count = 2
 
-        const parte1 = 
-            `
-                SELECT c.cupcake_id, c.nombre, im.codigo
+        const parte1 = `
+            SELECT c.cupcake_id, c.nombre, im.codigo
+            FROM (
+                SELECT cu.cupcake_id, cu.nombre, imc.imagen_id
                 FROM (
-                    SELECT cu.cupcake_id, cu.nombre, imc.imagen_id
-                    FROM (
-                        SELECT *
-                        FROM cupcakes
-                        WHERE paquete_id IN (
+                    SELECT *
+                    FROM cupcakes
+                    WHERE paquete_id IN (
                         SELECT up.paquete_id
                         FROM usuario_paquetes AS up,
-                        usuarios AS us
+                            usuarios AS us
                         WHERE us.email = $1 AND up.usuario_id = us.usuario_id
-                        )
-                    ) AS cu 
+                    )
+                ) AS cu 
                 LEFT JOIN imagenes_cupcakes imc ON cu.cupcake_id = imc.cupcake_id 
                 WHERE 
                     (imc.main = 1) 
                     AND (cu.tiempo <= $2)
-            `;
+        `;
+
         let parte2 = '';
         if (dificultad !== undefined && dificultad !== '0') {
-            count++;
+            count++; // siguiente placeholder
             parte2 = `AND (cu.dificultad_id = $${count}) `;
+            params.push(dificultad); // este valor corresponde al $count recién usado
         }
+
         let parte3 = '';
         if (festividad !== undefined && festividad !== '0') {
             count++;
             parte3 = `AND (cu.festividad_id = $${count}) `;
+            params.push(festividad);
         }
+
         let parte4 = '';
         if (predominante !== undefined && predominante !== 'todos') {
             count++;
             parte4 = `AND (cu.colorPredominante = $${count}) `;
+            params.push(predominante);
         }
+
         let parte5 = '';
         if (secundario !== undefined && secundario !== 'todos') {
             count++;
             parte5 = `AND (cu.colorSecundario = $${count}) `;
+            params.push(secundario);
         }
-        const parte6 =
-            `
-                ) AS c
-                LEFT JOIN imagenes im ON c.imagen_id = im.imagen_id;
-            `;
+
+        const parte6 = `
+            ) AS c
+            LEFT JOIN imagenes im ON c.imagen_id = im.imagen_id;
+        `;
 
         const query = parte1 + parte2 + parte3 + parte4 + parte5 + parte6;
 
-        const params = [email, tiempo, dificultad, festividad, predominante, secundario];
         return CupcakeModel.getByFilters({ query, params });
     }
 
