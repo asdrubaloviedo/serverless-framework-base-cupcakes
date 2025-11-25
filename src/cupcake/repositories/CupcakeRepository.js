@@ -376,10 +376,10 @@ class CupcakeRepository {
                     SELECT *
                     FROM cupcakes
                     WHERE paquete_id IN (
-                    SELECT up.paquete_id
-                    FROM usuario_paquetes AS up,
-                    usuarios AS us
-                    WHERE us.email = $1 AND up.usuario_id = us.usuario_id
+                        SELECT up.paquete_id
+                        FROM usuario_paquetes AS up,
+                        usuarios AS us
+                        WHERE us.email = $1 AND up.usuario_id = us.usuario_id
                     )
                 ) as c
                 ORDER BY RANDOM() LIMIT 1;
@@ -413,20 +413,55 @@ class CupcakeRepository {
                     AND (cu.tiempo <= $2)
         `;
 
+        // -------------------- DIFICULTAD --------------------
         let parte2 = '';
-        if (dificultad !== undefined && dificultad !== '0') {
-            count++; // siguiente placeholder
-            parte2 = `AND (cu.dificultad_id = $${count}) `;
-            params.push(dificultad); // este valor corresponde al $count recién usado
+        if (dificultad !== undefined && dificultad !== null) {
+            const difNum = parseInt(dificultad, 10);
+            if (!Number.isNaN(difNum) && difNum !== 0) {
+                count++;
+                parte2 = `AND (cu.dificultad_id = $${count}) `;
+                params.push(difNum);
+            }
         }
 
+        // -------------------- FESTIVIDAD --------------------
         let parte3 = '';
-        if (festividad !== undefined && festividad !== '0') {
-            count++;
-            parte3 = `AND (cu.festividad_id = $${count}) `;
-            params.push(festividad);
+        if (festividad !== undefined && festividad !== null) {
+            const festNum = parseInt(festividad, 10);
+
+            if (!Number.isNaN(festNum)) {
+                // 0 => sin filtro (no hacemos nada)
+                if (festNum === 1) {
+                    // 1 => festividades 1 a 6
+                    // No usamos parámetros, se hardcodean los IDs
+                    parte3 = `AND (cu.festividad_id IN (1, 2, 3, 4, 5, 6)) `;
+                } else if (festNum >= 2 && festNum <= 7) {
+                    // 2 => festividad con el id 1
+                    // 3 => festividad con el id 2
+                    // 4 => festividad con el id 3
+                    // 5 => festividad con el id 4
+                    // 6 => festividad con el id 5
+                    // 7 => festividad con el id 6
+                    const mapping = {
+                        2: 1,
+                        3: 2,
+                        4: 3,
+                        5: 4,
+                        6: 5,
+                        7: 6,
+                    };
+                    const targetFestividad = mapping[festNum];
+
+                    if (targetFestividad !== undefined) {
+                        count++;
+                        parte3 = `AND (cu.festividad_id = $${count}) `;
+                        params.push(targetFestividad);
+                    }
+                }
+            }
         }
 
+        // -------------------- COLOR PREDOMINANTE --------------------
         let parte4 = '';
         if (predominante !== undefined && predominante !== 'todos') {
             count++;
@@ -434,6 +469,7 @@ class CupcakeRepository {
             params.push(predominante);
         }
 
+        // -------------------- COLOR SECUNDARIO --------------------
         let parte5 = '';
         if (secundario !== undefined && secundario !== 'todos') {
             count++;
