@@ -1,30 +1,61 @@
 -- Limpieza previa
-drop table festividades cascade;
-drop table dificultades cascade;
-drop table cupcake_accesos cascade;
-drop table paquetes cascade;
-drop table cupcakes cascade;
-drop table ingredientes cascade;
-drop table imagenes cascade;
-drop table imagenes_cupcakes cascade;
-drop table receta_segmentos cascade;
-drop table categorias cascade;
-drop table imagenes_categorias cascade;
-drop table imagenes_festividades cascade;
-drop table imagenes_paquetes cascade;
-drop table propiedades cascade;
-drop table roles cascade;
-drop table usuario_estados cascade;
-drop table usuarios cascade;
-drop table cupcake_categorias cascade;
-drop table lugares cascade;
-drop table cupcake_estados cascade;
-drop table cupcake_usuario_estados cascade;
-drop table ligas cascade;
-drop table medallas cascade;
-drop table medallas_liga cascade;
-drop table usuario_medallas_liga cascade;
-drop table usuario_paquetes cascade;
+-- Limpieza previa de tablas
+DROP TABLE IF EXISTS festividades CASCADE;
+DROP TABLE IF EXISTS dificultades CASCADE;
+DROP TABLE IF EXISTS cupcake_accesos CASCADE;
+DROP TABLE IF EXISTS paquetes CASCADE;
+DROP TABLE IF EXISTS paquete_precios CASCADE;
+DROP TABLE IF EXISTS cupcakes CASCADE;
+DROP TABLE IF EXISTS ingredientes CASCADE;
+DROP TABLE IF EXISTS imagenes CASCADE;
+DROP TABLE IF EXISTS imagenes_cupcakes CASCADE;
+DROP TABLE IF EXISTS receta_segmentos CASCADE;
+DROP TABLE IF EXISTS categorias CASCADE;
+DROP TABLE IF EXISTS imagenes_categorias CASCADE;
+DROP TABLE IF EXISTS imagenes_festividades CASCADE;
+DROP TABLE IF EXISTS imagenes_paquetes CASCADE;
+DROP TABLE IF EXISTS propiedades CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
+DROP TABLE IF EXISTS usuario_estados CASCADE;
+DROP TABLE IF EXISTS usuarios CASCADE;
+DROP TABLE IF EXISTS cupcake_categorias CASCADE;
+DROP TABLE IF EXISTS lugares CASCADE;
+DROP TABLE IF EXISTS cupcake_estados CASCADE;
+DROP TABLE IF EXISTS cupcake_usuario_estados CASCADE;
+DROP TABLE IF EXISTS ligas CASCADE;
+DROP TABLE IF EXISTS medallas CASCADE;
+DROP TABLE IF EXISTS medallas_liga CASCADE;
+DROP TABLE IF EXISTS usuario_medallas_liga CASCADE;
+DROP TABLE IF EXISTS usuario_paquetes CASCADE;
+
+-- Limpieza de secuencias
+DROP SEQUENCE IF EXISTS festividad_id CASCADE;
+DROP SEQUENCE IF EXISTS dificultad_id CASCADE;
+DROP SEQUENCE IF EXISTS cupcake_acceso_id CASCADE;
+DROP SEQUENCE IF EXISTS paquete_id CASCADE;
+DROP SEQUENCE IF EXISTS paquete_precios_id CASCADE;
+DROP SEQUENCE IF EXISTS cupcake_id CASCADE;
+DROP SEQUENCE IF EXISTS ingrediente_id CASCADE;
+DROP SEQUENCE IF EXISTS imagen_id CASCADE;
+DROP SEQUENCE IF EXISTS imagen_cupcake_id CASCADE;
+DROP SEQUENCE IF EXISTS receta_segmentos_id CASCADE;
+DROP SEQUENCE IF EXISTS categoria_id CASCADE;
+DROP SEQUENCE IF EXISTS imagen_categoria_id CASCADE;
+DROP SEQUENCE IF EXISTS imagen_festividad_id CASCADE;
+DROP SEQUENCE IF EXISTS imagen_paquete_id CASCADE;
+DROP SEQUENCE IF EXISTS propiedad_id CASCADE;
+DROP SEQUENCE IF EXISTS rol_id CASCADE;
+DROP SEQUENCE IF EXISTS estado_id CASCADE;
+DROP SEQUENCE IF EXISTS usuario_id CASCADE;
+DROP SEQUENCE IF EXISTS cupcake_categoria_id CASCADE;
+DROP SEQUENCE IF EXISTS lugar_id CASCADE;
+DROP SEQUENCE IF EXISTS cupcake_estado_id CASCADE;
+DROP SEQUENCE IF EXISTS cupcake_usuario_estado_id CASCADE;
+DROP SEQUENCE IF EXISTS liga_id CASCADE;
+DROP SEQUENCE IF EXISTS medalla_id CASCADE;
+DROP SEQUENCE IF EXISTS medalla_liga_id CASCADE;
+DROP SEQUENCE IF EXISTS usuario_medalla_liga_id CASCADE;
+DROP SEQUENCE IF EXISTS usuario_paquetes_id CASCADE;
 -- Fin de la Limpieza previa
 
 CREATE SEQUENCE festividad_id;
@@ -43,6 +74,7 @@ INSERT INTO festividades (festividad_id, descripcion)
         (5, 'Halloween'),
         (6, 'Desconocida');
 
+SELECT setval('festividad_id', 6, true);        -- Mantiene los IDs fijos hasta el 6 y ajustar la secuencia al final para que vuelva a ser automatica
 
 CREATE SEQUENCE dificultad_id;
 CREATE TABLE IF NOT EXISTS dificultades (
@@ -60,6 +92,8 @@ INSERT INTO dificultades (dificultad_id, descripcion)
         (5, 'alta'),
         (6, 'desconocida');
 
+SELECT setval('dificultad_id', 6, true);        -- Mantiene los IDs fijos hasta el 6 y ajustar la secuencia al final para que vuelva a ser automatica
+
 CREATE SEQUENCE cupcake_acceso_id;
 CREATE TABLE IF NOT EXISTS cupcake_accesos (
     cupcake_acceso_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('cupcake_acceso_id'),
@@ -72,6 +106,7 @@ INSERT INTO cupcake_accesos (cupcake_acceso_id, descripcion)
         (1, 'Gratis'),
         (2, 'Pago');
 
+SELECT setval('cupcake_acceso_id', 2, true);        -- Mantiene los IDs fijos hasta el 2 y ajustar la secuencia al final para que vuelva a ser automatica
 
 CREATE SEQUENCE paquete_id;
 CREATE TABLE IF NOT EXISTS paquetes (
@@ -88,6 +123,60 @@ INSERT INTO paquetes (paquete_id, habilitado, descripcion)
         (3, FALSE, 'Pascua basico'),
         (4, TRUE, 'Navidad basico'),
         (5, TRUE, 'Halloween basico');
+
+SELECT setval('paquete_id', 5, true);        -- Mantiene los IDs fijos hasta el 5 y ajustar la secuencia al final para que vuelva a ser automatica
+
+CREATE SEQUENCE paquete_precios_id;
+CREATE TABLE IF NOT EXISTS paquete_precios (
+    paquete_precios_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('paquete_precios_id'),
+    paquete_id INTEGER NOT NULL,
+    moneda VARCHAR(3) NOT NULL,                 -- 'USD', 'EUR', 'PEN'
+    pais VARCHAR(3) DEFAULT NULL,               -- 'US', 'PE', 'ES', o NULL para global
+    defecto BOOLEAN NOT NULL DEFAULT FALSE,
+    monto_centavos INTEGER NOT NULL,            -- precio en centavos/céntimos
+    FOREIGN KEY (paquete_id) REFERENCES paquetes(paquete_id)
+);
+ALTER SEQUENCE paquete_precios_id OWNED BY paquete_precios.paquete_precios_id;
+
+-- Un precio por (paquete, país, moneda)
+ALTER TABLE paquete_precios
+ADD CONSTRAINT uq_paquete_pais_moneda
+UNIQUE (paquete_id, pais, moneda);
+
+-- Un solo "defecto" por paquete y país (incluyendo NULL como global)
+CREATE UNIQUE INDEX uq_paquete_pais_defecto
+ON paquete_precios (paquete_id, COALESCE(pais, 'ALL'))
+WHERE defecto = TRUE;
+
+INSERT INTO paquete_precios (paquete_precios_id, paquete_id, moneda, pais, defecto, monto_centavos)
+    VALUES
+        (1, 1, 'USD', 'US', TRUE, 999),
+        (2, 2, 'USD', 'US', TRUE, 999),
+        (3, 3, 'USD', 'US', TRUE, 999),
+        (4, 4, 'USD', 'US', TRUE, 999),
+        (5, 5, 'USD', 'US', TRUE, 999),
+        (6, 1, 'EUR', 'ES', TRUE, 849),
+        (7, 2, 'EUR', 'ES', TRUE, 849),
+        (8, 3, 'EUR', 'ES', TRUE, 849),
+        (9, 4, 'EUR', 'ES', TRUE, 849),
+        (10, 5, 'EUR', 'ES', TRUE, 849),
+        (11, 1, 'PEN', 'PE', TRUE, 3499),
+        (12, 1, 'USD', 'PE', FALSE, 999),
+        (13, 1, 'EUR', 'PE', FALSE, 849),
+        (14, 2, 'PEN', 'PE', TRUE, 3499),
+        (15, 2, 'USD', 'PE', FALSE, 999),
+        (16, 2, 'EUR', 'PE', FALSE, 849),
+        (17, 3, 'PEN', 'PE', TRUE, 3499),
+        (18, 3, 'USD', 'PE', FALSE, 999),
+        (19, 3, 'EUR', 'PE', FALSE, 849),
+        (20, 4, 'PEN', 'PE', TRUE, 3499),
+        (21, 4, 'USD', 'PE', FALSE, 999),
+        (22, 4, 'EUR', 'PE', FALSE, 849),
+        (23, 5, 'PEN', 'PE', TRUE, 3499),
+        (24, 5, 'USD', 'PE', FALSE, 999),
+        (25, 5, 'EUR', 'PE', FALSE, 849);
+
+SELECT setval('paquete_precios_id', 25, true);        -- Mantiene los IDs fijos hasta el 25 y ajustar la secuencia al final para que vuelva a ser automatica
 
 CREATE SEQUENCE cupcake_id;
 CREATE TABLE IF NOT EXISTS cupcakes (
@@ -175,7 +264,6 @@ INSERT INTO cupcakes (nombre, dificultad_id, colorPredominante, colorSecundario,
         ('Muffins de turrón de Jijona', 1, 'marron', 'marron', 12, 45, 4, FALSE, 2, 4),
         ('Magdalenas de turrón de Jijona', 1, 'marron', 'marron', 12, 90, 4, FALSE, 2, 4),
         ('Cupcakes de vainilla navideños', 3, 'verde', 'verde', 12, 45, 4, FALSE, 2, 4);
-
 
 CREATE SEQUENCE ingrediente_id;
 CREATE TABLE IF NOT EXISTS ingredientes (
@@ -1098,6 +1186,8 @@ INSERT INTO imagenes (imagen_id, codigo)
         (226, 'https://storage.googleapis.com/cupcakeslife/FrTHWW37TR.png'),
         (227, 'https://storage.googleapis.com/cupcakeslife/ZU2XaWE0Cn.png');
 
+SELECT setval('imagen_id', 227, true);        -- Mantiene los IDs fijos hasta el 227 y ajustar la secuencia al final para que vuelva a ser automatica
+
 CREATE SEQUENCE imagen_cupcake_id;
 CREATE TABLE IF NOT EXISTS imagenes_cupcakes (
     imagen_cupcake_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('imagen_cupcake_id'),
@@ -1939,6 +2029,8 @@ INSERT INTO categorias (categoria_id, descripcion)
         (5, 'Vegano'),
         (6, 'Dietetico');
 
+SELECT setval('categoria_id', 6, true);        -- Mantiene los IDs fijos hasta el 6 y ajustar la secuencia al final para que vuelva a ser automatica
+
 CREATE SEQUENCE imagen_categoria_id;
 CREATE TABLE IF NOT EXISTS imagenes_categorias (
     imagen_categoria_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('imagen_categoria_id'),
@@ -2107,6 +2199,8 @@ INSERT INTO usuario_estados (estado_id, descripcion)
         (1, 'activo'),
         (2, 'inactivo');
 
+SELECT setval('estado_id', 2, true);        -- Mantiene los IDs fijos hasta el 2 y ajustar la secuencia al final para que vuelva a ser automatica
+
 CREATE SEQUENCE usuario_id;
 CREATE TABLE IF NOT EXISTS usuarios (
     usuario_id SERIAL PRIMARY KEY,
@@ -2132,7 +2226,6 @@ INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_ap
         ('alminda', default, 'manoche', default, 50, 'f', 'almindao@gmail.com', 7, 2),
         ('abigail', default, 'cunes', default, 29, 'i', 'cunesmac24@gmail.com', 7, 2),
         ('asdrubal', 'david', 'oviedo', 'oviedo', 30, 'm', 'asdrubaloviedo2@gmail.com', 1, 1);
-
 
 CREATE SEQUENCE cupcake_categoria_id;
 CREATE TABLE IF NOT EXISTS cupcake_categorias (
@@ -2185,7 +2278,6 @@ INSERT INTO cupcake_categorias (cupcake_id, categoria_id)
         (63, 4),
         (64, 4);
 
-
 CREATE SEQUENCE lugar_id;
 CREATE TABLE IF NOT EXISTS lugares (
     lugar_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('lugar_id'),
@@ -2201,6 +2293,8 @@ INSERT INTO lugares (lugar_id, descripcion)
         (4, 'Lugares extravagantes'),
         (5, 'Clubes deportivos');
 
+SELECT setval('lugar_id', 5, true);        -- Mantiene los IDs fijos hasta el 5 y ajustar la secuencia al final para que vuelva a ser automatica
+
 CREATE SEQUENCE cupcake_estado_id;
 CREATE TABLE IF NOT EXISTS cupcake_estados (
     estado_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('estado_id'),
@@ -2214,6 +2308,7 @@ INSERT INTO cupcake_estados (estado_id, descripcion)
         (2, 'Hechos'),
         (3, 'Pendientes');
 
+SELECT setval('estado_id', 3, true);        -- Mantiene los IDs fijos hasta el 3 y ajustar la secuencia al final para que vuelva a ser automatica
 
 CREATE SEQUENCE cupcake_usuario_estado_id;
 CREATE TABLE IF NOT EXISTS cupcake_usuario_estados (
@@ -2260,6 +2355,8 @@ INSERT INTO ligas (liga_id, descripcion, rango)
         (2, 'Plata', 2),
         (3, 'Oro', 3);
 
+SELECT setval('liga_id', 3, true);        -- Mantiene los IDs fijos hasta el 3 y ajustar la secuencia al final para que vuelva a ser automatica
+
 CREATE SEQUENCE medalla_id;
 CREATE TABLE IF NOT EXISTS medallas (
     medalla_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('medalla_id'),
@@ -2278,6 +2375,8 @@ INSERT INTO medallas (medalla_id, descripcion)
         (4, 'Peliculas'),
         (5, 'Porciones'),
         (6, 'Tiempo');
+
+SELECT setval('medalla_id', 6, true);        -- Mantiene los IDs fijos hasta el 63 y ajustar la secuencia al final para que vuelva a ser automatica
 
 CREATE SEQUENCE medalla_liga_id;
 CREATE TABLE IF NOT EXISTS medallas_liga (
@@ -2343,7 +2442,6 @@ INSERT INTO usuario_medallas_liga (usuario_id, medalla_liga_id, requisito_alcanz
         (2, 16, 0, FALSE),
         (2, 17, 0, FALSE),
         (2, 18, 0, FALSE);
-
 
 CREATE SEQUENCE usuario_paquetes_id;
 CREATE TABLE IF NOT EXISTS usuario_paquetes (
