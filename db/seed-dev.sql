@@ -150,31 +150,32 @@ WHERE defecto = TRUE;
 
 INSERT INTO paquete_precios (paquete_precios_id, paquete_id, moneda, pais, defecto, monto_centavos)
     VALUES
-        (1, 1, 'USD', 'US', TRUE, 999),
-        (2, 2, 'USD', 'US', TRUE, 999),
-        (3, 3, 'USD', 'US', TRUE, 999),
-        (4, 4, 'USD', 'US', TRUE, 999),
-        (5, 5, 'USD', 'US', TRUE, 999),
-        (6, 1, 'EUR', 'ES', TRUE, 849),
-        (7, 2, 'EUR', 'ES', TRUE, 849),
-        (8, 3, 'EUR', 'ES', TRUE, 849),
-        (9, 4, 'EUR', 'ES', TRUE, 849),
-        (10, 5, 'EUR', 'ES', TRUE, 849),
-        (11, 1, 'PEN', 'PE', TRUE, 3499),
-        (12, 1, 'USD', 'PE', FALSE, 999),
-        (13, 1, 'EUR', 'PE', FALSE, 849),
-        (14, 2, 'PEN', 'PE', TRUE, 3499),
-        (15, 2, 'USD', 'PE', FALSE, 999),
-        (16, 2, 'EUR', 'PE', FALSE, 849),
-        (17, 3, 'PEN', 'PE', TRUE, 3499),
-        (18, 3, 'USD', 'PE', FALSE, 999),
-        (19, 3, 'EUR', 'PE', FALSE, 849),
-        (20, 4, 'PEN', 'PE', TRUE, 3499),
-        (21, 4, 'USD', 'PE', FALSE, 999),
-        (22, 4, 'EUR', 'PE', FALSE, 849),
-        (23, 5, 'PEN', 'PE', TRUE, 3499),
-        (24, 5, 'USD', 'PE', FALSE, 999),
-        (25, 5, 'EUR', 'PE', FALSE, 849);
+        (1, 1, 'USD', NULL, TRUE, 999),             -- Opcion por defecto si no se conocen los detalles del pais y su moneda
+        (2, 1, 'USD', 'US', TRUE, 999),
+        (3, 2, 'USD', 'US', TRUE, 999),
+        (4, 3, 'USD', 'US', TRUE, 999),
+        (5, 4, 'USD', 'US', TRUE, 999),
+        (6, 5, 'USD', 'US', TRUE, 999),
+        (7, 1, 'EUR', 'ES', TRUE, 849),
+        (8, 2, 'EUR', 'ES', TRUE, 849),
+        (9, 3, 'EUR', 'ES', TRUE, 849),
+        (10, 4, 'EUR', 'ES', TRUE, 849),
+        (11, 5, 'EUR', 'ES', TRUE, 849),
+        (12, 1, 'PEN', 'PE', TRUE, 3499),
+        (13, 1, 'USD', 'PE', FALSE, 999),
+        (14, 1, 'EUR', 'PE', FALSE, 849),
+        (15, 2, 'PEN', 'PE', TRUE, 3499),
+        (16, 2, 'USD', 'PE', FALSE, 999),
+        (17, 2, 'EUR', 'PE', FALSE, 849),
+        (18, 3, 'PEN', 'PE', TRUE, 3499),
+        (19, 3, 'USD', 'PE', FALSE, 999),
+        (20, 3, 'EUR', 'PE', FALSE, 849),
+        (21, 4, 'PEN', 'PE', TRUE, 3499),
+        (22, 4, 'USD', 'PE', FALSE, 999),
+        (23, 4, 'EUR', 'PE', FALSE, 849),
+        (24, 5, 'PEN', 'PE', TRUE, 3499),
+        (25, 5, 'USD', 'PE', FALSE, 999),
+        (26, 5, 'EUR', 'PE', FALSE, 849);
 
 SELECT setval('paquete_precios_id', 25, true);        -- Mantiene los IDs fijos hasta el 25 y ajustar la secuencia al final para que vuelva a ser automatica
 
@@ -2012,7 +2013,6 @@ INSERT INTO receta_segmentos (orden, descripcion, cupcake_id, imagen_id)
         (7, 'Con ayuda de cortadores y nuestras manos, hacer las diferentes formas navideñas con el fondant previamente tinturado con pinturas comestibles, pegar con leche condensada a los cupcakes.', 64, 226),
         (8, 'Consumir fríos.', 64, 227);
 
-
 CREATE SEQUENCE categoria_id;
 CREATE TABLE IF NOT EXISTS categorias (
     categoria_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('categoria_id'),
@@ -2445,23 +2445,47 @@ INSERT INTO usuario_medallas_liga (usuario_id, medalla_liga_id, requisito_alcanz
 
 CREATE SEQUENCE usuario_paquetes_id;
 CREATE TABLE IF NOT EXISTS usuario_paquetes (
-    usuario_paquetes_id SERIAL PRIMARY KEY,
-    usuario_id INTEGER,
-    paquete_id INTEGER,
+    usuario_paquetes_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('usuario_paquetes_id'),
+
+    usuario_id INTEGER NOT NULL,
+    paquete_id INTEGER NOT NULL,
+
+    fecha_compra TIMESTAMPTZ NOT NULL DEFAULT NOW(),   -- fecha/hora con zona horaria
+    moneda CHAR(3) NOT NULL,                           -- USD / EUR / PEN
+    monto_centavos INTEGER NOT NULL,                   -- precio pagado real en ese momento
+    pais_compra CHAR(2),                               -- país detectado en compra (US, PE, ES, etc.)
+
+    payment_provider VARCHAR(30),                      -- stripe, paypal, etc.
+    payment_provider_id VARCHAR(100),                  -- id retornado por la pasarela
+
+    activo BOOLEAN NOT NULL DEFAULT TRUE,              -- ¿aún tiene acceso?
+    fecha_expiracion TIMESTAMPTZ,                      -- si aplica, con zona horaria
+
     FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id),
     FOREIGN KEY (paquete_id) REFERENCES paquetes(paquete_id)
 );
 ALTER SEQUENCE usuario_paquetes_id OWNED BY usuario_paquetes.usuario_paquetes_id;
 
-INSERT INTO usuario_paquetes (usuario_id, paquete_id)
+INSERT INTO usuario_paquetes (
+    usuario_id,
+    paquete_id,
+    fecha_compra,
+    moneda,
+    monto_centavos,
+    pais_compra,
+    payment_provider,
+    payment_provider_id,
+    activo,
+    fecha_expiracion
+)
     VALUES
-        (1, 1),
-        (2, 1),
-        (3, 1),
-        (4, 1),
-        (5, 1),
-        (1, 5),
-        (6, 1),
-        (1, 2),
-        (1, 3),
-        (1, 4);
+        (1, 1, NOW() - INTERVAL '30 days', 'USD', 999,  'US', 'stripe', 'pi_001', TRUE, NULL),
+        (2, 1, NOW() - INTERVAL '15 days', 'USD', 999,  'US', 'stripe', 'pi_002', TRUE, NULL),
+        (3, 1, NOW() - INTERVAL '10 days', 'EUR', 857,  'ES', 'paypal', 'pp_003', TRUE, NULL),
+        (4, 1, NOW() - INTERVAL '5 days',  'PEN', 3499, 'PE', 'culqi',  'cq_004', TRUE, NULL),
+        (5, 1, NOW() - INTERVAL '2 days',  'USD', 999,  'US', 'stripe', 'pi_005', TRUE, NULL),
+        (1, 5, NOW() - INTERVAL '20 days', 'EUR', 857,  'ES', 'stripe', 'pi_006', TRUE, NULL),
+        (6, 1, NOW() - INTERVAL '3 days',  'PEN', 3499, 'PE', 'culqi',  'cq_007', TRUE, NULL),
+        (1, 2, NOW() - INTERVAL '40 days', 'USD', 999,  'US', 'paypal', 'pp_008', TRUE, NULL),
+        (1, 3, NOW() - INTERVAL '25 days', 'USD', 999,  'US', 'stripe', 'pi_009', TRUE, NULL),
+        (1, 4, NOW() - INTERVAL '12 days', 'PEN', 3499, 'PE', 'culqi',  'cq_010', TRUE, NULL);
