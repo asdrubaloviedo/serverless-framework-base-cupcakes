@@ -47,7 +47,12 @@ Content-Type: application/json
 
 {
   "email": "asdrubaloviedo9@gmail.com",
-  "paquete": 4
+  "paquete": 4,
+  "moneda": "USD",
+  "montoCentavos": 999,
+  "paisCompra": "US",
+  "paymentProvider": "stripe",
+  "paymentProviderId": "pi_010"
 }
 
 ### Desarrollo
@@ -56,7 +61,12 @@ Content-Type: application/json
 
 {
   "email": "asdrubaloviedo9@gmail.com",
-  "paquete": 4
+  "paquete": 4,
+  "moneda": "USD",
+  "montoCentavos": 999,
+  "paisCompra": "US",
+  "paymentProvider": "stripe",
+  "paymentProviderId": "pi_010"
 }
 
 ### POST Adicion de usuarios nuevos a la tabla usuarios.

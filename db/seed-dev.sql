@@ -2466,6 +2466,9 @@ CREATE TABLE IF NOT EXISTS usuario_paquetes (
 );
 ALTER SEQUENCE usuario_paquetes_id OWNED BY usuario_paquetes.usuario_paquetes_id;
 
+ALTER TABLE usuario_paquetes
+ADD CONSTRAINT uq_usuario_paquete UNIQUE (usuario_id, paquete_id);
+
 INSERT INTO usuario_paquetes (
     usuario_id,
     paquete_id,
