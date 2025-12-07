@@ -15,6 +15,6 @@ GET https://postman-echo.com/get?rootUrl={{rootUrlDev}}
 
 ### GET Listado de paquetes que el usuario no a comprado junto con su habilitacion e imagen para un usuario por id.
 ### Local
-GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{packageModule}}/usuario-paquetes-faltantes?email=asdrubaloviedo@gmail.com
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{packageModule}}/usuario-paquetes-faltantes?email=asdrubaloviedo2@gmail.com&pais=PE&moneda=PEN
 ### Desarrollo
-GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{packageModule}}/usuario-paquetes-faltantes?email=asdrubaloviedo@gmail.com
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{packageModule}}/usuario-paquetes-faltantes?email=asdrubaloviedo@gmail.com&pais=PE&moneda=PEN
