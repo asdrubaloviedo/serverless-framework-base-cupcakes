@@ -72,9 +72,23 @@ describe('user/schema/user', () => {
 
   describe('validateCreateUserPackage', () => {
     test('ok: email + paquete (coerce number)', () => {
-      const out = S.validateCreateUserPackage({ email: 'a@a.com', paquete: '10' });
+      const out = S.validateCreateUserPackage({
+        email: 'a@a.com',
+        paquete: '10',
+        moneda: 'pen',
+        montoCentavos: '1500',
+      });
+
       expect(out.success).toBe(true);
-      expect(out.data).toEqual({ email: 'a@a.com', paquete: 10 });
+      expect(out.data).toEqual({
+        email: 'a@a.com',
+        paquete: 10,
+        moneda: 'PEN',
+        montoCentavos: 1500,
+        paisCompra: undefined,
+        paymentProvider: undefined,
+        paymentProviderId: undefined,
+      });
     });
 
     test('error: paquete < 1', () => {
