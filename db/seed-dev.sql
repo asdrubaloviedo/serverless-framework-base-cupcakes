@@ -119,7 +119,7 @@ ALTER SEQUENCE paquete_id OWNED BY paquetes.paquete_id;
 INSERT INTO paquetes (paquete_id, habilitado, descripcion)
     VALUES
         (1, TRUE, 'Publico'),
-        (2, FALSE, 'San Valentín basico'),
+        (2, TRUE, 'San Valentín basico'),
         (3, FALSE, 'Pascua basico'),
         (4, TRUE, 'Navidad basico'),
         (5, TRUE, 'Halloween basico');
