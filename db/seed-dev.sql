@@ -282,7 +282,9 @@ INSERT INTO cupcakes (nombre, dificultad_id, colorPredominante, colorSecundario,
         ('Cupcakes de Zanahoria y Chocolate', 3, 'marron', 'naranja', 4, 30, 3, FALSE, 2, 2),
         ('Cupcakes con Pasto y Huevitos de Pascua', 2, 'marron', 'verde', 4, 30, 3, FALSE, 2, 2),
         ('Cupcakes para Pascua', 5, 'amarillo', 'indefinido', 6, 50, 3, FALSE, 2, 2),
-        ('Cupcakes de Pascua con conejitos de Kitkat ', 3, 'verde', 'marron', 12, 50, 3, FALSE, 2, 2);
+        ('Cupcakes de Pascua con conejitos de Kitkat ', 3, 'verde', 'marron', 12, 50, 3, FALSE, 2, 2),
+        ('Conejo de Pascua con cupcake de vainilla ', 4, 'marron', 'verde', 12, 180, 3, FALSE, 2, 2),
+        ('Cupcakes de Pascua (sabor fresa)', 3, 'rosado', 'indefinido', 20, 30, 3, FALSE, 2, 2);
 
 CREATE SEQUENCE ingrediente_id;
 CREATE TABLE IF NOT EXISTS ingredientes (
@@ -1216,7 +1218,36 @@ INSERT INTO ingredientes (descripcion, cupcake_id)
         ('Una gotita de colorante alimentario líquido verde', 82),
         ('(348 g.) 12 conejitos de KITKAT', 82),
         ('Caramelos de colores', 82),
-        ('Gomitas azucaradas en forma de zanahoria. en forma de zanahoria.', 82);
+        ('Gomitas azucaradas en forma de zanahoria. en forma de zanahoria.', 82),
+        ('115 gramos mantequilla', 83),
+        ('200 gramos azúcar', 83),
+        ('200 gramos harina', 83),
+        ('3 huevos medianos', 83),
+        ('2 cucharaditas polvo de hornear', 83),
+        ('120 c.c leche', 83),
+        ('1 cucharadita esencia de vainilla', 83),
+        ('merengue italiano', 83),
+        ('2 claras de huevo', 83),
+        ('120 gramos azúcar', 83),
+        ('20 c.c. agua', 83),
+        ('colorante verde', 83),
+        ('250 gramos chocolate con leche, de cobertura de buena calidad', 83),
+        ('250 gramos chocolate blanco', 83),
+        ('colorantes liposolubles o para pintar chocolate, a elección', 83),
+        ('moldes de conejo, pinceles, palitos para pincho', 83),
+        ('429 g harina normal', 84),
+        ('3 cdtas levadura química', 84),
+        ('265 g azúcar blanca', 84),
+        ('1/2 cdta sal', 84),
+        ('375 ml leche', 84),
+        ('125 ml aceite vegetal', 84),
+        ('125 g mantequilla blanda', 84),
+        ('2 cdas yogur griego', 84),
+        ('2 cdas pasta concentrada sabor fresa', 84),
+        ('2 huevos', 84),
+        ('sprinkles de colores', 84),
+        ('huevitos de pascua', 84),
+        ('monedas de chocolate', 84);
 
 CREATE SEQUENCE imagen_id;
 CREATE TABLE IF NOT EXISTS imagenes (
@@ -1724,7 +1755,9 @@ INSERT INTO imagenes_cupcakes (main, imagen_id, cupcake_id)
         (1, 242, 79),
         (1, 243, 80),
         (1, 244, 81),
-        (1, 245, 82);
+        (1, 245, 82),
+        (1, 246, 83),
+        (1, 247, 84);
 
 CREATE SEQUENCE receta_segmentos_id;
 CREATE TABLE IF NOT EXISTS receta_segmentos (
@@ -2601,7 +2634,40 @@ INSERT INTO receta_segmentos (orden, descripcion, cupcake_id, imagen_id)
         (7, 'En un tazón, mezclar el coco con el colorante verde hasta que asemeje el color del césped.', 82, null),
         (8, 'Espolvorear el coco verde sobre cada cupcake para hacer el césped.', 82, null),
         (9, 'Coronar con conejitos de KITKAT, y decorar con caramelos de colores, gomitas azucaradas.', 82, null),
-        (10, 'Refrigerar por 15 minutos', 82, null);
+        (10, 'Refrigerar por 15 minutos', 82, null),
+        (1, 'Cupcakes: ', 83, null),
+        (2, 'Precalentar el horno a 180 grados Centígrados y preparar el molde con los capacillos, ésta receta rinde para 12 cupcakes.', 83, null),
+        (3, 'Batir la mantequilla blanda y azúcar por aproximadamente 5 minutos. Incorporar los huevos uno a uno y seguir batiendo hasta conseguir una mezcla homogénea.', 83, null),
+        (4, 'Parar la batidora y agregar la harina junto con el polvo de hornear previamente tamizados.', 83, null),
+        (5, 'Mezclar con movimientos envolventes. Por último añadir la leche y la esencia de vainilla.', 83, null),
+        (6, 'Con ayuda de una cuchara para helados, rellenar los moldes más o menos 2 tercios de su capacidad.', 83, null),
+        (7, 'Hornear a 180 grados centígrados por aproximadamente 20 minutos.', 83, null),
+        (8, 'Pinchar con un palillo para comprobar que ya están cuando éste salga limpio.', 83, null),
+        (9, 'Reposar en el molde 5 minutos. Sacarlos del molde, dejarlos enfriar y reservar.', 83, null),
+        (10, 'Conejos de chocolate: ', 83, null),
+        (11, 'Picar los chocolates y fundirlos a baño maría o microondas por separado.', 83, null),
+        (12, 'Sacar en diferentes recipientes pequeños chocolate blanco y agregar color a cada uno para comenzar a pintar los conejos, según los detalles del molde, aquí hay que dejar volar la imaginación.', 83, null),
+        (13, 'Una vez hecho los detalles de los conejos, enfriar y proceder a cubrirlos con el chocolate de cobertura.', 83, null),
+        (14, 'Llevar el molde, boca arriba, a la nevera, durante 10 minutos aproximadamente. Retirar de la nevera y desmoldar.', 83, null),
+        (15, 'Merengue(Cesped): ', 83, null),
+        (16, 'Prepara el almíbar, para ello poner un olla al fuego con el agua y el azúcar', 83, null),
+        (17, 'Dejar hervir hasta que alcance una temperatura de 120ºC.', 83, null),
+        (18, 'Aparte, poner las claras de huevo en un bowl grande y las batir con una batidora de varillas.', 83, null),
+        (19, 'Una vez que el almíbar ha llegado a su temperatura, añadir a las claras muy lentamente, en un hilo, mientras se continua batiendo hasta que se enfríe y se formen picos.', 83, null),
+        (20, 'Por último agregar el color verde a elección. Integrar y colocar el merengue en una manga con boquilla para hacer césped.', 83, null),
+        (21, 'Proceder finalmente con la decoración, haciendo primero el césped en el cupcake.', 83, null),
+        (22, 'Colocar el conejo encima del césped y perfeccionar.', 83, null),
+        (1, 'Batir la mantequilla con el azúcar hasta que quede cremosa.', 84, null),
+        (2, 'Añadir los huevos uno a uno. Y deja batir a máxima velocidad durante 10 minutos.', 84, null),
+        (3, 'Mientras tanto mezclar los ingredientes secos, tamizar y reservar.', 84, null),
+        (4, 'Por otro lado mezclar la leche, el aceite el yogur y la pasta de fresa, y batir con una minipimer para que la pasta concentrada se integre y no queden grumos.', 84, null),
+        (5, 'Cuando la mantequilla esté cremosa agregar los ingredientes secos alternando con los líquidos y batir a velocidad mínima.', 84, null),
+        (6, 'Pasar la mezcla a unos moldes de silicona ya engrasados, en este caso tienen forma de tacita de té.', 84, null),
+        (7, 'Los puedes encontrar en tiendas especializadas de pastelería.', 84, null),
+        (8, 'También puedes usar las clásicas cápsulas de papel. Hornear a 175°C durante 15-20 minutos, según cada horno.', 84, null),
+        (9, 'Para decorar puedes usar crema de queso, nata montada o cualquier receta de buttercream.', 84, null),
+        (10, 'Además puedes añadir el sabor y color de tu preferencia.', 84, null),
+        (11, 'Para darle el toque de pascua usa sprinkles de colores, huevitos de pascua y monedas de chocolate.', 84, null);
 
 CREATE SEQUENCE categoria_id;
 CREATE TABLE IF NOT EXISTS categorias (
@@ -2776,7 +2842,9 @@ INSERT INTO propiedades (calorias, carbohidratos, proteinas, lipidos, fibra_diet
         (46, 53, 7, null, 5, null, null, 79),
         (null, null, null, null, null, null, null, 80),
         (null, null, null, null, null, null, null, 81),
-        (null, null, null, null, null, null, null, 82);
+        (null, null, null, null, null, null, null, 82),
+        (null, null, null, null, null, null, null, 83),
+        (null, null, null, null, null, null, null, 84);
 
 CREATE SEQUENCE rol_id;
 CREATE TABLE IF NOT EXISTS roles (
@@ -2902,7 +2970,9 @@ INSERT INTO cupcake_categorias (cupcake_id, categoria_id)
         (79, 3),
         (80, 3),
         (81, 3),
-        (82, 3);
+        (82, 3),
+        (83, 3),
+        (84, 3);
 
 CREATE SEQUENCE lugar_id;
 CREATE TABLE IF NOT EXISTS lugares (
