@@ -94,10 +94,6 @@ plugins:
   - serverless-offline
   - serverless-domain-manager
 
-package:
-  patterns:
-    - package.json
-
 resources:
   Conditions:
     IsDev:

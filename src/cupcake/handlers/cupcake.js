@@ -1,4 +1,5 @@
 require('module-alias/register');
+
 const CupcakeController = require('@cupcake/controller/cupcake');
 const {
   validateCupcakeUserState,
