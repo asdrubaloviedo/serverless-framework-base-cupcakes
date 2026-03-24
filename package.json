@@ -20,7 +20,8 @@
     "test:watch": "jest --watch",
     "create-domain:dev": "serverless create_domain --stage dev",
     "delete-domain:dev": "serverless delete_domain --stage dev",
-    "check:node": "node -e \"const v=process.versions.node.split('.')[0]; if(v < 22 || v >= 23){ console.error('Usa Node 22'); process.exit(1) }\""
+    "check:node": "node -e \"const v=process.versions.node.split('.')[0]; if(v < 22 || v >= 23){ console.error('Usa Node 22'); process.exit(1) }\"",
+    "logs:cupcake": "serverless logs -f cupcake -t --stage dev"
   },
   "dependencies": {
     "aws-sdk": "^2.1691.0",

@@ -11,6 +11,11 @@ params:
 custom:
   stage: ${opt:stage, 'local'}
 
+  runtimeByStage:
+    local: nodejs20.x
+    dev: nodejs22.x
+    prod: nodejs22.x
+
   endpointRoot: ${env:ENDPOINT_ROOT, 'cupcakeslife'}
   categoryModule: ${env:CATEGORY_MODULE, 'categorias'}
   cupcakeModule: ${env:CUPCAKE_MODULE, 'cupcakes'}
@@ -21,9 +26,27 @@ custom:
   userModule: ${env:USER_MODULE, 'usuarios'}
 
   db:
-    username: ${env:DB_USER, 'postgres'}
-    password: ${env:DB_PASSWORD, 'postgres'}
-    dbName:    ${env:DB_NAME, 'cupcakes'}
+    local:
+      host: 127.0.0.1
+      port: '5432'
+      user: postgres
+      password: postgres
+      name: cupcakes
+      sslmode: disable
+    dev:
+      host: ${env:DB_HOST}
+      port: ${env:DB_PORT, '5432'}
+      user: ${env:DB_USER}
+      password: ${env:DB_PASSWORD}
+      name: ${env:DB_NAME}
+      sslmode: ${env:PGSSLMODE, 'require'}
+    prod:
+      host: ${env:DB_HOST}
+      port: ${env:DB_PORT, '5432'}
+      user: ${env:DB_USER}
+      password: ${env:DB_PASSWORD}
+      name: ${env:DB_NAME}
+      sslmode: ${env:PGSSLMODE, 'require'}
 
   # basePath por stage
   basePathByStage:
@@ -42,7 +65,7 @@ custom:
     domainName: api.thecupcakelife.com
     basePath: ${self:custom.basePathByStage.${self:custom.stage}}
     stage: ${self:custom.stage}
-    endpointType: edge        # Edge requiere REST (events:http)
+    endpointType: edge
     apiType: rest
     createRoute53Record: ${self:custom.createRecord.${self:custom.stage}}
     securityPolicy: tls_1_2
@@ -61,7 +84,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: ${self:custom.runtimeByStage.${self:custom.stage}}
   region: us-east-2
   stage: ${self:custom.stage}
 
@@ -81,18 +104,22 @@ provider:
     PACKAGE_MODULE: ${self:custom.packageModule}
     RECIPE_MODULE: ${self:custom.recipeModule}
     USER_MODULE: ${self:custom.userModule}
-    DB_HOST: ${env:DB_HOST, '127.0.0.1'}
-    DB_PORT: ${env:DB_PORT, '5432'}
-    DB_USER: ${env:DB_USER, 'postgres'}
-    DB_PASSWORD: ${env:DB_PASSWORD, 'postgres'}
-    DB_NAME: ${env:DB_NAME, 'cupcakes'}
-    PGSSLMODE: ${env:PGSSLMODE, 'require'}
+    DB_HOST: ${self:custom.db.${self:custom.stage}.host}
+    DB_PORT: ${self:custom.db.${self:custom.stage}.port}
+    DB_USER: ${self:custom.db.${self:custom.stage}.user}
+    DB_PASSWORD: ${self:custom.db.${self:custom.stage}.password}
+    DB_NAME: ${self:custom.db.${self:custom.stage}.name}
+    PGSSLMODE: ${self:custom.db.${self:custom.stage}.sslmode}
 
 functions: ${file(./functions.yml)}
 
 plugins:
   - serverless-offline
   - serverless-domain-manager
+
+package:
+  patterns:
+    - package.json
 
 resources:
   Conditions:
@@ -143,9 +170,9 @@ resources:
         Engine: postgres
         EngineVersion: "17.6"
         DBInstanceIdentifier: ${self:service}-${self:custom.stage}-db
-        MasterUsername: ${self:custom.db.username}
-        MasterUserPassword: ${self:custom.db.password}
-        DBName: ${self:custom.db.dbName}
+        MasterUsername: ${self:custom.db.${self:custom.stage}.user}
+        MasterUserPassword: ${self:custom.db.${self:custom.stage}.password}
+        DBName: ${self:custom.db.${self:custom.stage}.name}
         AllocatedStorage: 20
         StorageType: gp2
         PubliclyAccessible: true
