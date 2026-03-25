@@ -2,44 +2,196 @@
 
 ## Tabla de Contenidos
 
-1. [Instalación](#instalación)
-2. [Levantamiento](#levantamiento)
-3. [Contenido](#contenido)
-4. [Autores](#autores)
+1. [Descripción](#descripción)
+2. [Requisitos](#requisitos)
+3. [Instalación](#instalación)
+4. [Ambientes](#ambientes)
+5. [Runtimes](#runtimes)
+6. [Comandos](#comandos)
+7. [Levantamiento](#levantamiento)
+8. [Variables](#variables)
+9. [Notas](#notas)
+10. [Contenido](#contenido)
+11. [Autores](#autores)
+
+---
+
+## Descripción
+
+Backend serverless de CupcakesLife construido con Serverless Framework sobre AWS Lambda.
+
+Incluye:
+
+- API Gateway + Lambda
+- Conexión a PostgreSQL (local y RDS)
+- Arquitectura modular por dominios (categorías, cupcakes, ingredientes, etc.)
+- Soporte de múltiples ambientes (local, dev, prod), todo lo referente a prod aun esta por probarse.
+- Runtime moderno (nodejs22.x) en AWS
+- Despliegues reproducibles
+
+---
+
+## Requisitos
+
+- Node local: 22.22.0
+- npm compatible con Node 22
+- Serverless Framework v3
+- AWS CLI configurado
+- Credenciales de AWS activas
+
+---
 
 ## Instalación
 
-```bash
-npm install 
-```
+Instalamos dependencias con el metodo antiguo de node
+    - npm install --legacy-peer-deps
+
+Luego validamos la version de node
+    - npm run check:node
+
+Si bien actualmente se usa este comando, lo ideal es que al final se haga una revision para poder instalar todo con un simple
+    - npm install
+
+---
+
+## Ambientes
+
+El proyecto usa variables separadas por stage mediante archivos .env.
+
+- Local (.env.local):
+    DB_HOST=127.0.0.1
+    DB_PORT=5432
+    DB_USER=postgres
+    DB_PASSWORD=postgres
+    DB_NAME=cupcakes
+    PGSSLMODE=disable
+- Dev (.env.dev):
+    DB_HOST=hello-world-dev-db.cbqcauiquiir.us-east-2.rds.amazonaws.com
+    DB_PORT=5432
+    DB_USER=postgres
+    DB_PASSWORD=tu_password_dev
+    DB_NAME=cupcakes
+    PGSSLMODE=require
+
+    ENDPOINT_ROOT=cupcakeslife
+    CATEGORY_MODULE=categorias
+    CUPCAKE_MODULE=cupcakes
+    FESTIVITY_MODULE=festividades
+    INGREDIENT_MODULE=ingredientes
+    PACKAGE_MODULE=paquetes
+    RECIPE_MODULE=recipes
+    USER_MODULE=usuarios
+- Prod (.env.prod):
+    DB_HOST=tu-rds-prod.amazonaws.com
+    DB_PORT=5432
+    DB_USER=postgres
+    DB_PASSWORD=tu_password_prod
+    DB_NAME=cupcakes
+    PGSSLMODE=require
+
+    ENDPOINT_ROOT=cupcakeslife
+    CATEGORY_MODULE=categorias
+    CUPCAKE_MODULE=cupcakes
+    FESTIVITY_MODULE=festividades
+    INGREDIENT_MODULE=ingredientes
+    PACKAGE_MODULE=paquetes
+    RECIPE_MODULE=recipes
+    USER_MODULE=usuarios
+
+---
+
+## Runtimes
+
+Runtime por stage
+
+- local: nodejs20.x
+- dev: nodejs22.x
+- prod: nodejs22.x
+
+---
+
+## Comandos
+
+- Validación:
+    - npm run check:node
+    - npm test
+    - npm run test:coverage
+    - npm run test:watch
+- Print de configuración:
+    - npm run print
+    - npm run print:local
+    - npm run print:dev
+    - serverless print --stage prod
+- Ejecución local:
+    - npm run start:local
+- Despliegue:
+    - npm run deploy:dev
+    - serverless deploy --stage prod
+- Dominios:
+    - npm run create-domain:dev
+    - npm run delete-domain:dev
+    - serverless create_domain --stage prod
+- Logs:
+    - npm run logs:cupcake
+
+---
 
 ## Levantamiento
 
-1.- Ambiente local
+- Local
+    - npm run start:local
+    - Ejemplo de url resultante: http://localhost:3000/local/cupcakeslife/cupcakes/categorias-imagen-cantidad
+    - Ir a cupcake.http y presionar "Send Request" para probar un endpoint local
+    - Si se ejecuta el endpoint y muestra el resultado todo esta bien
+- Dev
+    - npm run print:dev
+    - npm run deploy:dev
+    - Ejemplo de url resultante: https://api.thecupcakelife.com/dev/cupcakeslife/cupcakes/categorias-imagen-cantidad
+    - Ir a cupcake.http y presionar "Send Request" para probar un endpoint de desarrollo
+    - Si se ejecuta el endpoint y muestra el resultado todo esta bien
+- Prod
+    - serverless print --stage prod
+    - serverless create_domain --stage prod
+    - serverless deploy --stage prod
+    - Ejemplo de url resultante: https://api.thecupcakelife.com/prod/cupcakeslife/cupcakes/categorias-imagen-cantidad
 
-```bash
-npm run start:local
-```
-Url resultante: http://localhost:3000/dev/categorias-imagen-cantidad
+---
 
-2.- Ambiente de desarrollo
+## Variables
 
-```bash
-npm run deploy:dev
-```
-Url resultante: https://api.thecupcakelife.com/dev/cupcakeslife/categorias/categorias-imagen-cantidad
+- Principales:
+    DB_HOST
+    DB_PORT
+    DB_USER
+    DB_PASSWORD
+    DB_NAME
+    PGSSLMODE
 
-3.- Ambiente de produccion
+- Adicionales:
+    ENDPOINT_ROOT
+    CATEGORY_MODULE
+    CUPCAKE_MODULE
+    FESTIVITY_MODULE
+    INGREDIENT_MODULE
+    PACKAGE_MODULE
+    RECIPE_MODULE
+    USER_MODULE
 
-```bash
-serverless create_domain --stage prod
-sls deploy --stage prod
-```
-Url resultante: https://thecupcakelife.com/categorias-imagen-cantidad
+---
+
+## Notas
+
+AWS Lambda soporta nodejs22.x
+Serverless v3 está fijado en este proyecto
+NO usar npm audit fix --force
+NO migrar aún a Serverless v4
+NO actualizar serverless-offline a v14
+
+---
 
 ## Contenido
 
-serverless, serverless framework, serverless-offline, serverless-domain-manager, serverless-rds, lambda, api-gateway, module-alias, jest, zod
+serverless, aws, lambda, api-gateway, postgres, rds, jest, zod
 
 ## Autores
 
