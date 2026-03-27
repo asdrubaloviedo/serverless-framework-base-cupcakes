@@ -12,7 +12,7 @@
     "start:local": "serverless offline start --stage local",
     "deploy:dev": "serverless deploy --stage dev",
     "remove:dev": "serverless remove --stage dev",
-    "deploy:prod": "serverless deploy --stage prod",
+    "deploy:prod": "NO USAR AUN serverless deploy --stage prod",
     "print": "serverless print",
     "print:local": "serverless print --stage local",
     "print:dev": "serverless print --stage dev",

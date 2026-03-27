@@ -21,13 +21,18 @@
 Backend serverless de CupcakesLife construido con Serverless Framework sobre AWS Lambda.
 
 Incluye:
+    - API Gateway + Lambda
+    - Conexión a PostgreSQL (local y RDS)
+    - Arquitectura modular por dominios (categorías, cupcakes, ingredientes, etc.)
+    - Soporte de múltiples ambientes (local, dev, prod), todo lo referente a prod aun esta por probarse.
+    - Runtime moderno (nodejs22.x) en AWS
+    - Despliegues reproducibles
+    - Separación de secretos por ambiente usando AWS Systems Manager Parameter Store para `dev` y `prod`
 
-- API Gateway + Lambda
-- Conexión a PostgreSQL (local y RDS)
-- Arquitectura modular por dominios (categorías, cupcakes, ingredientes, etc.)
-- Soporte de múltiples ambientes (local, dev, prod), todo lo referente a prod aun esta por probarse.
-- Runtime moderno (nodejs22.x) en AWS
-- Despliegues reproducibles
+Estado actual del proyecto:
+    - `local`: validado
+    - `dev`: validado y funcionando con SSM
+    - `prod`: preparado a nivel de configuración, pendiente de pruebas reales de infraestructura y despliegue
 
 ---
 
@@ -56,47 +61,43 @@ Si bien actualmente se usa este comando, lo ideal es que al final se haga una re
 
 ## Ambientes
 
-El proyecto usa variables separadas por stage mediante archivos .env.
+El proyecto usa configuración separada por stage.
 
-- Local (.env.local):
+- Local usa valores definidos dentro de serverless.yml:
     DB_HOST=127.0.0.1
     DB_PORT=5432
     DB_USER=postgres
     DB_PASSWORD=postgres
     DB_NAME=cupcakes
     PGSSLMODE=disable
-- Dev (.env.dev):
-    DB_HOST=hello-world-dev-db.cbqcauiquiir.us-east-2.rds.amazonaws.com
-    DB_PORT=5432
-    DB_USER=postgres
-    DB_PASSWORD=tu_password_dev
-    DB_NAME=cupcakes
-    PGSSLMODE=require
-
-    ENDPOINT_ROOT=cupcakeslife
-    CATEGORY_MODULE=categorias
-    CUPCAKE_MODULE=cupcakes
-    FESTIVITY_MODULE=festividades
-    INGREDIENT_MODULE=ingredientes
-    PACKAGE_MODULE=paquetes
-    RECIPE_MODULE=recipes
-    USER_MODULE=usuarios
-- Prod (.env.prod):
-    DB_HOST=tu-rds-prod.amazonaws.com
-    DB_PORT=5432
-    DB_USER=postgres
-    DB_PASSWORD=tu_password_prod
-    DB_NAME=cupcakes
-    PGSSLMODE=require
-
-    ENDPOINT_ROOT=cupcakeslife
-    CATEGORY_MODULE=categorias
-    CUPCAKE_MODULE=cupcakes
-    FESTIVITY_MODULE=festividades
-    INGREDIENT_MODULE=ingredientes
-    PACKAGE_MODULE=paquetes
-    RECIPE_MODULE=recipes
-    USER_MODULE=usuarios
+- Dev obtiene secretos desde AWS Systems Manager Parameter Store usando este prefijo:
+    /cupcakes/dev/
+    Parámetros esperados:
+        /cupcakes/dev/DB_HOST
+        /cupcakes/dev/DB_PORT
+        /cupcakes/dev/DB_USER
+        /cupcakes/dev/DB_PASSWORD
+        /cupcakes/dev/DB_NAME
+        /cupcakes/dev/PGSSLMODE
+    Además, el ambiente usa variables complementarias como:
+        ENDPOINT_ROOT=cupcakeslife
+        CATEGORY_MODULE=categorias
+        CUPCAKE_MODULE=cupcakes
+        FESTIVITY_MODULE=festividades
+        INGREDIENT_MODULE=ingredientes
+        PACKAGE_MODULE=paquetes
+        RECIPE_MODULE=recipes
+        USER_MODULE=usuarios
+- prod obtiene secretos desde AWS Systems Manager Parameter Store usando este prefijo:
+    /cupcakes/prod/
+    Parámetros esperados:
+        /cupcakes/prod/DB_HOST
+        /cupcakes/prod/DB_PORT
+        /cupcakes/prod/DB_USER
+        /cupcakes/prod/DB_PASSWORD
+        /cupcakes/prod/DB_NAME
+        /cupcakes/prod/PGSSLMODE
+    Actualmente prod está preparado a nivel de configuración, pero todavía no cuenta con validación completa de infraestructura real.
 
 ---
 
@@ -121,7 +122,7 @@ Runtime por stage
     - npm run print
     - npm run print:local
     - npm run print:dev
-    - serverless print --stage prod
+    - npm run print:prod
 - Ejecución local:
     - npm run start:local
 - Despliegue:
@@ -150,10 +151,12 @@ Runtime por stage
     - Ir a cupcake.http y presionar "Send Request" para probar un endpoint de desarrollo
     - Si se ejecuta el endpoint y muestra el resultado todo esta bien
 - Prod
-    - serverless print --stage prod
-    - serverless create_domain --stage prod
-    - serverless deploy --stage prod
-    - Ejemplo de url resultante: https://api.thecupcakelife.com/prod/cupcakeslife/cupcakes/categorias-imagen-cantidad
+    - npm run print:prod
+    - Estado actual de prod:
+        separación de variables validada
+        runtime configurado
+        parámetros en SSM configurados
+        pendiente validación de infraestructura real y despliegue final
 
 ---
 
@@ -183,9 +186,12 @@ Runtime por stage
 
 AWS Lambda soporta nodejs22.x
 Serverless v3 está fijado en este proyecto
-NO usar npm audit fix --force
-NO migrar aún a Serverless v4
-NO actualizar serverless-offline a v14
+serverless-offline está fijado y no debe actualizarse todavía
+No usar npm audit fix --force
+No migrar aún a Serverless v4
+dev ya usa AWS Systems Manager Parameter Store
+prod ya está desacoplado de dev a nivel de variables y stage
+prod todavía requiere validación real de infraestructura antes de desplegar
 
 ---
 

@@ -33,34 +33,31 @@ custom:
       password: postgres
       name: cupcakes
       sslmode: disable
-    dev:
-      host: ${env:DB_HOST}
-      port: ${env:DB_PORT, '5432'}
-      user: ${env:DB_USER}
-      password: ${env:DB_PASSWORD}
-      name: ${env:DB_NAME}
-      sslmode: ${env:PGSSLMODE, 'require'}
-    prod:
-      host: ${env:DB_HOST}
-      port: ${env:DB_PORT, '5432'}
-      user: ${env:DB_USER}
-      password: ${env:DB_PASSWORD}
-      name: ${env:DB_NAME}
-      sslmode: ${env:PGSSLMODE, 'require'}
 
-  # basePath por stage
+  ssmPrefixByStage:
+    dev: /cupcakes/dev
+    prod: /cupcakes/prod
+
+  vpcByStage:
+    local: {}
+    dev:
+      securityGroupIds:
+        - Ref: MyLambdaSecurityGroup
+      subnetIds:
+        - ${param:SubnetIdA, 'subnet-00000000000000000'}
+        - ${param:SubnetIdB, 'subnet-00000000000000000'}
+    prod: {}
+
   basePathByStage:
     local: local
     dev: dev
     prod: ""
 
-  # crear registro DNS solo en entornos remotos
   createRecord:
     local: false
     dev: true
     prod: true
 
-  # Dominio personalizado (API Gateway + CloudFront edge)
   customDomain:
     domainName: api.thecupcakelife.com
     basePath: ${self:custom.basePathByStage.${self:custom.stage}}
@@ -71,7 +68,6 @@ custom:
     securityPolicy: tls_1_2
     certificateArn: arn:aws:acm:us-east-1:823999505065:certificate/67ca50d3-f7a6-4c45-943d-b58276c70451
 
-  # CORS reusable
   corsCommon:
     origins:
       - https://www.thecupcakelife.com
@@ -87,13 +83,7 @@ provider:
   runtime: ${self:custom.runtimeByStage.${self:custom.stage}}
   region: us-east-2
   stage: ${self:custom.stage}
-
-  vpc:
-    securityGroupIds:
-      - Ref: MyLambdaSecurityGroup
-    subnetIds:
-      - ${param:SubnetIdA, 'subnet-00000000000000000'}
-      - ${param:SubnetIdB, 'subnet-00000000000000000'}
+  vpc: ${self:custom.vpcByStage.${self:custom.stage}}
 
   environment:
     ENDPOINT_ROOT: ${self:custom.endpointRoot}
@@ -104,12 +94,15 @@ provider:
     PACKAGE_MODULE: ${self:custom.packageModule}
     RECIPE_MODULE: ${self:custom.recipeModule}
     USER_MODULE: ${self:custom.userModule}
-    DB_HOST: ${self:custom.db.${self:custom.stage}.host}
-    DB_PORT: ${self:custom.db.${self:custom.stage}.port}
-    DB_USER: ${self:custom.db.${self:custom.stage}.user}
-    DB_PASSWORD: ${self:custom.db.${self:custom.stage}.password}
-    DB_NAME: ${self:custom.db.${self:custom.stage}.name}
-    PGSSLMODE: ${self:custom.db.${self:custom.stage}.sslmode}
+
+    DB_HOST: ${self:custom.db.${self:custom.stage}.host, ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/DB_HOST}
+    DB_PORT: ${self:custom.db.${self:custom.stage}.port, ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/DB_PORT}
+    DB_USER: ${self:custom.db.${self:custom.stage}.user, ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/DB_USER}
+    DB_PASSWORD: ${self:custom.db.${self:custom.stage}.password, ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/DB_PASSWORD}
+    DB_NAME: ${self:custom.db.${self:custom.stage}.name, ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/DB_NAME}
+    PGSSLMODE: ${self:custom.db.${self:custom.stage}.sslmode, ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/PGSSLMODE}
+
+  versionFunctions: true
 
 functions: ${file(./functions.yml)}
 
@@ -166,9 +159,9 @@ resources:
         Engine: postgres
         EngineVersion: "17.6"
         DBInstanceIdentifier: ${self:service}-${self:custom.stage}-db
-        MasterUsername: ${self:custom.db.${self:custom.stage}.user}
-        MasterUserPassword: ${self:custom.db.${self:custom.stage}.password}
-        DBName: ${self:custom.db.${self:custom.stage}.name}
+        MasterUsername: ${self:provider.environment.DB_USER}
+        MasterUserPassword: ${self:provider.environment.DB_PASSWORD}
+        DBName: ${self:provider.environment.DB_NAME}
         AllocatedStorage: 20
         StorageType: gp2
         PubliclyAccessible: true
@@ -185,4 +178,4 @@ resources:
       Condition: IsDev
       Description: "RDS endpoint (host)"
       Value:
-        Fn::GetAtt: [ MyPostgresDB, Endpoint.Address ]
+        Fn::GetAtt: [MyPostgresDB, Endpoint.Address]
