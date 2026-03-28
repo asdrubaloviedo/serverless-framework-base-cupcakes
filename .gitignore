@@ -14,7 +14,6 @@ temp/
 tmp/
 
 # Coverage / cache
-package-lock.json
 coverage/
 .nyc_output/
 .jest/

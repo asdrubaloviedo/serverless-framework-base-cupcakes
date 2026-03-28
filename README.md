@@ -48,14 +48,16 @@ Estado actual del proyecto:
 
 ## Instalación
 
-Instalamos dependencias con el metodo antiguo de node
-    - npm install --legacy-peer-deps
-
-Luego validamos la version de node
-    - npm run check:node
-
-Si bien actualmente se usa este comando, lo ideal es que al final se haga una revision para poder instalar todo con un simple
-    - npm install
+1. Usar Node 24.x para pruebas locales
+2. Instalar dependencias:
+   - Si existe package-lock.json:
+        - npm ci
+    - Si no existe package-lock.json:
+        - npm install
+3. Validar entorno:
+   - npm run check:node
+4. Ejecutar tests:
+   - npm test
 
 ---
 
