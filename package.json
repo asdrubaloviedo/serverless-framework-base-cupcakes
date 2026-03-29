@@ -5,27 +5,27 @@
   "main": "src/handler.js",
   "type": "commonjs",
   "engines": {
-    "node": ">=22 <25"
+    "node": "^20 || ^22"
   },
   "scripts": {
-    "start": "serverless offline start",
-    "start:local": "serverless offline start --stage local",
-    "deploy:dev": "serverless deploy --stage dev",
-    "remove:dev": "serverless remove --stage dev",
-    "deploy:prod": "NO USAR AUN serverless deploy --stage prod",
-    "print": "serverless print",
-    "print:local": "serverless print --stage local",
-    "print:dev": "serverless print --stage dev",
-    "print:prod": "serverless print --stage prod",
+    "start": "npm run start:local",
+    "start:local": "npm run check:node:local && serverless offline start --stage local",
+    "deploy:dev": "npm run check:node:dev && serverless deploy --stage dev",
+    "remove:dev": "npm run check:node:dev && serverless remove --stage dev",
+    "deploy:prod": "node -e \"console.error('NO USAR AUN'); process.exit(1)\"",
+    "print": "npm run print:local",
+    "print:local": "npm run check:node:local && serverless print --stage local",
+    "print:dev": "npm run check:node:dev && serverless print --stage dev",
+    "print:prod": "npm run check:node:dev && serverless print --stage prod",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
-    "create-domain:dev": "serverless create_domain --stage dev",
-    "delete-domain:dev": "serverless delete_domain --stage dev",
-    "check:node": "node -e \"const v=Number(process.versions.node.split('.')[0]); if(v !== 22){ console.error('Usa Node 22'); process.exit(1) }\"",
-    "check:node:eval": "node -e \"const v=Number(process.versions.node.split('.')[0]); if(![22,24].includes(v)){ console.error('Usa Node 22 o 24'); process.exit(1) }\"",
-    "verify": "npm run check:node:eval && npm test",
-    "logs:cupcake": "serverless logs -f cupcake -t --stage dev"
+    "create-domain:dev": "npm run check:node:dev && serverless create_domain --stage dev",
+    "delete-domain:dev": "npm run check:node:dev && serverless delete_domain --stage dev",
+    "check:node:local": "node -e \"const v=Number(process.versions.node.split('.')[0]); if(v !== 20){ console.error('Usa Node 20 para local'); process.exit(1) }\"",
+    "check:node:dev": "node -e \"const v=Number(process.versions.node.split('.')[0]); if(v !== 22){ console.error('Usa Node 22 para dev/CI'); process.exit(1) }\"",
+    "check:node": "node -e \"const v=Number(process.versions.node.split('.')[0]); if(![20,22].includes(v)){ console.error('Usa Node 20 o 22'); process.exit(1) }\"",
+    "logs:cupcake": "npm run check:node:dev && serverless logs -f cupcake -t --stage dev"
   },
   "dependencies": {
     "aws-sdk": "^2.1691.0",

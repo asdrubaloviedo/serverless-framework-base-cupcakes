@@ -1,4 +1,3 @@
-# .github/workflows/ci.yml
 name: CI – Serverless (Node + Jest)
 
 on:
@@ -23,7 +22,7 @@ jobs:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js
+      - name: 🟢 Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22.x
@@ -34,6 +33,10 @@ jobs:
           echo "::group::npm install"
           npm ci || npm install
           echo "::endgroup::"
+
+      - name: ✅ Validate Node for dev/CI
+        run: |
+          npm run check:node:dev
 
       - name: 🧪 Run tests (Jest)
         env:
@@ -52,16 +55,25 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: 🧰 Install Serverless CLI v3 (no login)
+      - name: 🧰 Install Serverless CLI v3
         run: npm i -g serverless@3
 
-      - name: 🧱 Serverless package (dev)
+      - name: 🧱 Serverless print (dev)
         run: |
-          echo "::group::serverless package"
-          serverless package --stage dev
+          echo "::group::serverless print dev"
+          npm run print:dev
           echo "::endgroup::"
 
-      # Deploy sólo si haces push a development
+      - name: 🧱 Serverless package (local)
+        run: |
+          echo "::group::serverless package local"
+          serverless package --stage local
+          echo "::endgroup::"
+
+      # Solo si luego quieres validar realmente el stage dev contra AWS/SSM
+      # porque dev usa parámetros SSM en serverless.yml.
+      # :contentReference[oaicite:0]{index=0}
+      #
       # - name: 🔐 Configure AWS credentials
       #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
       #   uses: aws-actions/configure-aws-credentials@v4
@@ -69,10 +81,17 @@ jobs:
       #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
       #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       #     aws-region: us-east-2
-
+      #
+      # - name: 🧱 Serverless package (dev)
+      #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
+      #   run: |
+      #     echo "::group::serverless package dev"
+      #     serverless package --stage dev
+      #     echo "::endgroup::"
+      #
       # - name: 🚀 Deploy (dev)
       #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
       #   run: |
-      #     echo "::group::serverless deploy (dev)"
-      #     serverless deploy --stage dev
+      #     echo "::group::serverless deploy dev"
+      #     npm run deploy:dev
       #     echo "::endgroup::"

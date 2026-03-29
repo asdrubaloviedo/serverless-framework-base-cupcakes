@@ -38,7 +38,8 @@ Estado actual del proyecto:
 
 ## Requisitos
 
-- Node local: 22.22.0
+- Local/offline: Node 20
+- CI/dev/deploy: Node 22
 - npm compatible con Node 22
 - Serverless Framework v3
 - AWS CLI configurado
