@@ -48,7 +48,7 @@ Estado actual del proyecto:
 
 ## Instalación
 
-1. Usar Node 24.x para pruebas locales
+1. Usar Node 20.x para pruebas locales
 2. Instalar dependencias:
    - Si existe package-lock.json:
         - npm ci
@@ -186,11 +186,12 @@ Runtime por stage
 
 ## Notas
 
-AWS Lambda soporta nodejs22.x
+nodejs22.x es soportado por AWS Lambda, pero Serverless Framework v3 no lo valida correctamente en local,
+por eso el stage local usa nodejs20.x
+no migrar aún a Serverless v4 hasta validar compatibilidad con serverless-offline
 Serverless v3 está fijado en este proyecto
 serverless-offline está fijado y no debe actualizarse todavía
 No usar npm audit fix --force
-No migrar aún a Serverless v4
 dev ya usa AWS Systems Manager Parameter Store
 prod ya está desacoplado de dev a nivel de variables y stage
 prod todavía requiere validación real de infraestructura antes de desplegar
