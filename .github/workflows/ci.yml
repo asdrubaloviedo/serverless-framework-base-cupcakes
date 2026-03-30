@@ -35,8 +35,7 @@ jobs:
           echo "::endgroup::"
 
       - name: ✅ Validate Node for dev/CI
-        run: |
-          npm run check:node:dev
+        run: npm run check:node:dev
 
       - name: 🧪 Run tests (Jest)
         env:
@@ -46,42 +45,17 @@ jobs:
           npm test --silent -- --coverage
           echo "::endgroup::"
 
-      - name: 🧰 Install Serverless CLI v3
-        run: npm i -g serverless@3
+      - name: 🧰 Verify Serverless
+        run: npx serverless --version
 
-      - name: 🧱 Serverless print (local)
+      - name: 🧱 Serverless print (ci/local config)
         run: |
-          echo "::group::serverless print local"
-          npm run print:local
+          echo "::group::serverless print ci"
+          npm run print:ci
           echo "::endgroup::"
 
       - name: 🧱 Serverless package (local)
         run: |
           echo "::group::serverless package local"
-          serverless package --stage local
+          npx serverless package --stage local
           echo "::endgroup::"
-
-      # Solo si luego quieres validar realmente el stage dev contra AWS/SSM
-      # porque dev usa parámetros SSM en serverless.yml.
-      #
-      # - name: 🔐 Configure AWS credentials
-      #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: us-east-2
-      #
-      # - name: 🧱 Serverless package (dev)
-      #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
-      #   run: |
-      #     echo "::group::serverless package dev"
-      #     serverless package --stage dev
-      #     echo "::endgroup::"
-      #
-      # - name: 🚀 Deploy (dev)
-      #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
-      #   run: |
-      #     echo "::group::serverless deploy dev"
-      #     npm run deploy:dev
-      #     echo "::endgroup::"

@@ -17,6 +17,7 @@
     "print:local": "npm run check:node:local && serverless print --stage local",
     "print:dev": "npm run check:node:dev && serverless print --stage dev",
     "print:prod": "npm run check:node:dev && serverless print --stage prod",
+    "print:ci": "serverless print --stage local",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
