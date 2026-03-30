@@ -108,9 +108,38 @@ El proyecto usa configuración separada por stage.
 
 Runtime por stage
 
-- local: nodejs20.x
-- dev: nodejs22.x
-- prod: nodejs22.x
+El proyecto utiliza diferentes versiones de Node.js según el entorno:
+
+- **local:** nodejs20.x  
+- **dev:** nodejs22.x  
+- **prod:** nodejs22.x  
+
+### ⚠️ Nota importante sobre Node 22 en local
+
+Aunque AWS Lambda ya soporta `nodejs22.x`, actualmente **Serverless Framework v3 + serverless-offline no soportan correctamente este runtime en entorno local**.
+
+Si se configura `nodejs22.x` en `local`, se obtiene el siguiente error:
+
+Warning: found unsupported runtime 'nodejs22.x'
+× Unsupported runtime
+
+Por esta razón:
+
+- El entorno **local debe ejecutarse con Node 20**
+- Los entornos **dev y prod usan Node 22**
+
+### 🧪 Estado actual
+
+- Código compatible con Node 22 ✅  
+- Tests pasan en Node 22 ✅  
+- Runtime AWS (`dev`) usa Node 22 ✅  
+- Limitación actual: `serverless-offline` ❗  
+
+> ⚠️ Esta configuración es intencional y responde a una limitación actual de serverless-offline.
+
+### 🚀 Plan futuro
+
+Cuando `serverless-offline` o Serverless Framework soporten correctamente `nodejs22.x` en local, se podrá unificar el runtime a Node 22 en todos los entornos.
 
 ---
 
