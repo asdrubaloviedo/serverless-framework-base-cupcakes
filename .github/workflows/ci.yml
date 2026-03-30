@@ -46,22 +46,13 @@ jobs:
           npm test --silent -- --coverage
           echo "::endgroup::"
 
-      - name: 📈 Upload coverage artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage
-          path: coverage/
-          if-no-files-found: ignore
-          retention-days: 7
-
       - name: 🧰 Install Serverless CLI v3
         run: npm i -g serverless@3
 
-      - name: 🧱 Serverless print (dev)
+      - name: 🧱 Serverless print (local)
         run: |
-          echo "::group::serverless print dev"
-          npm run print:dev
+          echo "::group::serverless print local"
+          npm run print:local
           echo "::endgroup::"
 
       - name: 🧱 Serverless package (local)
@@ -72,7 +63,6 @@ jobs:
 
       # Solo si luego quieres validar realmente el stage dev contra AWS/SSM
       # porque dev usa parámetros SSM en serverless.yml.
-      # :contentReference[oaicite:0]{index=0}
       #
       # - name: 🔐 Configure AWS credentials
       #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/development' }}
