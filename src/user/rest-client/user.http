@@ -75,7 +75,8 @@ POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{userModule}}/insertar-usuario
 Content-Type: application/json
 
 {
-  "email": "asdrubaloviedo9@gmail.com"
+  "nombre": "Test17Node",
+  "email": "test17node@gmail.com"
 }
 
 ### Desarrollo
@@ -83,5 +84,6 @@ POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{userModule}}/insertar-usuario-nue
 Content-Type: application/json
 
 {
-  "email": "asdrubaloviedo9@gmail.com"
+  "nombre": "Test17Node",
+  "email": "test17node@gmail.com"
 }

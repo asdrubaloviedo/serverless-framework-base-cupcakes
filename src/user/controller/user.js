@@ -21,8 +21,8 @@ class UserController {
   };
   
   static async createOneUser(params = {}) {
-    const { email, paquete } = params;
-    return CreateOneUser.execute({ email, paquete });
+    const { nombre, email } = params;
+    return CreateOneUser.execute({ nombre, email });
   };
 }
 

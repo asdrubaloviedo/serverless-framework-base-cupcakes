@@ -3,19 +3,39 @@
 const { UserModel } = require("@user/models/user");
 
 class UserRepository {
+    splitName(nombre = '') {
+        const normalized = String(nombre)
+        .trim()
+        .replace(/\s+/g, ' ');
 
-    async create({ email }) {
+        const [primerNombre = 'indefinido', segundoNombre = 'indefinido'] = normalized.split(' ');
+
+        return {
+            primerNombre,
+            segundoNombre,
+        };
+    }
+
+    async create({ nombre, email }) {
+        const { primerNombre, segundoNombre } = this.splitName(nombre);
+
         const query = 
             `
-                INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, edad, sexo, email, rol_id, estado_id)
-                SELECT 'indefinido', 'indefinido', 'indefinido', 'indefinido', 1, 'i', $1, 7, 1
-                WHERE NOT EXISTS (
-                    SELECT u.usuario_id
-                    FROM usuarios AS u
-                    WHERE u.email = $1
-                );
+                INSERT INTO usuarios (
+                    primer_nombre,
+                    segundo_nombre,
+                    primer_apellido,
+                    segundo_apellido,
+                    edad,
+                    sexo,
+                    email,
+                    rol_id,
+                    estado_id
+                )
+                VALUES ($1, $2, 'indefinido', 'indefinido', 1, 'i', LOWER($3), 7, 1)
+                ON CONFLICT (email) DO NOTHING;
             `
-        const params = [email];
+        const params = [primerNombre, segundoNombre, email];
         return UserModel.create({ query, params });
     }
 
@@ -24,7 +44,7 @@ class UserRepository {
             `
                 SELECT *
                 FROM usuarios
-                WHERE email = $1
+                WHERE email = LOWER($1)
             `
         const params = [email];
         return UserModel.getCreated({ query, params });

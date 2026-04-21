@@ -2,16 +2,16 @@ const { UserRepository } = require("@user/repositories/index");
 
 // POST Adicion de usuarios nuevos a la tabla usuarios.
 class CreateOneUser {
-    static async execute({ email }) {
+    static async execute({ nombre, email }) {
         const userRepository = new UserRepository();
 
         // API: '/insertar-usuario-nuevo'
         try {
-            await userRepository.create({ email });
+            await userRepository.create({ nombre, email });
         } catch (e) {
             // No enviar el error al usuario
             throw new Error('Error creating the user');
-        }        
+        }
         
         const newUser = await userRepository.getCreated({ email });
 
