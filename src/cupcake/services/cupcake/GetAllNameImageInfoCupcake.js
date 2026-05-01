@@ -16,12 +16,14 @@ class GetAllNameImageInfoCupcake {
 
         if (cupcakes.length === 0) {
             return {
+                paquete: 'Pack Personal',
                 total_cupcakes: 0,
                 cupcakes: []
             };
         }
 
         return {
+            paquete: 'Pack Personal',
             total_cupcakes: Number(cupcakes[0].total_cupcakes),
             cupcakes: cupcakes.map(({ total_cupcakes, ...cupcake }) => cupcake)
         };

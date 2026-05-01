@@ -37,6 +37,7 @@ describe('GetAllNameImageInfoCupcake Service', () => {
     });
 
     expect(res).toEqual({
+      paquete: 'Pack Personal',
       total_cupcakes: 0,
       cupcakes: [],
     });
@@ -65,6 +66,7 @@ describe('GetAllNameImageInfoCupcake Service', () => {
     });
 
     expect(res).toEqual({
+      paquete: 'Pack Personal',
       total_cupcakes: 2,
       cupcakes: [
         {
