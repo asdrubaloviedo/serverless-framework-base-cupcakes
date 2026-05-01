@@ -1,4 +1,4 @@
-const { DoTestCupcake, GetAllCupcake, GetAllNameImageCupcake, GetAllNameImageMoviesCupcake, GetByIdCupcake, GetByIdInfoImageCupcake, GetAllRamdomCupcake, GetAllNameImageFiltrosCupcake } = require('@cupcake/services/cupcake');
+const { DoTestCupcake, GetAllCupcake, GetAllNameImageCupcake, GetAllNameImageMoviesCupcake, GetByIdCupcake, GetByIdInfoImageCupcake, GetAllRamdomCupcake, GetAllNameImageFiltrosCupcake, GetAllNameImageInfoCupcake } = require('@cupcake/services/cupcake');
 const { GetByIdCupcakeUserStateCupcake, CreateOneCupcakeUserStateCupcake, PatchOneCupcakeUserStateCupcake } = require('@cupcake/services/cupcakeUserState');
 
 class CupcakeController {
@@ -20,6 +20,11 @@ class CupcakeController {
   static async getAllNameImageMovies(params = {}) {
     const { email } = params;
     return GetAllNameImageMoviesCupcake.execute({ email });
+  };
+
+  static async getAllNameImageInfoByUserEmail(params = {}) {
+    const { email } = params;
+    return GetAllNameImageInfoCupcake.execute({ email });
   };
 
   static async getById(params = {}) {

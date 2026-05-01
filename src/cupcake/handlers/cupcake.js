@@ -80,6 +80,7 @@ const routes = {
   'GET /name-image-festividad/usuario': (e) => CupcakeController.getAllNameImage(qs(e)),
   'GET /name-image-peliculas':          (e) => CupcakeController.getAllNameImageMovies(qs(e)),
   'GET /name-image-peliculas/usuario':  (e) => CupcakeController.getAllNameImageMovies(qs(e)),
+  'GET /name-image-info/usuario':       (e) => CupcakeController.getAllNameImageInfoByUserEmail(qs(e)),
   'GET /cupcake':                       (e) => CupcakeController.getById(qs(e)),
   'GET /busqueda/usuario':              (e) => CupcakeController.getById(qs(e)),
   'GET /ramdom/usuario':                (e) => CupcakeController.getById(qs(e)),

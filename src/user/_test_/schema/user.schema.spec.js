@@ -105,14 +105,31 @@ describe('user/schema/user', () => {
   });
 
   describe('validateCreateUser', () => {
-    test('ok: email válido', () => {
-      const out = S.validateCreateUser({ email: 'a@a.com' });
+    test('ok: nombre y email válidos', () => {
+      const out = S.validateCreateUser({
+        nombre: 'Juan Perez',
+        email: 'A@A.COM',
+      });
+
       expect(out.success).toBe(true);
-      expect(out.data).toEqual({ email: 'a@a.com' });
+      expect(out.data).toEqual({
+        nombre: 'Juan Perez',
+        email: 'a@a.com',
+      });
+    });
+
+    test('error: nombre faltante', () => {
+      const out = S.validateCreateUser({ email: 'a@a.com' });
+
+      expect(out.success).toBe(false);
+      expect(out.error.issues[0].message).toBe(
+        'User nombre must have at least 2 characters.'
+      );
     });
 
     test('error: email faltante', () => {
-      const out = S.validateCreateUser({});
+      const out = S.validateCreateUser({ nombre: 'Juan Perez' });
+
       expect(out.success).toBe(false);
       expect(out.error.issues[0].message).toBe('User email is required.');
     });

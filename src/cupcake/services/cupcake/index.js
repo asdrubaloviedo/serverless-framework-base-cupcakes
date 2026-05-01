@@ -6,6 +6,7 @@ const GetByIdCupcake = require ("@cupcake/services/cupcake/GetByIdCupcake");
 const GetByIdInfoImageCupcake = require ("@cupcake/services/cupcake/GetByIdInfoImageCupcake");
 const GetAllRamdomCupcake = require ("@cupcake/services/cupcake/GetAllRamdomCupcake");
 const GetAllNameImageFiltrosCupcake = require ("@cupcake/services/cupcake/GetAllNameImageFiltrosCupcake");
+const GetAllNameImageInfoCupcake = require("@cupcake/services/cupcake/GetAllNameImageInfoCupcake");
 
 module.exports = {
     DoTestCupcake,
@@ -15,5 +16,6 @@ module.exports = {
     GetByIdCupcake,
     GetByIdInfoImageCupcake,
     GetAllRamdomCupcake,
-    GetAllNameImageFiltrosCupcake
+    GetAllNameImageFiltrosCupcake,
+    GetAllNameImageInfoCupcake
 }

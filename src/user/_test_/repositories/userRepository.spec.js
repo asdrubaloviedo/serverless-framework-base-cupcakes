@@ -10,10 +10,12 @@ beforeEach(() => jest.clearAllMocks());
 describe('UserRepository', () => {
   test('create arma SQL y pasa params', async () => {
     const repo = new UserRepository();
-    await repo.create({ email: 'a@a.com' });
+
+    await repo.create({ nombre: 'Juan Perez', email: 'a@a.com' });
+
     expect(UserModel.create).toHaveBeenCalledWith({
       query: expect.stringContaining('INSERT INTO usuarios'),
-      params: ['a@a.com'],
+      params: ['Juan', 'Perez', 'a@a.com'],
     });
   });
 

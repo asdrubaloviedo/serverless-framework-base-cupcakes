@@ -49,6 +49,10 @@ class CupcakeModel {
     return db.query(query, params);
   }
 
+  static async getAllNameImageInfoByUserEmail({ query, params }) {
+    return db.query(query, params);
+  }
+
   static async getAllNameImageMovies({ query }) {
     return db.query(query);
   }

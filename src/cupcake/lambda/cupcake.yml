@@ -54,6 +54,10 @@ cupcake:
         method: get
         cors: ${self:custom.corsCommon}
     - http:
+        path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/name-image-info/usuario
+        method: get
+        cors: ${self:custom.corsCommon}
+    - http:
         path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/cupcake
         method: get
         cors: ${self:custom.corsCommon}

@@ -41,13 +41,25 @@ describe('UserController', () => {
 
   test('createOneUser pasa params', async () => {
     CreateOneUser.execute.mockResolvedValue([{ ok: 4 }]);
-    const r = await UserController.createOneUser({ email: 'b@b.com', paquete: 1 });
-    expect(CreateOneUser.execute).toHaveBeenCalledWith({ email: 'b@b.com', paquete: 1 });
+
+    const r = await UserController.createOneUser({
+      nombre: 'Juan Perez',
+      email: 'b@b.com',
+    });
+
+    expect(CreateOneUser.execute).toHaveBeenCalledWith({
+      nombre: 'Juan Perez',
+      email: 'b@b.com',
+    });
+
     expect(r).toEqual([{ ok: 4 }]);
   });
 
   test('propaga error de servicios', async () => {
     CreateOneUser.execute.mockRejectedValue(new Error('boom'));
-    await expect(UserController.createOneUser({ email: 'x@x.com' })).rejects.toThrow('boom');
+
+    await expect(
+      UserController.createOneUser({ nombre: 'Juan Perez', email: 'x@x.com' })
+    ).rejects.toThrow('boom');
   });
 });
