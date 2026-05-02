@@ -1,6 +1,7 @@
 jest.mock('@cupcake/repositories/index', () => {
   const repo = {
     getAllNameImageInfoByUserEmail: jest.fn(),
+    getAllNameImageInfoPackagesByUserEmail: jest.fn(),
   };
 
   return {
@@ -79,5 +80,119 @@ describe('GetAllNameImageInfoCupcake Service', () => {
         },
       ],
     });
+  });
+
+  test('tipo paquetes sin email retorna arreglo vacío y no consulta repositorio', async () => {
+    const repo = new CupcakeRepository();
+
+    const res = await S.execute({ tipo: 'paquetes' });
+
+    expect(res).toEqual([]);
+    expect(repo.getAllNameImageInfoPackagesByUserEmail).not.toHaveBeenCalled();
+  });
+
+  test('tipo paquetes sin resultados retorna arreglo vacío', async () => {
+    const repo = new CupcakeRepository();
+
+    repo.getAllNameImageInfoPackagesByUserEmail.mockResolvedValueOnce([]);
+
+    const res = await S.execute({
+      email: 'USER@MAIL.COM',
+      tipo: 'paquetes',
+    });
+
+    expect(repo.getAllNameImageInfoPackagesByUserEmail).toHaveBeenCalledWith({
+      lowerCaseEmail: 'user@mail.com',
+    });
+
+    expect(res).toEqual([]);
+  });
+
+  test('tipo paquetes agrupa cupcakes por paquete', async () => {
+    const repo = new CupcakeRepository();
+
+    repo.getAllNameImageInfoPackagesByUserEmail.mockResolvedValueOnce([
+      {
+        paquete_id: 2,
+        paquete: 'San Valentin basico',
+        total_cupcakes: '2',
+        cupcake_id: 10,
+        nombre: 'Cupcake Amor',
+        codigo: 'url-1',
+        hecho: true,
+        tiempo: 30,
+        porciones: 10,
+      },
+      {
+        paquete_id: 2,
+        paquete: 'San Valentin basico',
+        total_cupcakes: '2',
+        cupcake_id: 11,
+        nombre: 'Cupcake Corazon',
+        codigo: 'url-2',
+        hecho: false,
+        tiempo: 40,
+        porciones: 12,
+      },
+      {
+        paquete_id: 3,
+        paquete: 'Pascua basico',
+        total_cupcakes: '1',
+        cupcake_id: 20,
+        nombre: 'Cupcake Conejo',
+        codigo: 'url-3',
+        hecho: false,
+        tiempo: 35,
+        porciones: 8,
+      },
+    ]);
+
+    const res = await S.execute({
+      email: 'USER@MAIL.COM',
+      tipo: 'paquetes',
+    });
+
+    expect(repo.getAllNameImageInfoPackagesByUserEmail).toHaveBeenCalledWith({
+      lowerCaseEmail: 'user@mail.com',
+    });
+
+    expect(res).toEqual([
+      {
+        paquete: 'San Valentin basico',
+        total_cupcakes: 2,
+        cupcakes: [
+          {
+            cupcake_id: 10,
+            nombre: 'Cupcake Amor',
+            codigo: 'url-1',
+            hecho: true,
+            tiempo: 30,
+            porciones: 10,
+          },
+          {
+            cupcake_id: 11,
+            nombre: 'Cupcake Corazon',
+            codigo: 'url-2',
+            hecho: false,
+            tiempo: 40,
+            porciones: 12,
+          },
+        ],
+      },
+      {
+        paquete: 'Pascua basico',
+        total_cupcakes: 1,
+        cupcakes: [
+          {
+            cupcake_id: 20,
+            nombre: 'Cupcake Conejo',
+            codigo: 'url-3',
+            hecho: false,
+            tiempo: 35,
+            porciones: 8,
+          },
+        ],
+      },
+    ]);
   });
 });

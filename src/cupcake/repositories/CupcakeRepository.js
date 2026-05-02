@@ -308,6 +308,49 @@ class CupcakeRepository {
         return CupcakeModel.getAllNameImageInfoByUserEmail({ query, params });
     }
 
+    async getAllNameImageInfoPackagesByUserEmail({ lowerCaseEmail }) {
+        const query = `
+        SELECT
+            p.paquete_id,
+            p.descripcion AS paquete,
+            cu.cupcake_id,
+            cu.nombre,
+            im.codigo,
+            COALESCE(cue.valor, FALSE) AS hecho,
+            cu.tiempo,
+            cu.porciones,
+            COUNT(cu.cupcake_id) OVER(PARTITION BY p.paquete_id) AS total_cupcakes
+        FROM usuarios us
+        INNER JOIN usuario_paquetes up
+            ON up.usuario_id = us.usuario_id
+        INNER JOIN paquetes p
+            ON p.paquete_id = up.paquete_id
+        INNER JOIN cupcakes cu
+            ON cu.paquete_id = p.paquete_id
+        LEFT JOIN imagenes_cupcakes imc
+            ON cu.cupcake_id = imc.cupcake_id
+            AND imc.main = 1
+        LEFT JOIN imagenes im
+            ON imc.imagen_id = im.imagen_id
+        LEFT JOIN cupcake_usuario_estados cue
+            ON cue.cupcake_id = cu.cupcake_id
+            AND cue.usuario_id = us.usuario_id
+            AND cue.estado_id = 2
+        WHERE LOWER(us.email) = $1
+            AND p.paquete_id <> 1
+            AND up.activo = TRUE
+            AND p.habilitado = TRUE
+        ORDER BY p.paquete_id, cu.cupcake_id;
+        `;
+
+        const params = [lowerCaseEmail];
+
+        return CupcakeModel.getAllNameImageInfoPackagesByUserEmail({
+        query,
+        params,
+        });
+    }
+
     async getAllNameImageMovies() {
         const query = 
             `

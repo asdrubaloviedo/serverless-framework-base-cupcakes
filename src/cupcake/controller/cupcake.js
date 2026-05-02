@@ -23,8 +23,8 @@ class CupcakeController {
   };
 
   static async getAllNameImageInfoByUserEmail(params = {}) {
-    const { email } = params;
-    return GetAllNameImageInfoCupcake.execute({ email });
+    const { email, tipo } = params;
+    return GetAllNameImageInfoCupcake.execute({ email, tipo });
   };
 
   static async getById(params = {}) {
