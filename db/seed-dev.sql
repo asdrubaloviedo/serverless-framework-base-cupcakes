@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS paquete_precios (
     paquete_precios_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('paquete_precios_id'),
     paquete_id INTEGER NOT NULL,
     moneda VARCHAR(3) NOT NULL,                 -- 'USD', 'EUR', 'PEN'
-    pais VARCHAR(3) DEFAULT NULL,               -- 'US', 'PE', 'ES', o NULL para global
+    pais VARCHAR(3) DEFAULT NULL,               -- 'USA', 'PER', 'ESP', o NULL para global
     defecto BOOLEAN NOT NULL DEFAULT FALSE,
     monto_centavos INTEGER NOT NULL,            -- precio en centavos/céntimos
     FOREIGN KEY (paquete_id) REFERENCES paquetes(paquete_id)
@@ -151,33 +151,33 @@ WHERE defecto = TRUE;
 INSERT INTO paquete_precios (paquete_precios_id, paquete_id, moneda, pais, defecto, monto_centavos)
     VALUES
         (1, 1, 'USD', NULL, TRUE, 999),             -- Opcion por defecto si no se conocen los detalles del pais y su moneda
-        (2, 1, 'USD', 'US', TRUE, 999),
-        (3, 2, 'USD', 'US', TRUE, 999),
-        (4, 3, 'USD', 'US', TRUE, 999),
-        (5, 4, 'USD', 'US', TRUE, 999),
-        (6, 5, 'USD', 'US', TRUE, 999),
-        (7, 1, 'EUR', 'ES', TRUE, 849),
-        (8, 2, 'EUR', 'ES', TRUE, 849),
-        (9, 3, 'EUR', 'ES', TRUE, 849),
-        (10, 4, 'EUR', 'ES', TRUE, 849),
-        (11, 5, 'EUR', 'ES', TRUE, 849),
-        (12, 1, 'PEN', 'PE', TRUE, 3499),
-        (13, 1, 'USD', 'PE', FALSE, 999),
-        (14, 1, 'EUR', 'PE', FALSE, 849),
-        (15, 2, 'PEN', 'PE', TRUE, 3499),
-        (16, 2, 'USD', 'PE', FALSE, 999),
-        (17, 2, 'EUR', 'PE', FALSE, 849),
-        (18, 3, 'PEN', 'PE', TRUE, 3499),
-        (19, 3, 'USD', 'PE', FALSE, 999),
-        (20, 3, 'EUR', 'PE', FALSE, 849),
-        (21, 4, 'PEN', 'PE', TRUE, 3499),
-        (22, 4, 'USD', 'PE', FALSE, 999),
-        (23, 4, 'EUR', 'PE', FALSE, 849),
-        (24, 5, 'PEN', 'PE', TRUE, 3499),
-        (25, 5, 'USD', 'PE', FALSE, 999),
-        (26, 5, 'EUR', 'PE', FALSE, 849);
+        (2, 1, 'USD', 'USA', TRUE, 999),
+        (3, 2, 'USD', 'USA', TRUE, 999),
+        (4, 3, 'USD', 'USA', TRUE, 999),
+        (5, 4, 'USD', 'USA', TRUE, 999),
+        (6, 5, 'USD', 'USA', TRUE, 999),
+        (7, 1, 'EUR', 'ESP', TRUE, 849),
+        (8, 2, 'EUR', 'ESP', TRUE, 849),
+        (9, 3, 'EUR', 'ESP', TRUE, 849),
+        (10, 4, 'EUR', 'ESP', TRUE, 849),
+        (11, 5, 'EUR', 'ESP', TRUE, 849),
+        (12, 1, 'PEN', 'PER', TRUE, 3499),
+        (13, 1, 'USD', 'PER', FALSE, 999),
+        (14, 1, 'EUR', 'PER', FALSE, 849),
+        (15, 2, 'PEN', 'PER', TRUE, 3499),
+        (16, 2, 'USD', 'PER', FALSE, 999),
+        (17, 2, 'EUR', 'PER', FALSE, 849),
+        (18, 3, 'PEN', 'PER', TRUE, 3499),
+        (19, 3, 'USD', 'PER', FALSE, 999),
+        (20, 3, 'EUR', 'PER', FALSE, 849),
+        (21, 4, 'PEN', 'PER', TRUE, 3499),
+        (22, 4, 'USD', 'PER', FALSE, 999),
+        (23, 4, 'EUR', 'PER', FALSE, 849),
+        (24, 5, 'PEN', 'PER', TRUE, 3499),
+        (25, 5, 'USD', 'PER', FALSE, 999),
+        (26, 5, 'EUR', 'PER', FALSE, 849);
 
-SELECT setval('paquete_precios_id', 25, true);        -- Mantiene los IDs fijos hasta el 25 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval('paquete_precios_id', 26, true);        -- Mantiene los IDs fijos hasta el 26 y ajustar la secuencia al final para que vuelva a ser automatica
 
 CREATE SEQUENCE cupcake_id;
 CREATE TABLE IF NOT EXISTS cupcakes (
