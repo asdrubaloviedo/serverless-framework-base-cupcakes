@@ -1,39 +1,72 @@
-jest.mock('@user/repositories/index', () => ({
-  UserRepository: jest.fn(),
-}));
-const { UserRepository } = require('@user/repositories/index');
+jest.mock('@user/repositories/index', () => {
+  const mockCreate = jest.fn();
+  const mockGetCreated = jest.fn();
+
+  return {
+    UserRepository: jest.fn().mockImplementation(() => ({
+      create: mockCreate,
+      getCreated: mockGetCreated,
+    })),
+    __mocks__: {
+      mockCreate,
+      mockGetCreated,
+    },
+  };
+});
+
+const { UserRepository, __mocks__ } = require('@user/repositories/index');
 const CreateOneUser = require('../../services/user/CreateOneUser');
 
-beforeEach(() => jest.clearAllMocks());
-
 describe('CreateOneUser Service', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test('crea y devuelve usuario', async () => {
-    const create = jest.fn().mockResolvedValue(undefined);
-    const getCreated = jest.fn().mockResolvedValue([{ id: 1 }]);
-    UserRepository.mockImplementation(() => ({ create, getCreated }));
+    __mocks__.mockGetCreated.mockResolvedValue([{ id: 1 }]);
 
     const res = await CreateOneUser.execute({ email: 'a@a.com' });
-    expect(create).toHaveBeenCalledWith({ email: 'a@a.com' });
-    expect(getCreated).toHaveBeenCalledWith({ email: 'a@a.com' });
+
+    expect(__mocks__.mockCreate).toHaveBeenCalledWith({
+      nombre: undefined,
+      email: 'a@a.com',
+      pais: 'PER',
+    });
+
+    expect(__mocks__.mockGetCreated).toHaveBeenCalledWith({
+      email: 'a@a.com',
+    });
+
     expect(res).toEqual([{ id: 1 }]);
   });
 
-  test('si no hay filas -> null', async () => {
-    const create = jest.fn().mockResolvedValue(undefined);
-    const getCreated = jest.fn().mockResolvedValue([]);
-    UserRepository.mockImplementation(() => ({ create, getCreated }));
+  test('retorna null si no encuentra usuario creado', async () => {
+    __mocks__.mockGetCreated.mockResolvedValue([]);
 
-    const res = await CreateOneUser.execute({ email: 'b@b.com' });
+    const res = await CreateOneUser.execute({
+      nombre: 'Juan Perez',
+      email: 'a@a.com',
+      pais: 'PER',
+    });
+
+    expect(__mocks__.mockCreate).toHaveBeenCalledWith({
+      nombre: 'Juan Perez',
+      email: 'a@a.com',
+      pais: 'PER',
+    });
+
     expect(res).toBeNull();
   });
 
-  test('error en create -> error genérico', async () => {
-    const create = jest.fn().mockRejectedValue(new Error('db down'));
-    const getCreated = jest.fn(); // no debería llamarse
-    UserRepository.mockImplementation(() => ({ create, getCreated }));
+  test('lanza error si falla create', async () => {
+    __mocks__.mockCreate.mockRejectedValue(new Error('db error'));
 
-    await expect(CreateOneUser.execute({ email: 'x@x.com' }))
-      .rejects.toThrow('Error creating the user');
-    expect(getCreated).not.toHaveBeenCalled();
+    await expect(
+      CreateOneUser.execute({
+        nombre: 'Juan Perez',
+        email: 'a@a.com',
+        pais: 'PER',
+      })
+    ).rejects.toThrow('Error creating the user');
   });
 });

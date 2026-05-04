@@ -15,11 +15,10 @@ describe('UserRepository', () => {
 
     expect(UserModel.create).toHaveBeenCalledWith({
       query: expect.stringContaining('INSERT INTO usuarios'),
-      params: ['Juan', 'Perez', 'a@a.com'],
+      params: ['Juan', 'Perez', 'PER', 'a@a.com'],
     });
   });
 
-  // ✅ NUEVO: nombre con solo una palabra
   test('create con solo un nombre usa segundo nombre indefinido', async () => {
     const repo = new UserRepository();
 
@@ -27,11 +26,10 @@ describe('UserRepository', () => {
 
     expect(UserModel.create).toHaveBeenCalledWith({
       query: expect.stringContaining('INSERT INTO usuarios'),
-      params: ['Juan', 'indefinido', 'a@a.com'],
+      params: ['Juan', 'indefinido', 'PER', 'a@a.com'],
     });
   });
 
-  // ✅ NUEVO: sin nombre
   test('create sin nombre usa valores por defecto', async () => {
     const repo = new UserRepository();
 
@@ -39,7 +37,22 @@ describe('UserRepository', () => {
 
     expect(UserModel.create).toHaveBeenCalledWith({
       query: expect.stringContaining('INSERT INTO usuarios'),
-      params: ['', 'indefinido', 'a@a.com'],
+      params: ['', 'indefinido', 'PER', 'a@a.com'],
+    });
+  });
+
+  test('create con pais personalizado lo pasa en params', async () => {
+    const repo = new UserRepository();
+
+    await repo.create({
+      nombre: 'Juan Perez',
+      email: 'a@a.com',
+      pais: 'FRA',
+    });
+
+    expect(UserModel.create).toHaveBeenCalledWith({
+      query: expect.stringContaining('INSERT INTO usuarios'),
+      params: ['Juan', 'Perez', 'FRA', 'a@a.com'],
     });
   });
 

@@ -93,7 +93,7 @@ const createUserPackageSchema = z.object({
 const createUserSchema = z.object({
   nombre: nameRequired,
   email: emailRequired,
-  pais: paisOptional.optional()
+  pais: paisOptional.default('PER')
 }).strict();
 
 const validateCreateUserMedalLeage = (o) => createUserMedalSchema.safeParse(o);

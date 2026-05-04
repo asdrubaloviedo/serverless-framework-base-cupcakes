@@ -115,6 +115,7 @@ describe('user/schema/user', () => {
       expect(out.data).toEqual({
         nombre: 'Juan Perez',
         email: 'a@a.com',
+        pais: 'PER',
       });
     });
 
@@ -132,6 +133,31 @@ describe('user/schema/user', () => {
 
       expect(out.success).toBe(false);
       expect(out.error.issues[0].message).toBe('User email is required.');
+    });
+
+    test('createUserSchema asigna PER cuando pais no viene', () => {
+      const { validateCreateUser } = require('../../schema/user');
+
+      const result = validateCreateUser({
+        nombre: 'Juan Perez',
+        email: 'test@test.com',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data.pais).toBe('PER');
+    });
+
+    test('createUserSchema asigna PER cuando pais viene vacío', () => {
+      const { validateCreateUser } = require('../../schema/user');
+
+      const result = validateCreateUser({
+        nombre: 'Juan Perez',
+        email: 'test@test.com',
+        pais: '',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data.pais).toBe('PER');
     });
   });
 });

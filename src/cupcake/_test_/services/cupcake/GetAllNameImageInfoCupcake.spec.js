@@ -289,4 +289,51 @@ describe('GetAllNameImageInfoCupcake Service', () => {
       },
     ]);
   });
+
+  test('paquetes-faltantes maneja precio null correctamente', async () => {
+    const repo = new CupcakeRepository();
+
+    repo.getAllNameImageInfoMissingPackagesByUserEmail.mockResolvedValueOnce([
+      {
+        paquete_id: 5,
+        paquete: 'Navidad basico',
+        moneda: null,
+        monto_centavos: null,
+        total_cupcakes: '1',
+        cupcake_id: 100,
+        nombre: 'Cupcake Nieve',
+        codigo: 'url-x',
+        hecho: false,
+        tiempo: 10,
+        porciones: 5,
+      },
+    ]);
+
+    const res = await S.execute({
+      email: 'USER@MAIL.COM',
+      tipo: 'paquetes-faltantes',
+    });
+
+    expect(res).toEqual([
+      {
+        paquete: 'Navidad basico',
+        precio: {
+          moneda: null,
+          monto_centavos: null,
+          monto: null,
+        },
+        total_cupcakes: 1,
+        cupcakes: [
+          {
+            cupcake_id: 100,
+            nombre: 'Cupcake Nieve',
+            codigo: 'url-x',
+            hecho: false,
+            tiempo: 10,
+            porciones: 5,
+          },
+        ],
+      },
+    ]);
+  });
 });
