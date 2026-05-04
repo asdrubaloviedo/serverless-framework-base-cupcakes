@@ -351,6 +351,47 @@ class CupcakeRepository {
         });
     }
 
+    async getAllNameImageInfoMissingPackagesByUserEmail({ lowerCaseEmail }) {
+        const query = `
+            SELECT
+            p.paquete_id,
+            p.descripcion AS paquete,
+            cu.cupcake_id,
+            cu.nombre,
+            im.codigo,
+            FALSE AS hecho,
+            cu.tiempo,
+            cu.porciones,
+            COUNT(cu.cupcake_id) OVER(PARTITION BY p.paquete_id) AS total_cupcakes
+            FROM paquetes p
+            INNER JOIN cupcakes cu
+            ON cu.paquete_id = p.paquete_id
+            LEFT JOIN imagenes_cupcakes imc
+            ON cu.cupcake_id = imc.cupcake_id
+            AND imc.main = 1
+            LEFT JOIN imagenes im
+            ON imc.imagen_id = im.imagen_id
+            WHERE p.paquete_id <> 1
+            AND p.habilitado = TRUE
+            AND NOT EXISTS (
+                SELECT 1
+                FROM usuario_paquetes up
+                INNER JOIN usuarios us
+                ON us.usuario_id = up.usuario_id
+                WHERE up.paquete_id = p.paquete_id
+                AND LOWER(us.email) = $1
+            )
+            ORDER BY p.paquete_id, cu.cupcake_id;
+        `;
+
+        const params = [lowerCaseEmail];
+
+        return CupcakeModel.getAllNameImageInfoMissingPackagesByUserEmail({
+            query,
+            params,
+        });
+        }
+
     async getAllNameImageMovies() {
         const query = 
             `

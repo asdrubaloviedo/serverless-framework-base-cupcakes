@@ -2,6 +2,7 @@ jest.mock('@cupcake/repositories/index', () => {
   const repo = {
     getAllNameImageInfoByUserEmail: jest.fn(),
     getAllNameImageInfoPackagesByUserEmail: jest.fn(),
+    getAllNameImageInfoMissingPackagesByUserEmail: jest.fn(),
   };
 
   return {
@@ -190,6 +191,86 @@ describe('GetAllNameImageInfoCupcake Service', () => {
             hecho: false,
             tiempo: 35,
             porciones: 8,
+          },
+        ],
+      },
+    ]);
+  });
+
+  test('tipo paquetes-faltantes sin resultados retorna arreglo vacío', async () => {
+    const repo = new CupcakeRepository();
+
+    repo.getAllNameImageInfoMissingPackagesByUserEmail.mockResolvedValueOnce([]);
+
+    const res = await S.execute({
+      email: 'USER@MAIL.COM',
+      tipo: 'paquetes-faltantes',
+    });
+
+    expect(repo.getAllNameImageInfoMissingPackagesByUserEmail).toHaveBeenCalledWith({
+      lowerCaseEmail: 'user@mail.com',
+    });
+
+    expect(res).toEqual([]);
+  });
+
+  test('tipo paquetes-faltantes agrupa cupcakes por paquete', async () => {
+    const repo = new CupcakeRepository();
+
+    repo.getAllNameImageInfoMissingPackagesByUserEmail.mockResolvedValueOnce([
+      {
+        paquete_id: 4,
+        paquete: 'Halloween basico',
+        total_cupcakes: '2',
+        cupcake_id: 30,
+        nombre: 'Cupcake Fantasma',
+        codigo: 'url-1',
+        hecho: false,
+        tiempo: 30,
+        porciones: 10,
+      },
+      {
+        paquete_id: 4,
+        paquete: 'Halloween basico',
+        total_cupcakes: '2',
+        cupcake_id: 31,
+        nombre: 'Cupcake Calabaza',
+        codigo: 'url-2',
+        hecho: false,
+        tiempo: 40,
+        porciones: 12,
+      },
+    ]);
+
+    const res = await S.execute({
+      email: 'USER@MAIL.COM',
+      tipo: 'paquetes-faltantes',
+    });
+
+    expect(repo.getAllNameImageInfoMissingPackagesByUserEmail).toHaveBeenCalledWith({
+      lowerCaseEmail: 'user@mail.com',
+    });
+
+    expect(res).toEqual([
+      {
+        paquete: 'Halloween basico',
+        total_cupcakes: 2,
+        cupcakes: [
+          {
+            cupcake_id: 30,
+            nombre: 'Cupcake Fantasma',
+            codigo: 'url-1',
+            hecho: false,
+            tiempo: 30,
+            porciones: 10,
+          },
+          {
+            cupcake_id: 31,
+            nombre: 'Cupcake Calabaza',
+            codigo: 'url-2',
+            hecho: false,
+            tiempo: 40,
+            porciones: 12,
           },
         ],
       },

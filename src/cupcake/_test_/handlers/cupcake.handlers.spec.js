@@ -52,4 +52,23 @@ describe('cupcake handler', () => {
 
     expect(res).toBeDefined();
   });
+
+  test('GET /name-image-info/paquetes-faltantes/usuario agrega tipo paquetes-faltantes', async () => {
+    CupcakeController.getAllNameImageInfoByUserEmail.mockResolvedValue([
+      { ok: 1 },
+    ]);
+
+    const event = buildEvent('/name-image-info/paquetes-faltantes/usuario', {
+      email: 'test@test.com',
+    });
+
+    const res = await handler.handler(event);
+
+    expect(CupcakeController.getAllNameImageInfoByUserEmail).toHaveBeenCalledWith({
+      email: 'test@test.com',
+      tipo: 'paquetes-faltantes',
+    });
+
+    expect(res).toBeDefined();
+  });
 });

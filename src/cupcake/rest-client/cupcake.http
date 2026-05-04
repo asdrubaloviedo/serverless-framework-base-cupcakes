@@ -103,6 +103,12 @@ GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-inf
 ### Desarrollo
 GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes/usuario?email=asdrubaloviedo@gmail.com
 
+### ### GET Nombre, imagen principal, estado Hecho, tiempo y porciones de los cupcakes de cada paquete faltantes para un usuario por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes-faltantes/usuario?email=asdrubaloviedo@gmail.com
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes-faltantes/usuario?email=asdrubaloviedo@gmail.com
+
 ### GET Info del cupcake por id.
 ### Local
 GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/cupcake?id=1
