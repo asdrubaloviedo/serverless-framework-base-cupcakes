@@ -356,6 +356,8 @@ class CupcakeRepository {
             SELECT
             p.paquete_id,
             p.descripcion AS paquete,
+            pp.moneda,
+            pp.monto_centavos,
             cu.cupcake_id,
             cu.nombre,
             im.codigo,
@@ -366,6 +368,9 @@ class CupcakeRepository {
             FROM paquetes p
             INNER JOIN cupcakes cu
             ON cu.paquete_id = p.paquete_id
+            LEFT JOIN paquete_precios pp
+            ON pp.paquete_id = p.paquete_id
+            AND pp.defecto = TRUE
             LEFT JOIN imagenes_cupcakes imc
             ON cu.cupcake_id = imc.cupcake_id
             AND imc.main = 1
@@ -390,7 +395,7 @@ class CupcakeRepository {
             query,
             params,
         });
-        }
+    }
 
     async getAllNameImageMovies() {
         const query = 

@@ -36,25 +36,45 @@ class GetAllNameImageInfoCupcake {
 
     // API: '/name-image-info/paquetes-faltantes/usuario'
     if (tipo === 'paquetes-faltantes') {
-        const cupcakes = await cupcakeRepository.getAllNameImageInfoMissingPackagesByUserEmail({
+        const cupcakes =
+            await cupcakeRepository.getAllNameImageInfoMissingPackagesByUserEmail({
             lowerCaseEmail,
-        });
+            });
 
         if (cupcakes.length === 0) return [];
 
         const packagesMap = new Map();
 
-        cupcakes.forEach(({ paquete_id, paquete, total_cupcakes, ...cupcake }) => {
+        cupcakes.forEach(
+            ({
+            paquete_id,
+            paquete,
+            moneda,
+            monto_centavos,
+            total_cupcakes,
+            ...cupcake
+            }) => {
             if (!packagesMap.has(paquete_id)) {
-            packagesMap.set(paquete_id, {
+                const montoCentavos =
+                monto_centavos === null || monto_centavos === undefined
+                    ? null
+                    : Number(monto_centavos);
+
+                packagesMap.set(paquete_id, {
                 paquete,
+                precio: {
+                    moneda: moneda || null,
+                    monto_centavos: montoCentavos,
+                    monto: montoCentavos === null ? null : montoCentavos / 100,
+                },
                 total_cupcakes: Number(total_cupcakes),
                 cupcakes: [],
-            });
+                });
             }
 
             packagesMap.get(paquete_id).cupcakes.push(cupcake);
-        });
+            }
+        );
 
         return Array.from(packagesMap.values());
     }

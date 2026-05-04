@@ -207,20 +207,24 @@ describe('GetAllNameImageInfoCupcake Service', () => {
       tipo: 'paquetes-faltantes',
     });
 
-    expect(repo.getAllNameImageInfoMissingPackagesByUserEmail).toHaveBeenCalledWith({
+    expect(
+      repo.getAllNameImageInfoMissingPackagesByUserEmail
+    ).toHaveBeenCalledWith({
       lowerCaseEmail: 'user@mail.com',
     });
 
     expect(res).toEqual([]);
   });
 
-  test('tipo paquetes-faltantes agrupa cupcakes por paquete', async () => {
+  test('tipo paquetes-faltantes agrupa cupcakes por paquete con precio', async () => {
     const repo = new CupcakeRepository();
 
     repo.getAllNameImageInfoMissingPackagesByUserEmail.mockResolvedValueOnce([
       {
         paquete_id: 4,
         paquete: 'Halloween basico',
+        moneda: 'PEN',
+        monto_centavos: 2000,
         total_cupcakes: '2',
         cupcake_id: 30,
         nombre: 'Cupcake Fantasma',
@@ -232,6 +236,8 @@ describe('GetAllNameImageInfoCupcake Service', () => {
       {
         paquete_id: 4,
         paquete: 'Halloween basico',
+        moneda: 'PEN',
+        monto_centavos: 2000,
         total_cupcakes: '2',
         cupcake_id: 31,
         nombre: 'Cupcake Calabaza',
@@ -247,13 +253,20 @@ describe('GetAllNameImageInfoCupcake Service', () => {
       tipo: 'paquetes-faltantes',
     });
 
-    expect(repo.getAllNameImageInfoMissingPackagesByUserEmail).toHaveBeenCalledWith({
+    expect(
+      repo.getAllNameImageInfoMissingPackagesByUserEmail
+    ).toHaveBeenCalledWith({
       lowerCaseEmail: 'user@mail.com',
     });
 
     expect(res).toEqual([
       {
         paquete: 'Halloween basico',
+        precio: {
+          moneda: 'PEN',
+          monto_centavos: 2000,
+          monto: 20,
+        },
         total_cupcakes: 2,
         cupcakes: [
           {
