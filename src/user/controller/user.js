@@ -16,13 +16,30 @@ class UserController {
   };
 
   static async createOneUserPackage(params = {}) {
-    const { email, paquete, moneda, montoCentavos, paisCompra, paymentProvider, paymentProviderId } = params;
-    return CreateOneUserPackage.execute({ email, paquete, moneda, montoCentavos, paisCompra, paymentProvider, paymentProviderId });
+    const {
+      email,
+      paquete,
+      moneda,
+      montoCentavos,
+      paisCompra,
+      paymentProvider,
+      paymentProviderId
+    } = params;
+
+    return CreateOneUserPackage.execute({
+      email,
+      paquete,
+      moneda,
+      montoCentavos,
+      paisCompra,
+      paymentProvider,
+      paymentProviderId
+    });
   };
   
   static async createOneUser(params = {}) {
-    const { nombre, email } = params;
-    return CreateOneUser.execute({ nombre, email });
+    const { nombre, email, pais = 'PER' } = params;
+    return CreateOneUser.execute({ nombre, email, pais });
   };
 }
 

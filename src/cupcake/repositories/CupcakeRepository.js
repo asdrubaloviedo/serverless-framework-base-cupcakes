@@ -353,24 +353,46 @@ class CupcakeRepository {
 
     async getAllNameImageInfoMissingPackagesByUserEmail({ lowerCaseEmail }) {
         const query = `
+            WITH usuario_actual AS (
+                SELECT usuario_id, pais
+                FROM usuarios
+                WHERE email = LOWER($1)
+                LIMIT 1
+            )
             SELECT
-            p.paquete_id,
-            p.descripcion AS paquete,
-            pp.moneda,
-            pp.monto_centavos,
-            cu.cupcake_id,
-            cu.nombre,
-            im.codigo,
-            FALSE AS hecho,
-            cu.tiempo,
-            cu.porciones,
-            COUNT(cu.cupcake_id) OVER(PARTITION BY p.paquete_id) AS total_cupcakes
-            FROM paquetes p
+                p.paquete_id,
+                p.descripcion AS paquete,
+                pp.moneda,
+                pp.monto_centavos,
+                cu.cupcake_id,
+                cu.nombre,
+                im.codigo,
+                FALSE AS hecho,
+                cu.tiempo,
+                cu.porciones,
+                COUNT(cu.cupcake_id) OVER(PARTITION BY p.paquete_id) AS total_cupcakes
+            FROM usuario_actual ua
+            CROSS JOIN paquetes p
             INNER JOIN cupcakes cu
             ON cu.paquete_id = p.paquete_id
-            LEFT JOIN paquete_precios pp
-            ON pp.paquete_id = p.paquete_id
-            AND pp.defecto = TRUE
+            LEFT JOIN LATERAL (
+                SELECT
+                    pp.moneda,
+                    pp.monto_centavos
+                FROM paquete_precios pp
+                WHERE pp.paquete_id = p.paquete_id
+                    AND (
+                        pp.pais = ua.pais
+                        OR pp.defecto = TRUE
+                    )
+                ORDER BY
+                    CASE
+                    WHEN pp.pais = ua.pais THEN 1
+                    WHEN pp.defecto = TRUE THEN 2
+                    ELSE 3
+                    END
+                LIMIT 1
+            ) pp ON TRUE
             LEFT JOIN imagenes_cupcakes imc
             ON cu.cupcake_id = imc.cupcake_id
             AND imc.main = 1
@@ -381,10 +403,8 @@ class CupcakeRepository {
             AND NOT EXISTS (
                 SELECT 1
                 FROM usuario_paquetes up
-                INNER JOIN usuarios us
-                ON us.usuario_id = up.usuario_id
-                WHERE up.paquete_id = p.paquete_id
-                AND LOWER(us.email) = $1
+                WHERE up.usuario_id = ua.usuario_id
+                AND up.paquete_id = p.paquete_id
             )
             ORDER BY p.paquete_id, cu.cupcake_id;
         `;

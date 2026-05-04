@@ -2871,6 +2871,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     segundo_nombre VARCHAR(25) DEFAULT 'indefinido',
     primer_apellido VARCHAR(25) DEFAULT 'indefinido',
     segundo_apellido VARCHAR(25) DEFAULT 'indefinido',
+    pais VARCHAR(3) DEFAULT 'PER',
     edad INTEGER CHECK (edad >= 1 AND edad <= 150),
     sexo VARCHAR(1) DEFAULT 'i',
     email VARCHAR(50) UNIQUE,
@@ -2881,14 +2882,14 @@ CREATE TABLE IF NOT EXISTS usuarios (
 );
 ALTER SEQUENCE usuario_id OWNED BY usuarios.usuario_id;
 
-INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, edad, sexo, email, rol_id, estado_id)
+INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, pais, edad, sexo, email, rol_id, estado_id)
     VALUES
-        ('asdrubal', 'david', 'oviedo', 'oviedo', 30, 'm', 'asdrubaloviedo@gmail.com', 1, 1),
-        ('katrine', 'del valle', 'ortiz', 'manoche', 26, 'f', 'katyorman.10@gmail.com', 4, 1),
-        ('evert', default, 'ortiz', default, 28, 'm', 'evert.ortiz.m@gmail.com', 7, 1),
-        ('alminda', default, 'manoche', default, 50, 'f', 'almindao@gmail.com', 7, 2),
-        ('abigail', default, 'cunes', default, 29, 'i', 'cunesmac24@gmail.com', 7, 2),
-        ('asdrubal', 'david', 'oviedo', 'oviedo', 30, 'm', 'asdrubaloviedo2@gmail.com', 1, 1);
+        ('asdrubal', 'david', 'oviedo', 'oviedo', 'PER', 30, 'm', 'asdrubaloviedo@gmail.com', 1, 1),
+        ('katrine', 'del valle', 'ortiz', 'manoche', 'PER', 26, 'f', 'katyorman.10@gmail.com', 4, 1),
+        ('evert', default, 'ortiz', default, 'FRA', 28, 'm', 'evert.ortiz.m@gmail.com', 7, 1),
+        ('alminda', default, 'manoche', default, 'USA', 50, 'f', 'almindao@gmail.com', 7, 2),
+        ('abigail', default, 'cunes', default, 'ARG', 29, 'i', 'cunesmac24@gmail.com', 7, 2),
+        ('asdrubal', 'david', 'oviedo', 'oviedo', 'PER', 30, 'm', 'asdrubaloviedo2@gmail.com', 1, 1);
 
 CREATE SEQUENCE cupcake_categoria_id;
 CREATE TABLE IF NOT EXISTS cupcake_categorias (

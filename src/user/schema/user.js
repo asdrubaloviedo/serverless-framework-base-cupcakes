@@ -1,9 +1,4 @@
-// src/user/schema/user.js
 const z = require('zod');
-
-// --------------------------------------
-// Helpers comunes
-// --------------------------------------
 
 const emailRequired = z.preprocess(
   (v) => (v == null ? '' : v),
@@ -29,6 +24,14 @@ const nameRequired = z.preprocess(
     .transform((value) => value.replace(/\s+/g, ' '))
 );
 
+const paisOptional = z.preprocess(
+  (v) => (v == null || v === '' ? 'PER' : v),
+  z.string()
+    .trim()
+    .regex(/^[A-Za-z]{3}$/, 'User pais must be a 3-letter country code.')
+    .transform((value) => value.toUpperCase())
+);
+
 const idRequired = (name) =>
   z.coerce.number({ required_error: `${name} is required.` })
     .int(`${name} must be an integer.`)
@@ -52,10 +55,6 @@ const countryOptional = z.string()
   .regex(/^[A-Za-z]{2}$/, 'paisCompra must be a 2-letter country code (e.g. US, PE, ES).')
   .transform((s) => s.toUpperCase())
   .optional();
-
-// --------------------------------------
-// Schemas por endpoint
-// --------------------------------------
 
 const createUserMedalSchema = z.object({
   email: emailRequired,
@@ -93,12 +92,9 @@ const createUserPackageSchema = z.object({
 
 const createUserSchema = z.object({
   nombre: nameRequired,
-  email: emailRequired
+  email: emailRequired,
+  pais: paisOptional.optional()
 }).strict();
-
-// --------------------------------------
-// Export de validadores (safeParse)
-// --------------------------------------
 
 const validateCreateUserMedalLeage = (o) => createUserMedalSchema.safeParse(o);
 const validatePatchUserMedalLeage = (o) => patchUserMedalSchema.safeParse(o);
