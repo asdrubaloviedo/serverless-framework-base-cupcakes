@@ -275,16 +275,16 @@ INSERT INTO cupcakes (nombre, dificultad_id, colorPredominante, colorSecundario,
         ('Cupcakes de San Valentín', 2, 'rosado', 'rojo', 8, 45, 2, FALSE, 2, 2),
         ('Cupcakes de San Valentín 2', 3, 'blanco', 'rojo', 12, 40, 2, FALSE, 2, 2),
         ('Cupcakes de fresa 2', 2, 'blanco', 'rojo', 4, 30, 2, FALSE, 2, 2),
-        ('Cupcakes de Vainilla con Mermelada y Conejito de Chocolate', 2, 'marron', 'blanco', 4, 40, 3, FALSE, 2, 2),
-        ('Cupcakes de Chocolate con Nougat y Huevos de Pascua', 2, 'marron', 'blanco', 4, 40, 3, FALSE, 2, 2),
-        ('Cupcakes estilo “Carrot Cake” decorativos', 2, 'negro', 'anaranjado', 4, 40, 3, FALSE, 2, 2),
-        ('Cupcakes de nueces con caramelo, chocolate y zanahoria decorativa', 3, 'blanco', 'marron', 4, 30, 3, FALSE, 2, 2),
-        ('Cupcakes de Zanahoria y Chocolate', 3, 'marron', 'naranja', 4, 30, 3, FALSE, 2, 2),
-        ('Cupcakes con Crema de Limón para Pascua', 2, 'marron', 'indefinido', 20, 35, 3, FALSE, 2, 2),
-        ('Cupcakes para Pascua', 5, 'amarillo', 'indefinido', 6, 50, 3, FALSE, 2, 2),
-        ('Cupcakes de Pascua con conejitos de Kitkat ', 3, 'verde', 'marron', 12, 50, 3, FALSE, 2, 2),
-        ('Conejo de Pascua con cupcake de vainilla ', 4, 'marron', 'verde', 12, 180, 3, FALSE, 2, 2),
-        ('Cupcakes de Pascua (sabor fresa)', 3, 'rosado', 'indefinido', 20, 30, 3, FALSE, 2, 2);
+        ('Cupcakes de Vainilla con Mermelada y Conejito de Chocolate', 2, 'marron', 'blanco', 4, 40, 3, FALSE, 2, 3),
+        ('Cupcakes de Chocolate con Nougat y Huevos de Pascua', 2, 'marron', 'blanco', 4, 40, 3, FALSE, 2, 3),
+        ('Cupcakes estilo “Carrot Cake” decorativos', 2, 'negro', 'anaranjado', 4, 40, 3, FALSE, 2, 3),
+        ('Cupcakes de nueces con caramelo, chocolate y zanahoria decorativa', 3, 'blanco', 'marron', 4, 30, 3, FALSE, 2, 3),
+        ('Cupcakes de Zanahoria y Chocolate', 3, 'marron', 'naranja', 4, 30, 3, FALSE, 2, 3),
+        ('Cupcakes con Crema de Limón para Pascua', 2, 'marron', 'indefinido', 20, 35, 3, FALSE, 2, 3),
+        ('Cupcakes para Pascua', 5, 'amarillo', 'indefinido', 6, 50, 3, FALSE, 2, 3),
+        ('Cupcakes de Pascua con conejitos de Kitkat ', 3, 'verde', 'marron', 12, 50, 3, FALSE, 2, 3),
+        ('Conejo de Pascua con cupcake de vainilla ', 4, 'marron', 'verde', 12, 180, 3, FALSE, 2, 3),
+        ('Cupcakes de Pascua (sabor fresa)', 3, 'rosado', 'indefinido', 20, 30, 3, FALSE, 2, 3);
 
 CREATE SEQUENCE ingrediente_id;
 CREATE TABLE IF NOT EXISTS ingredientes (
