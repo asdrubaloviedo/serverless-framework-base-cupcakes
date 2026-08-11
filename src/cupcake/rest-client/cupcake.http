@@ -99,15 +99,15 @@ GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-info/us
 
 ### GET Nombre, imagen principal, estado Hecho, tiempo y porciones de los cupcakes de cada paquete disponibles para un usuario por id.
 ### Local
-GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes/usuario?email=asdrubaloviedo@gmail.com
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes/usuario?email=asdrubaloviedo2@gmail.com
 ### Desarrollo
-GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes/usuario?email=asdrubaloviedo@gmail.com
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes/usuario?email=asdrubaloviedo2@gmail.com
 
-### ### GET Nombre, imagen principal, estado Hecho, tiempo y porciones de los cupcakes de cada paquete faltantes para un usuario por id.
+### GET Nombre, imagen principal, estado Hecho, tiempo y porciones de los cupcakes de cada paquete faltantes para un usuario por id.
 ### Local
-GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes-faltantes/usuario?email=asdrubaloviedo@gmail.com
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes-faltantes/usuario?email=asdrubaloviedo2@gmail.com
 ### Desarrollo
-GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes-faltantes/usuario?email=asdrubaloviedo@gmail.com
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-info/paquetes-faltantes/usuario?email=asdrubaloviedo2@gmail.com
 
 ### GET Info del cupcake por id.
 ### Local
