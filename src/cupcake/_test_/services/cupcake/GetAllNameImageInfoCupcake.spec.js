@@ -3,6 +3,7 @@ jest.mock('@cupcake/repositories/index', () => {
     getAllNameImageInfoByUserEmail: jest.fn(),
     getAllNameImageInfoPackagesByUserEmail: jest.fn(),
     getAllNameImageInfoMissingPackagesByUserEmail: jest.fn(),
+    getAllNameImageInfoPublicPackageByUserEmail: jest.fn(),
   };
 
   return {
@@ -331,6 +332,71 @@ describe('GetAllNameImageInfoCupcake Service', () => {
             hecho: false,
             tiempo: 10,
             porciones: 5,
+          },
+        ],
+      },
+    ]);
+  });
+
+  test('tipo publico agrupa cupcakes del paquete público', async () => {
+    const repo = new CupcakeRepository();
+
+    repo.getAllNameImageInfoPublicPackageByUserEmail.mockResolvedValueOnce([
+      {
+        paquete_id: 1,
+        paquete: 'Publico',
+        total_cupcakes: '2',
+        cupcake_id: 1,
+        nombre: 'Cupcake Publico 1',
+        codigo: 'url-1',
+        hecho: true,
+        tiempo: 20,
+        porciones: 6,
+      },
+      {
+        paquete_id: 1,
+        paquete: 'Publico',
+        total_cupcakes: '2',
+        cupcake_id: 2,
+        nombre: 'Cupcake Publico 2',
+        codigo: 'url-2',
+        hecho: false,
+        tiempo: 30,
+        porciones: 8,
+      },
+    ]);
+
+    const res = await S.execute({
+      email: 'USER@MAIL.COM',
+      tipo: 'publico',
+    });
+
+    expect(
+      repo.getAllNameImageInfoPublicPackageByUserEmail
+    ).toHaveBeenCalledWith({
+      lowerCaseEmail: 'user@mail.com',
+    });
+
+    expect(res).toEqual([
+      {
+        paquete: 'Publico',
+        total_cupcakes: 2,
+        cupcakes: [
+          {
+            cupcake_id: 1,
+            nombre: 'Cupcake Publico 1',
+            codigo: 'url-1',
+            hecho: true,
+            tiempo: 20,
+            porciones: 6,
+          },
+          {
+            cupcake_id: 2,
+            nombre: 'Cupcake Publico 2',
+            codigo: 'url-2',
+            hecho: false,
+            tiempo: 30,
+            porciones: 8,
           },
         ],
       },

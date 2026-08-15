@@ -20,8 +20,9 @@ jest.mock('@cupcake/models/cupcake', () => {
       getByFilters:                  jest.fn(),
       getByIdInfoImage:              jest.fn(),
 
-      // ✅ NUEVO MOCK (IMPORTANTE)
+      // ✅ MOCKS
       getAllNameImageInfoPackagesByUserEmail: jest.fn(),
+      getAllNameImageInfoPublicPackageByUserEmail: jest.fn(),
     }
   };
   return m;
@@ -126,18 +127,17 @@ describe('CupcakeRepository', () => {
     expect(query).toMatch(/LEFT JOIN imagenes im/);
   });
 
-  // ✅ NUEVO TEST (IMPORTANTE)
-  test('getAllNameImageInfoPackagesByUserEmail arma query y params', async () => {
+  test('getAllNameImageInfoPublicPackageByUserEmail arma query y params', async () => {
     const repo = new Repo();
 
-    await repo.getAllNameImageInfoPackagesByUserEmail({
+    await repo.getAllNameImageInfoPublicPackageByUserEmail({
       lowerCaseEmail: 'test@test.com',
     });
 
     expect(
       CupcakeModel.getAllNameImageInfoPackagesByUserEmail
     ).toHaveBeenCalledWith({
-      query: expect.stringContaining('paquete_id'),
+      query: expect.stringContaining('p.paquete_id = 1'),
       params: ['test@test.com'],
     });
   });

@@ -3175,4 +3175,6 @@ INSERT INTO usuario_paquetes (
         (6, 1, NOW() - INTERVAL '3 days',  'PEN', 3499, 'PE', 'culqi',  'cq_007', TRUE, NULL),
         (1, 2, NOW() - INTERVAL '40 days', 'USD', 999,  'US', 'paypal', 'pp_008', TRUE, NULL),
         (1, 3, NOW() - INTERVAL '25 days', 'USD', 999,  'US', 'stripe', 'pi_009', TRUE, NULL),
-        (1, 4, NOW() - INTERVAL '12 days', 'PEN', 3499, 'PE', 'culqi',  'cq_010', TRUE, NULL);
+        (1, 4, NOW() - INTERVAL '12 days', 'PEN', 3499, 'PE', 'culqi',  'cq_010', TRUE, NULL),
+        (6, 2, NOW() - INTERVAL '12 days', 'PEN', 3499, 'PE', 'culqi',  'cq_010', TRUE, NULL),
+        (6, 4, NOW() - INTERVAL '12 days', 'PEN', 3499, 'PE', 'culqi',  'cq_010', TRUE, NULL);

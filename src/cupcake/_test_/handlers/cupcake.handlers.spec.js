@@ -71,4 +71,21 @@ describe('cupcake handler', () => {
 
     expect(res).toBeDefined();
   });
+
+  test('GET /name-image-info/publico/usuario agrega tipo publico', async () => {
+    CupcakeController.getAllNameImageInfoByUserEmail.mockResolvedValueOnce([]);
+
+    const event = buildEvent('/name-image-info/publico/usuario', {
+      email: 'user@mail.com',
+    });
+
+    await handler.handler(event);
+
+    expect(
+      CupcakeController.getAllNameImageInfoByUserEmail
+    ).toHaveBeenCalledWith({
+      email: 'user@mail.com',
+      tipo: 'publico',
+    });
+  });
 });
