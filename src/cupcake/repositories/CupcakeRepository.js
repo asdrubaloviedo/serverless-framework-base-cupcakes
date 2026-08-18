@@ -284,12 +284,17 @@ class CupcakeRepository {
                 cu.cupcake_id,
                 cu.nombre,
                 im.codigo,
-                COALESCE(cue.valor, FALSE) AS hecho,
+
+                COALESCE(cue_hecho.valor, FALSE) AS hecho,
+                COALESCE(cue_favorito.valor, FALSE) AS favorito,
+
                 cu.tiempo,
                 cu.porciones,
+
                 COUNT(cu.cupcake_id) OVER(
                     PARTITION BY p.paquete_id
                 ) AS total_cupcakes
+
             FROM paquetes p
 
             INNER JOIN cupcakes cu
@@ -305,10 +310,15 @@ class CupcakeRepository {
             LEFT JOIN usuarios us
                 ON LOWER(us.email) = $1
 
-            LEFT JOIN cupcake_usuario_estados cue
-                ON cue.cupcake_id = cu.cupcake_id
-                AND cue.usuario_id = us.usuario_id
-                AND cue.estado_id = 2
+            LEFT JOIN cupcake_usuario_estados cue_hecho
+                ON cue_hecho.cupcake_id = cu.cupcake_id
+                AND cue_hecho.usuario_id = us.usuario_id
+                AND cue_hecho.estado_id = 2
+
+            LEFT JOIN cupcake_usuario_estados cue_favorito
+                ON cue_favorito.cupcake_id = cu.cupcake_id
+                AND cue_favorito.usuario_id = us.usuario_id
+                AND cue_favorito.estado_id = 1
 
             WHERE p.paquete_id = 1
                 AND p.habilitado = TRUE
@@ -360,106 +370,161 @@ class CupcakeRepository {
 
     async getAllNameImageInfoPackagesByUserEmail({ lowerCaseEmail }) {
         const query = `
-        SELECT
-            p.paquete_id,
-            p.descripcion AS paquete,
-            cu.cupcake_id,
-            cu.nombre,
-            im.codigo,
-            COALESCE(cue.valor, FALSE) AS hecho,
-            cu.tiempo,
-            cu.porciones,
-            COUNT(cu.cupcake_id) OVER(PARTITION BY p.paquete_id) AS total_cupcakes
-        FROM usuarios us
-        INNER JOIN usuario_paquetes up
-            ON up.usuario_id = us.usuario_id
-        INNER JOIN paquetes p
-            ON p.paquete_id = up.paquete_id
-        INNER JOIN cupcakes cu
-            ON cu.paquete_id = p.paquete_id
-        LEFT JOIN imagenes_cupcakes imc
-            ON cu.cupcake_id = imc.cupcake_id
-            AND imc.main = 1
-        LEFT JOIN imagenes im
-            ON imc.imagen_id = im.imagen_id
-        LEFT JOIN cupcake_usuario_estados cue
-            ON cue.cupcake_id = cu.cupcake_id
-            AND cue.usuario_id = us.usuario_id
-            AND cue.estado_id = 2
-        WHERE LOWER(us.email) = $1
-            AND p.paquete_id <> 1
-            AND up.activo = TRUE
-            AND p.habilitado = TRUE
-        ORDER BY p.paquete_id, cu.cupcake_id;
+            SELECT
+                p.paquete_id,
+                p.descripcion AS paquete,
+                cu.cupcake_id,
+                cu.nombre,
+                im.codigo,
+
+                COALESCE(cue_hecho.valor, FALSE) AS hecho,
+                COALESCE(cue_favorito.valor, FALSE) AS favorito,
+
+                cu.tiempo,
+                cu.porciones,
+
+                COUNT(cu.cupcake_id) OVER(
+                    PARTITION BY p.paquete_id
+                ) AS total_cupcakes
+
+            FROM usuarios us
+
+            INNER JOIN usuario_paquetes up
+                ON up.usuario_id = us.usuario_id
+
+            INNER JOIN paquetes p
+                ON p.paquete_id = up.paquete_id
+
+            INNER JOIN cupcakes cu
+                ON cu.paquete_id = p.paquete_id
+
+            LEFT JOIN imagenes_cupcakes imc
+                ON cu.cupcake_id = imc.cupcake_id
+                AND imc.main = 1
+
+            LEFT JOIN imagenes im
+                ON imc.imagen_id = im.imagen_id
+
+            LEFT JOIN cupcake_usuario_estados cue_hecho
+                ON cue_hecho.cupcake_id = cu.cupcake_id
+                AND cue_hecho.usuario_id = us.usuario_id
+                AND cue_hecho.estado_id = 2
+
+            LEFT JOIN cupcake_usuario_estados cue_favorito
+                ON cue_favorito.cupcake_id = cu.cupcake_id
+                AND cue_favorito.usuario_id = us.usuario_id
+                AND cue_favorito.estado_id = 1
+
+            WHERE LOWER(us.email) = $1
+                AND p.paquete_id <> 1
+                AND up.activo = TRUE
+                AND p.habilitado = TRUE
+
+            ORDER BY
+                p.paquete_id,
+                cu.cupcake_id;
         `;
 
-        const params = [lowerCaseEmail];
+        const params = [
+            lowerCaseEmail
+        ];
 
         return CupcakeModel.getAllNameImageInfoPackagesByUserEmail({
-        query,
-        params,
+            query,
+            params,
         });
     }
 
     async getAllNameImageInfoMissingPackagesByUserEmail({ lowerCaseEmail }) {
         const query = `
             WITH usuario_actual AS (
-                SELECT usuario_id, pais
+                SELECT
+                    usuario_id,
+                    pais
                 FROM usuarios
                 WHERE email = LOWER($1)
                 LIMIT 1
             )
+
             SELECT
                 p.paquete_id,
                 p.descripcion AS paquete,
+
                 pp.moneda,
                 pp.monto_centavos,
+
                 cu.cupcake_id,
                 cu.nombre,
                 im.codigo,
+
                 FALSE AS hecho,
+                FALSE AS favorito,
+
                 cu.tiempo,
                 cu.porciones,
-                COUNT(cu.cupcake_id) OVER(PARTITION BY p.paquete_id) AS total_cupcakes
+
+                COUNT(cu.cupcake_id) OVER(
+                    PARTITION BY p.paquete_id
+                ) AS total_cupcakes
+
             FROM usuario_actual ua
+
             CROSS JOIN paquetes p
+
             INNER JOIN cupcakes cu
-            ON cu.paquete_id = p.paquete_id
+                ON cu.paquete_id = p.paquete_id
+
             LEFT JOIN LATERAL (
                 SELECT
                     pp.moneda,
                     pp.monto_centavos
+
                 FROM paquete_precios pp
+
                 WHERE pp.paquete_id = p.paquete_id
                     AND (
                         pp.pais = ua.pais
                         OR pp.defecto = TRUE
                     )
+
                 ORDER BY
                     CASE
-                    WHEN pp.pais = ua.pais THEN 1
-                    WHEN pp.defecto = TRUE THEN 2
-                    ELSE 3
+                        WHEN pp.pais = ua.pais THEN 1
+                        WHEN pp.defecto = TRUE THEN 2
+                        ELSE 3
                     END
+
                 LIMIT 1
-            ) pp ON TRUE
+            ) pp
+                ON TRUE
+
             LEFT JOIN imagenes_cupcakes imc
-            ON cu.cupcake_id = imc.cupcake_id
-            AND imc.main = 1
+                ON cu.cupcake_id = imc.cupcake_id
+                AND imc.main = 1
+
             LEFT JOIN imagenes im
-            ON imc.imagen_id = im.imagen_id
+                ON imc.imagen_id = im.imagen_id
+
             WHERE p.paquete_id <> 1
-            AND p.habilitado = TRUE
-            AND NOT EXISTS (
-                SELECT 1
-                FROM usuario_paquetes up
-                WHERE up.usuario_id = ua.usuario_id
-                AND up.paquete_id = p.paquete_id
-            )
-            ORDER BY p.paquete_id, cu.cupcake_id;
+                AND p.habilitado = TRUE
+
+                AND NOT EXISTS (
+                    SELECT 1
+
+                    FROM usuario_paquetes up
+
+                    WHERE up.usuario_id = ua.usuario_id
+                        AND up.paquete_id = p.paquete_id
+                )
+
+            ORDER BY
+                p.paquete_id,
+                cu.cupcake_id;
         `;
 
-        const params = [lowerCaseEmail];
+        const params = [
+            lowerCaseEmail
+        ];
 
         return CupcakeModel.getAllNameImageInfoMissingPackagesByUserEmail({
             query,
