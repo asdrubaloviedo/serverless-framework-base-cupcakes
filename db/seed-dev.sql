@@ -74,7 +74,11 @@ INSERT INTO festividades (festividad_id, descripcion)
         (5, 'Halloween'),
         (6, 'Desconocida');
 
-SELECT setval('festividad_id', 6, true);        -- Mantiene los IDs fijos hasta el 6 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'festividad_id',
+    COALESCE((SELECT MAX(festividad_id) FROM festividades), 1),
+    EXISTS (SELECT 1 FROM festividades)
+);        -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE dificultad_id;
 CREATE TABLE IF NOT EXISTS dificultades (
@@ -92,7 +96,11 @@ INSERT INTO dificultades (dificultad_id, descripcion)
         (5, 'alta'),
         (6, 'desconocida');
 
-SELECT setval('dificultad_id', 6, true);        -- Mantiene los IDs fijos hasta el 6 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'dificultad_id',
+    COALESCE((SELECT MAX(dificultad_id) FROM dificultades), 1),
+    EXISTS (SELECT 1 FROM dificultades)
+);        -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE cupcake_acceso_id;
 CREATE TABLE IF NOT EXISTS cupcake_accesos (
@@ -106,7 +114,11 @@ INSERT INTO cupcake_accesos (cupcake_acceso_id, descripcion)
         (1, 'Gratis'),
         (2, 'Pago');
 
-SELECT setval('cupcake_acceso_id', 2, true);        -- Mantiene los IDs fijos hasta el 2 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'cupcake_acceso_id',
+    COALESCE((SELECT MAX(cupcake_acceso_id) FROM cupcake_accesos), 1),
+    EXISTS (SELECT 1 FROM cupcake_accesos)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE paquete_id;
 CREATE TABLE IF NOT EXISTS paquetes (
@@ -124,7 +136,11 @@ INSERT INTO paquetes (paquete_id, habilitado, descripcion)
         (4, TRUE, 'Navidad basico'),
         (5, TRUE, 'Halloween basico');
 
-SELECT setval('paquete_id', 5, true);        -- Mantiene los IDs fijos hasta el 5 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'paquete_id',
+    COALESCE((SELECT MAX(paquete_id) FROM paquetes), 1),
+    EXISTS (SELECT 1 FROM paquetes)
+);        -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE paquete_precios_id;
 CREATE TABLE IF NOT EXISTS paquete_precios (
@@ -177,7 +193,11 @@ INSERT INTO paquete_precios (paquete_precios_id, paquete_id, moneda, pais, defec
         (25, 5, 'USD', 'PER', FALSE, 999),
         (26, 5, 'EUR', 'PER', FALSE, 849);
 
-SELECT setval('paquete_precios_id', 26, true);        -- Mantiene los IDs fijos hasta el 26 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'paquete_precios_id',
+    COALESCE((SELECT MAX(paquete_precios_id) FROM paquete_precios), 1),
+    EXISTS (SELECT 1 FROM paquete_precios)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE cupcake_id;
 CREATE TABLE IF NOT EXISTS cupcakes (
@@ -285,6 +305,12 @@ INSERT INTO cupcakes (nombre, dificultad_id, colorPredominante, colorSecundario,
         ('Cupcakes de Pascua con conejitos de Kitkat ', 3, 'verde', 'marron', 12, 50, 3, FALSE, 2, 3),
         ('Conejo de Pascua con cupcake de vainilla ', 4, 'marron', 'verde', 12, 180, 3, FALSE, 2, 3),
         ('Cupcakes de Pascua (sabor fresa)', 3, 'rosado', 'indefinido', 20, 30, 3, FALSE, 2, 3);
+
+SELECT setval(
+    'cupcake_id',
+    COALESCE((SELECT MAX(cupcake_id) FROM cupcakes), 1),
+    EXISTS (SELECT 1 FROM cupcakes)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE ingrediente_id;
 CREATE TABLE IF NOT EXISTS ingredientes (
@@ -1244,6 +1270,12 @@ INSERT INTO ingredientes (descripcion, cupcake_id)
         ('huevitos de pascua', 84),
         ('monedas de chocolate', 84);
 
+SELECT setval(
+    'ingrediente_id',
+    COALESCE((SELECT MAX(ingrediente_id) FROM ingredientes), 1),
+    EXISTS (SELECT 1 FROM ingredientes)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
 CREATE SEQUENCE imagen_id;
 CREATE TABLE IF NOT EXISTS imagenes (
     imagen_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('imagen_id'),
@@ -1254,77 +1286,44 @@ ALTER SEQUENCE imagen_id OWNED BY imagenes.imagen_id;
 INSERT INTO imagenes (imagen_id, codigo)
     VALUES
         (1, 'https://storage.googleapis.com/cupcakeslife/rqSuxJXvCy.jpg'),
-        (2, 'https://storage.googleapis.com/cupcakeslife/z6i6GGdtLD.jpg'),
-        (3, 'https://storage.googleapis.com/cupcakeslife/ZTZHq737c4.png'),
         (4, 'https://storage.googleapis.com/cupcakeslife/aqgRzvvtz3.jpg'),
-        (5, 'https://storage.googleapis.com/cupcakeslife/fdgc7x54hY.jpg'),
         (6, 'https://storage.googleapis.com/cupcakeslife/f8QHmNRJvG.jpg'),
-        (7, 'https://storage.googleapis.com/cupcakeslife/qefeCJ5YDt.jpg'),
         (8, 'https://storage.googleapis.com/cupcakeslife/5UADBP4nkT.jpg'),
-        (9, 'https://storage.googleapis.com/cupcakeslife/gyf4R2qVa7.jpg'),
         (10, 'https://storage.googleapis.com/cupcakeslife/H2qWrXjnJJ.jpg'),
-        (11, 'https://storage.googleapis.com/cupcakeslife/QBEhJkKMaW.jpg'),
-        (12, 'https://storage.googleapis.com/cupcakeslife/DFgCGcPPeN.jpg'),
         (13, 'https://storage.googleapis.com/cupcakeslife/Exe8p7LaxA.jpg'),
         (14, 'https://storage.googleapis.com/cupcakeslife/tBVxhUFHZC.jpg'),
-        (15, 'https://storage.googleapis.com/cupcakeslife/zPZFaf5Bpp.jpg'),
         (16, 'https://storage.googleapis.com/cupcakeslife/9eR9gV7wFa.jpg'),
-        (17, 'https://storage.googleapis.com/cupcakeslife/b2Qqq2aApJ.jpg'),
         (18, 'https://storage.googleapis.com/cupcakeslife/6GZLFvbNW2.jpg'),
-        (19, 'https://storage.googleapis.com/cupcakeslife/6ZjtkDPZEm.jpg'),
         (20, 'https://storage.googleapis.com/cupcakeslife/DwFvzAEVFi.jpg'),
         (21, 'https://storage.googleapis.com/cupcakeslife/BUKwqe23Ch.jpg'),
         (22, 'https://storage.googleapis.com/cupcakeslife/Kuwp4gaNP2.jpg'),
-        (23, 'https://storage.googleapis.com/cupcakeslife/hTBkGmg6bh.jpg'),
         (24, 'https://storage.googleapis.com/cupcakeslife/PxeJ9DMBqt.jpg'),
         (25, 'https://storage.googleapis.com/cupcakeslife/VuFqi2m23g.jpg'),
         (26, 'https://storage.googleapis.com/cupcakeslife/5Q2uZQVVk2.jpg'),
-        (27, 'https://storage.googleapis.com/cupcakeslife/yN6LgGbaWu.png'),
         (28, 'https://storage.googleapis.com/cupcakeslife/x4tNPr9Rzj.jpg'),
-        (29, 'https://storage.googleapis.com/cupcakeslife/2YBAtmvEvb.jpg'),
         (30, 'https://storage.googleapis.com/cupcakeslife/MvtkJw4axx.jpg'),
-        (31, 'https://storage.googleapis.com/cupcakeslife/JKgxYxbUFC.jpg'),
         (32, 'https://storage.googleapis.com/cupcakeslife/bQAY9n2HTT.jpg'),
         (33, 'https://storage.googleapis.com/cupcakeslife/Eu732MpYG8.jpg'),
         (34, 'https://storage.googleapis.com/cupcakeslife/xXnvjxZiBG.jpg'),
-        (35, 'https://storage.googleapis.com/cupcakeslife/kWKgNkD5pf.png'),
         (36, 'https://storage.googleapis.com/cupcakeslife/RcquHBwSQw.jpg'),
-        (37, 'https://storage.googleapis.com/cupcakeslife/KCWMzeeGUt.jpg'),
         (38, 'https://storage.googleapis.com/cupcakeslife/HBHYpMPKEt.jpg'),
-        (39, 'https://storage.googleapis.com/cupcakeslife/URRVZWuR7J.png'),
         (40, 'https://storage.googleapis.com/cupcakeslife/Xih7biT63A.jpg'),
-        (41, 'https://storage.googleapis.com/cupcakeslife/2H8VkgWM9c.png'),
-        (42, 'https://storage.googleapis.com/cupcakeslife/aQPcLwJdBn.jpg'),
         (43, 'https://storage.googleapis.com/cupcakeslife/RYeKWD9DYL.jpg'),
-        (44, 'https://storage.googleapis.com/cupcakeslife/F5vRCfPkJP.jpg'),
         (45, 'https://storage.googleapis.com/cupcakeslife/Xb6KGJ49NY.jpg'),
-        (46, 'https://storage.googleapis.com/cupcakeslife/bJap6CMTL8.jpg'),
         (47, 'https://storage.googleapis.com/cupcakeslife/D9ctDid3pj.jpg'),
-        (48, 'https://storage.googleapis.com/cupcakeslife/nC54RvzVdV.png'),
-        (49, 'https://storage.googleapis.com/cupcakeslife/rgy5BHcUMB.jpg'),
         (50, 'https://storage.googleapis.com/cupcakeslife/uk3fkVettE.jpg'),
         (51, 'https://storage.googleapis.com/cupcakeslife/qehagdU9zN.jpg'),
-        (52, 'https://storage.googleapis.com/cupcakeslife/TSjad643Y4.jpg'),
         (53, 'https://storage.googleapis.com/cupcakeslife/iZJpf3HuC6.jpg'),
         (54, 'https://storage.googleapis.com/cupcakeslife/CYJwgyQ2GN.jpg'),
-        (55, 'https://storage.googleapis.com/cupcakeslife/DRVckKezEL.jpg'),
         (56, 'https://storage.googleapis.com/cupcakeslife/SdujbB5gN2.jpg'),
-        (57, 'https://storage.googleapis.com/cupcakeslife/mESP7C2rFB.jpg'),
         (58, 'https://storage.googleapis.com/cupcakeslife/DXcix7WSFi.jpg'),
         (59, 'https://storage.googleapis.com/cupcakeslife/rKTzfTViK8.jpg'),
-        (60, 'https://storage.googleapis.com/cupcakeslife/yXByJdrZSt.jpg'),
         (61, 'https://storage.googleapis.com/cupcakeslife/8RAVWNpFdR.jpg'),
-        (62, 'https://storage.googleapis.com/cupcakeslife/Yx9yPquCxL.jpg'),
         (63, 'https://storage.googleapis.com/cupcakeslife/fgme3Fdcyr.jpg'),
-        (64, 'https://storage.googleapis.com/cupcakeslife/m3BbVKCyiE.jpg'),
         (65, 'https://storage.googleapis.com/cupcakeslife/bhGNZiG9FU.jpg'),
-        (66, 'https://storage.googleapis.com/cupcakeslife/Rgc52ubjZL.png'),
         (67, 'https://storage.googleapis.com/cupcakeslife/iuNJc9wmp7.jpg'),
         (68, 'https://storage.googleapis.com/cupcakeslife/7PNVJgfaMj.jpg'),
-        (69, 'https://storage.googleapis.com/cupcakeslife/C5PX2h6JwZ.jpg'),
         (70, 'https://storage.googleapis.com/cupcakeslife/NBxx7RjvNx.jpg'),
-        (71, 'https://storage.googleapis.com/cupcakeslife/dt6g9yJRyB.jpg'),
-        (72, 'https://storage.googleapis.com/cupcakeslife/VPNMtxNGAp.jpg'),
         (73, 'https://storage.googleapis.com/cupcakeslife/a4HZRxdPmY.jpg'),
         (74, 'https://storage.googleapis.com/cupcakeslife/categorias/jJRCZFFHDf.jpg'),
         (75, 'https://storage.googleapis.com/cupcakeslife/categorias/Tp8bvL6w3H.jpg'),
@@ -1338,148 +1337,28 @@ INSERT INTO imagenes (imagen_id, codigo)
         (83, 'https://storage.googleapis.com/cupcakeslife/peliculas/9gXCnazHKx.jpg'),
         (84, 'https://storage.googleapis.com/cupcakeslife/peliculas/eSzzUFf2cz.jpg'),
         (85, 'https://storage.googleapis.com/cupcakeslife/peliculas/qAr2Da7rXd.jpg'),
-        (86, 'https://storage.googleapis.com/cupcakeslife/PetJVHzknB.jpg'),
-        (87, 'https://storage.googleapis.com/cupcakeslife/x4BSJGgYeM.png'),
-        (88, 'https://storage.googleapis.com/cupcakeslife/kSXG8jDCFa.png'),
-        (89, 'https://storage.googleapis.com/cupcakeslife/4ATayyfNG3.png'),
-        (90, 'https://storage.googleapis.com/cupcakeslife/GpNVrMWrnr.png'),
-        (91, 'https://storage.googleapis.com/cupcakeslife/rLtgx83mXi.png'),
-        (92, 'https://storage.googleapis.com/cupcakeslife/TxrhHHErpq.png'),
-        (93, 'https://storage.googleapis.com/cupcakeslife/SZR6ETBJ4z.png'),
         (94, 'https://storage.googleapis.com/cupcakeslife/cQEZnfrMQ7.png'),
         (95, 'https://storage.googleapis.com/cupcakeslife/festividades/SmvMDGPJjJ.jpg'),
-        (96, 'https://storage.googleapis.com/cupcakeslife/U6S9mnS8Ng.jpg'),
-        (97, 'https://storage.googleapis.com/cupcakeslife/9DVYGxvkaQ.jpg'),
-        (98, 'https://storage.googleapis.com/cupcakeslife/vxtLNiiSSN.jpg'),
-        (99, 'https://storage.googleapis.com/cupcakeslife/pCMudM6LKU.jpg'),
-        (100, 'https://storage.googleapis.com/cupcakeslife/54xmHfCeUQ.jpg'),
-        (101, 'https://storage.googleapis.com/cupcakeslife/BM4bBgMpFk.jpg'),
-        (102, 'https://storage.googleapis.com/cupcakeslife/8nhVNUZ6bk.jpg'),
-        (103, 'https://storage.googleapis.com/cupcakeslife/cqHLQmpZUn.jpg'),
-        (104, 'https://storage.googleapis.com/cupcakeslife/jXrbfKmz47.jpg'),
-        (105, 'https://storage.googleapis.com/cupcakeslife/DdQyLKVNwW.jpg'),
-        (106, 'https://storage.googleapis.com/cupcakeslife/rijjbuuVmw.jpg'),
-        (107, 'https://storage.googleapis.com/cupcakeslife/P26Vhx4wTA.jpg'),
-        (108, 'https://storage.googleapis.com/cupcakeslife/DmUzNqFSR5.jpg'),
-        (109, 'https://storage.googleapis.com/cupcakeslife/EkDt39KcpD.jpg'),
+        (96, 'https://storage.googleapis.com/cupcakeslife/U6S9mnS8Ng.jpg'),        
+        (104, 'https://storage.googleapis.com/cupcakeslife/jXrbfKmz47.jpg'),        
         (110, 'https://storage.googleapis.com/cupcakeslife/X8GnLmgMUF.jpg'),
-        (111, 'https://storage.googleapis.com/cupcakeslife/b4b8RNgWk6.jpg'),
-        (112, 'https://storage.googleapis.com/cupcakeslife/4HA7GCN2tV.jpg'),
-        (113, 'https://storage.googleapis.com/cupcakeslife/2TdVjyQAYf.jpg'),
-        (114, 'https://storage.googleapis.com/cupcakeslife/T93S9evEg6.jpg'),
-        (115, 'https://storage.googleapis.com/cupcakeslife/PRyFvhSNYN.jpg'),
-        (116, 'https://storage.googleapis.com/cupcakeslife/gMjC2Y6Aa7.jpg'),
         (117, 'https://storage.googleapis.com/cupcakeslife/yAg7VhLZMb.jpg'),
-        (118, 'https://storage.googleapis.com/cupcakeslife/jBCKRRPjLV.jpg'),
-        (119, 'https://storage.googleapis.com/cupcakeslife/2f8tAURjM2.jpg'),
-        (120, 'https://storage.googleapis.com/cupcakeslife/N6xpQEwF2T.jpg'),
-        (121, 'https://storage.googleapis.com/cupcakeslife/NzUnpD2MV5.jpg'),
-        (122, 'https://storage.googleapis.com/cupcakeslife/6cj3GUucnU.jpg'),
         (123, 'https://storage.googleapis.com/cupcakeslife/X72d9pktbJ.jpg'),
-        (124, 'https://storage.googleapis.com/cupcakeslife/cjEzbEnZnH.jpg'),
-        (125, 'https://storage.googleapis.com/cupcakeslife/AeERRPmVZ4.jpg'),
-        (126, 'https://storage.googleapis.com/cupcakeslife/8FV3Jn5mvu.jpg'),
-        (127, 'https://storage.googleapis.com/cupcakeslife/R5Q2r2iUQP.jpg'),
-        (128, 'https://storage.googleapis.com/cupcakeslife/cmSEwdgH3A.jpg'),
-        (129, 'https://storage.googleapis.com/cupcakeslife/iYQYjYtQGH.jpg'),
-        (130, 'https://storage.googleapis.com/cupcakeslife/crxX4XC34Y.jpg'),
-        (131, 'https://storage.googleapis.com/cupcakeslife/yfQkcGwVcF.jpg'),
-        (132, 'https://storage.googleapis.com/cupcakeslife/N7MdYWWcVu.jpg'),
-        (133, 'https://storage.googleapis.com/cupcakeslife/Vu7KhkkRhL.jpg'),
-        (134, 'https://storage.googleapis.com/cupcakeslife/X8LyVcMg5k.jpg'),
-        (135, 'https://storage.googleapis.com/cupcakeslife/fBuuXBffrh.jpg'),
-        (136, 'https://storage.googleapis.com/cupcakeslife/gghUEg8hP5.jpg'),
-        (137, 'https://storage.googleapis.com/cupcakeslife/bSTfS8XU3T.jpg'),
-        (138, 'https://storage.googleapis.com/cupcakeslife/8aJPinpHhX.jpg'),
-        (139, 'https://storage.googleapis.com/cupcakeslife/C8HDJQGQeE.jpg'),
+        (130, 'https://storage.googleapis.com/cupcakeslife/crxX4XC34Y.jpg'),        
         (140, 'https://storage.googleapis.com/cupcakeslife/gbDSu9Np7N.jpg'),
-        (141, 'https://storage.googleapis.com/cupcakeslife/jHXeSHtbMk.jpg'),
-        (142, 'https://storage.googleapis.com/cupcakeslife/BLAMEjiC9Y.jpg'),
-        (143, 'https://storage.googleapis.com/cupcakeslife/786BHiYXYU.jpg'),
-        (144, 'https://storage.googleapis.com/cupcakeslife/3PEfJxRpmX.jpg'),
-        (145, 'https://storage.googleapis.com/cupcakeslife/T9j9CkZwYa.jpg'),
-        (146, 'https://storage.googleapis.com/cupcakeslife/PSrShf6RQj.jpg'),
-        (147, 'https://storage.googleapis.com/cupcakeslife/uPtff25rtZ.jpg'),
-        (148, 'https://storage.googleapis.com/cupcakeslife/yEUGz3qWy4.jpg'),
-        (149, 'https://storage.googleapis.com/cupcakeslife/mNmfiaLrAf.jpg'),
         (150, 'https://storage.googleapis.com/cupcakeslife/w9iAeddDZP.jpg'),
-        (151, 'https://storage.googleapis.com/cupcakeslife/ELpmHYRtUf.jpg'),
-        (152, 'https://storage.googleapis.com/cupcakeslife/9fLXbQLTcC.jpg'),
-        (153, 'https://storage.googleapis.com/cupcakeslife/hX4WKKf9nJ.jpg'),
-        (154, 'https://storage.googleapis.com/cupcakeslife/6S98UT2g2r.jpg'),
-        (155, 'https://storage.googleapis.com/cupcakeslife/zEzd2VVceM.jpg'),
-        (156, 'https://storage.googleapis.com/cupcakeslife/DyMxpBVBgv.jpg'),
         (157, 'https://storage.googleapis.com/cupcakeslife/cjjvTRCZQP.jpg'),
-        (158, 'https://storage.googleapis.com/cupcakeslife/B33HDpz6fJ.jpg'),
-        (159, 'https://storage.googleapis.com/cupcakeslife/6ChHpQKL3t.jpg'),
-        (160, 'https://storage.googleapis.com/cupcakeslife/HfSDWvDAeQ.jpg'),
-        (161, 'https://storage.googleapis.com/cupcakeslife/Y3juTCZMqg.jpg'),
-        (162, 'https://storage.googleapis.com/cupcakeslife/SDviBjMb3t.jpg'),
-        (163, 'https://storage.googleapis.com/cupcakeslife/xnYz8uEpaf.jpg'),
-        (164, 'https://storage.googleapis.com/cupcakeslife/gAvBQKnFUn.jpg'),
-        (165, 'https://storage.googleapis.com/cupcakeslife/ZcTXmAh28Q.jpg'),
-        (166, 'https://storage.googleapis.com/cupcakeslife/HWLqn9zQW2.jpg'),
-        (167, 'https://storage.googleapis.com/cupcakeslife/624HSdt3FL.jpg'),
-        (168, 'https://storage.googleapis.com/cupcakeslife/KmAEvK24jB.jpg'),
-        (169, 'https://storage.googleapis.com/cupcakeslife/Rr7HuaymYA.jpg'),
         (170, 'https://storage.googleapis.com/cupcakeslife/8mdYdVUtFn.jpg'),
         (171, 'https://storage.googleapis.com/cupcakeslife/wV1ngMKQ8X.png'),
-        (172, 'https://storage.googleapis.com/cupcakeslife/gDHBfDhTNf.png'),
-        (173, 'https://storage.googleapis.com/cupcakeslife/ZGXA2XVv50.png'),
-        (174, 'https://storage.googleapis.com/cupcakeslife/64vAq7Cx6Q.png'),
-        (175, 'https://storage.googleapis.com/cupcakeslife/3p55GtA7HA.png'),
-        (176, 'https://storage.googleapis.com/cupcakeslife/eknX5RkdpG.png'),
-        (177, 'https://storage.googleapis.com/cupcakeslife/iQLg06dmrq.png'),
-        (178, 'https://storage.googleapis.com/cupcakeslife/8yHyPPrw6X.png'),
-        (179, 'https://storage.googleapis.com/cupcakeslife/apMMa8FrbB.png'),
-        (180, 'https://storage.googleapis.com/cupcakeslife/ckxPHLQaxq.png'),
         (181, 'https://storage.googleapis.com/cupcakeslife/1fDgvCpqPa.png'),
         (182, 'https://storage.googleapis.com/cupcakeslife/Hqi7R8Dyvu.png'),
-        (183, 'https://storage.googleapis.com/cupcakeslife/HBFQNeaWpL.png'),
-        (184, 'https://storage.googleapis.com/cupcakeslife/VWvRMUXXc9.png'),
-        (185, 'https://storage.googleapis.com/cupcakeslife/mCJKES8y8E.png'),
-        (186, 'https://storage.googleapis.com/cupcakeslife/gJ1ZSz1LiF.png'),
-        (187, 'https://storage.googleapis.com/cupcakeslife/URwxFFhpM9.png'),
-        (188, 'https://storage.googleapis.com/cupcakeslife/6H5WTpHiYR.png'),
-        (189, 'https://storage.googleapis.com/cupcakeslife/A7XvCT7eHU.png'),
         (190, 'https://storage.googleapis.com/cupcakeslife/C3j5jkxCWx.png'),
-        (191, 'https://storage.googleapis.com/cupcakeslife/n6NVEALCJM.png'),
-        (192, 'https://storage.googleapis.com/cupcakeslife/KatnuWaiGj.png'),
-        (193, 'https://storage.googleapis.com/cupcakeslife/AeVRLGkZrJ.png'),
-        (194, 'https://storage.googleapis.com/cupcakeslife/NWuBZCQ8DA.png'),
-        (195, 'https://storage.googleapis.com/cupcakeslife/BcDp803EeR.png'),
-        (196, 'https://storage.googleapis.com/cupcakeslife/KjyY4tMUM2.png'),
-        (197, 'https://storage.googleapis.com/cupcakeslife/DCGUZvVCSc.png'),
-        (198, 'https://storage.googleapis.com/cupcakeslife/CHz7xEUxPm.png'),
-        (199, 'https://storage.googleapis.com/cupcakeslife/B6uE2rT3u5.png'),
         (200, 'https://storage.googleapis.com/cupcakeslife/h0zpWYG0jp.png'),
-        (201, 'https://storage.googleapis.com/cupcakeslife/x9Fn6Q2Kp2.png'),
-        (202, 'https://storage.googleapis.com/cupcakeslife/rbat7vi28P.png'),
-        (203, 'https://storage.googleapis.com/cupcakeslife/zrcUP5Kxjd.png'),
-        (204, 'https://storage.googleapis.com/cupcakeslife/cSBQ4dY1nn.png'),
-        (205, 'https://storage.googleapis.com/cupcakeslife/2F8FG4XCeA.png'),
-        (206, 'https://storage.googleapis.com/cupcakeslife/vQprMYEawJ.png'),
         (207, 'https://storage.googleapis.com/cupcakeslife/AiWPwEmgu2.png'),
-        (208, 'https://storage.googleapis.com/cupcakeslife/BUXBXQctF2.png'),
-        (209, 'https://storage.googleapis.com/cupcakeslife/ArYfnQZwKm.png'),
-        (210, 'https://storage.googleapis.com/cupcakeslife/H99g9LuvXf.png'),
-        (211, 'https://storage.googleapis.com/cupcakeslife/4TXKj06xmE.png'),
-        (212, 'https://storage.googleapis.com/cupcakeslife/g3RHT1RdHi.png'),
-        (213, 'https://storage.googleapis.com/cupcakeslife/Gf7CNJUwqS.png'),
-        (214, 'https://storage.googleapis.com/cupcakeslife/0H4fCB7fXY.png'),
-        (215, 'https://storage.googleapis.com/cupcakeslife/A1L4GQihd0.png'),
         (216, 'https://storage.googleapis.com/cupcakeslife/My9SiYAz3h.png'),
         (217, 'https://storage.googleapis.com/cupcakeslife/4m1MDmSVUv.png'),
         (218, 'https://storage.googleapis.com/cupcakeslife/GMruE1gQjf.png'),
         (219, 'https://storage.googleapis.com/cupcakeslife/FVXcer1p36.png'),
-        (220, 'https://storage.googleapis.com/cupcakeslife/vAH1Ea9YhM.png'),
-        (221, 'https://storage.googleapis.com/cupcakeslife/8Zhr3USGUj.png'),
-        (222, 'https://storage.googleapis.com/cupcakeslife/9anvATtLJe.png'),
-        (223, 'https://storage.googleapis.com/cupcakeslife/gBuX3Ztkbm.png'),
-        (224, 'https://storage.googleapis.com/cupcakeslife/up0zXHBKmm.png'),
-        (225, 'https://storage.googleapis.com/cupcakeslife/1qciL7Qxry.png'),
-        (226, 'https://storage.googleapis.com/cupcakeslife/FrTHWW37TR.png'),
-        (227, 'https://storage.googleapis.com/cupcakeslife/ZU2XaWE0Cn.png'),
         (228, 'https://storage.googleapis.com/cupcakeslife/XjZhbYBFLq.png'),
         (229, 'https://storage.googleapis.com/cupcakeslife/1FFaiv5hGe.jpg'),
         (230, 'https://storage.googleapis.com/cupcakeslife/ebXz1YWe2R.jpg'),
@@ -1501,7 +1380,11 @@ INSERT INTO imagenes (imagen_id, codigo)
         (246, 'https://storage.googleapis.com/cupcakeslife/puRWQphE3u.png'),
         (247, 'https://storage.googleapis.com/cupcakeslife/y85hhnR8Zh.png');
 
-SELECT setval('imagen_id', 247, true);        -- Mantiene los IDs fijos hasta el 247 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'imagen_id',
+    COALESCE((SELECT MAX(imagen_id) FROM imagenes), 1),
+    EXISTS (SELECT 1 FROM imagenes)
+);        -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE imagen_cupcake_id;
 CREATE TABLE IF NOT EXISTS imagenes_cupcakes (
@@ -1517,222 +1400,69 @@ ALTER SEQUENCE imagen_cupcake_id OWNED BY imagenes_cupcakes.imagen_cupcake_id;
 INSERT INTO imagenes_cupcakes (main, imagen_id, cupcake_id)
     VALUES
         (1, 1, 1),
-        (0, 2, 1),
-        (0, 3, 1),
         (1, 4, 2),
-        (0, 5, 2),
         (1, 6, 3),
-        (0, 7, 3),
         (1, 8, 4),
-        (0, 9, 4),
         (1, 10, 5),
-        (0, 11, 5),
-        (1, 12, 6),
-        (0, 13, 6),
+        (1, 13, 6),
         (1, 14, 7),
-        (0, 15, 7),
         (1, 16, 8),
-        (0, 17, 8),
         (1, 18, 9),
-        (0, 19, 9),
         (1, 20, 10),
         (1, 21, 11),
         (1, 22, 12),
-        (1, 23, 13),
-        (0, 24, 13),
+        (1, 24, 13),
         (1, 25, 14),
         (1, 26, 15),
-        (0, 27, 15),
         (1, 28, 16),
-        (0, 29, 16),
         (1, 30, 17),
-        (1, 31, 18),
-        (0, 32, 18),
+        (1, 32, 18),
         (1, 33, 19),
         (1, 34, 20),
-        (0, 35, 20),
         (1, 36, 21),
-        (0, 37, 21),
         (1, 38, 22),
-        (0, 39, 22),
         (1, 40, 23),
-        (0, 41, 23),
-        (1, 42, 24),
-        (0, 43, 24),
-        (1, 44, 25),
-        (0, 45, 25),
-        (0, 46, 25),
+        (1, 43, 24),
+        (1, 45, 25),
         (1, 47, 26),
-        (0, 48, 26),
-        (0, 49, 26),
         (1, 50, 27),
         (1, 51, 28),
-        (0, 52, 28),
         (1, 53, 29),
         (1, 54, 30),
-        (1, 55, 31),
-        (0, 56, 31),
-        (1, 57, 32),
-        (0, 58, 32),
+        (1, 56, 31),
+        (1, 58, 32),
         (1, 59, 33),
-        (0, 60, 33),
         (1, 61, 34),
-        (0, 62, 34),
         (1, 63, 35),
-        (0, 64, 35),
         (1, 65, 36),
-        (0, 66, 36),
         (1, 67, 37),
         (1, 68, 38),
-        (0, 69, 38),
         (1, 70, 39),
-        (0, 71, 39),
-        (1, 72, 40),
-        (0, 73, 40),
+        (1, 73, 40),
         (1, 83, 41),
         (1, 84, 42),
         (1, 85, 43),
-        (0, 86, 44),
-        (0, 87, 44),
-        (0, 88, 44),
-        (0, 89, 44),
-        (0, 90, 44),
-        (0, 91, 44),
-        (0, 92, 44),
-        (0, 93, 44),
         (1, 94, 44),
-        (1, 96, 45),
-        (0, 97, 45),
-        (0, 98, 45),
-        (0, 99, 45),
-        (0, 100, 45),
-        (0, 101, 45),
-        (0, 102, 45),
-        (0, 103, 45),
-        (1, 104, 46),
-        (0, 105, 46),
-        (0, 106, 46),
-        (0, 107, 46),
-        (0, 108, 46),
-        (0, 109, 46),
+        (1, 96, 45),        
+        (1, 104, 46),        
         (1, 110, 47),
-        (0, 111, 47),
-        (0, 112, 47),
-        (0, 113, 47),
-        (0, 114, 47),
-        (0, 115, 47),
-        (0, 116, 47),
         (1, 117, 48),
-        (0, 118, 48),
-        (0, 119, 48),
-        (0, 120, 48),
-        (0, 121, 48),
-        (0, 122, 48),
         (1, 123, 49),
-        (0, 124, 49),
-        (0, 125, 49),
-        (0, 126, 49),
-        (0, 127, 49),
-        (0, 128, 49),
-        (0, 129, 49),
-        (1, 130, 50),
-        (0, 131, 50),
-        (0, 132, 50),
-        (0, 133, 50),
-        (0, 134, 50),
-        (0, 135, 50),
-        (0, 136, 50),
-        (0, 137, 50),
-        (0, 138, 50),
-        (0, 139, 50),
+        (1, 130, 50),        
         (1, 140, 51),
-        (0, 141, 51),
-        (0, 142, 51),
-        (0, 143, 51),
-        (0, 144, 51),
-        (0, 145, 51),
-        (0, 146, 51),
-        (0, 147, 51),
-        (0, 148, 51),
-        (0, 149, 51),
         (1, 150, 52),
-        (0, 151, 52),
-        (0, 152, 52),
-        (0, 153, 52),
-        (0, 154, 52),
-        (0, 155, 52),
-        (0, 156, 52),
         (1, 157, 53),
-        (0, 158, 53),
-        (0, 159, 53),
-        (0, 160, 53),
-        (0, 161, 53),
-        (0, 162, 53),
-        (0, 163, 53),
-        (0, 164, 53),
-        (1, 165, 54),
-        (0, 166, 54),
-        (0, 167, 54),
-        (0, 168, 54),
-        (0, 169, 54),
-        (0, 170, 54),
+        (1, 170, 54),
         (1, 171, 55),
-        (0, 172, 55),
-        (0, 173, 55),
-        (0, 174, 55),
-        (0, 175, 55),
-        (0, 176, 55),
-        (0, 177, 55),
-        (0, 178, 55),
-        (0, 179, 55),
-        (0, 180, 55),
         (1, 181, 56),
         (1, 182, 57),
-        (0, 183, 57),
-        (0, 184, 57),
-        (0, 185, 57),
-        (0, 186, 57),
-        (0, 187, 57),
-        (0, 188, 57),
-        (0, 189, 57),
         (1, 190, 58),
-        (0, 191, 58),
-        (0, 192, 58),
-        (0, 193, 58),
-        (0, 194, 58),
-        (0, 195, 58),
-        (0, 196, 58),
-        (0, 197, 58),
-        (0, 198, 58),
-        (0, 199, 58),
         (1, 200, 59),
-        (0, 201, 59),
-        (0, 202, 59),
-        (0, 203, 59),
-        (0, 204, 59),
-        (0, 205, 59),
-        (0, 206, 59),
         (1, 207, 60),
-        (0, 208, 60),
-        (0, 209, 60),
-        (0, 210, 60),
-        (0, 211, 60),
-        (0, 212, 60),
-        (0, 213, 60),
-        (0, 214, 60),
-        (0, 215, 60),
         (1, 216, 61),
         (1, 217, 62),
         (1, 218, 63),
         (1, 219, 64),
-        (0, 220, 64),
-        (0, 221, 64),
-        (0, 222, 64),
-        (0, 223, 64),
-        (0, 224, 64),
-        (0, 225, 64),
-        (0, 226, 64),
-        (0, 227, 64),
         (1, 228, 65),
         (1, 229, 66),
         (1, 230, 67),
@@ -1753,6 +1483,13 @@ INSERT INTO imagenes_cupcakes (main, imagen_id, cupcake_id)
         (1, 245, 82),
         (1, 246, 83),
         (1, 247, 84);
+
+SELECT setval(
+    'imagen_cupcake_id',
+    COALESCE((SELECT MAX(imagen_cupcake_id) FROM imagenes_cupcakes), 1),
+    EXISTS (SELECT 1 FROM imagenes_cupcakes)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
 
 CREATE SEQUENCE receta_segmentos_id;
 CREATE TABLE IF NOT EXISTS receta_segmentos (
@@ -2171,110 +1908,110 @@ INSERT INTO receta_segmentos (orden, descripcion, cupcake_id, imagen_id)
         (10, 'Estira el fondant blanco y corta triángulos para formar los gorros y dibuja la boca con la ayuda de un palillo.', 43, null),
         (11, 'Si el clima de tu área es húmedo te aconsejo pongas un ventilador en el cuarto donde los guardes para evitar que el fondant se derrita o se ponga chicloso. ', 43, null),
         (1, 'Lo primero que debes hacer para poder ponerte manos a la obra con esta decoración para Halloween es alistar todos los ingredientes y utensilios. Así pues, puedes elaborar tu propio fondant con nubes de azúcar y teñirlo con colorante comestible, o comprarlo ya preparado. Por otro lado, tendrás que reunir los siguientes utensilios de repostería: Cortapastas redondo, Rodillo, Cuchillo de plástico', 44, null),
-        (2, 'Ahora que lo tienes todo listo, ¡empezamos! Coge el fondant blanco, extiéndelo sobre la superficie de trabajo con el rodillo hasta formar una capa fina pero manejable. Con un cortapastas redondo del tamaño que quieras que sea el espectro, corta un círculo para hacer el fantasma con fondant.', 44, 86),
+        (2, 'Ahora que lo tienes todo listo, ¡empezamos! Coge el fondant blanco, extiéndelo sobre la superficie de trabajo con el rodillo hasta formar una capa fina pero manejable. Con un cortapastas redondo del tamaño que quieras que sea el espectro, corta un círculo para hacer el fantasma con fondant.', 44, null),
         (3, 'Recuerda que los muffins puedes comprarlos ya hechos o prepararlos tú mismo. Si te decantas por la última opción, te aconsejamos las recetas de calabaza o de vainilla.', 44, null),
-        (4, 'El círculo de fondant blanco será el cuerpo del fantasma, pero para que se sostenga en pie deberemos utilizar algún tipo de soporte. Para ello, cogeremos otro trozo de fontant blanco y haremos un churro grueso con las manos. La longitud del mismo dependerá de lo levantado que queramos que quede el fantasma del muffin, es decir, si queremos que la falda repose sobre la magdalena, lo haremos más corto, pero si pretendemos que quede totalmente erguido, lo realizaremos más largo.', 44, 87),
-        (5, 'Si no quieres utilizar tanto fondant, puedes usar a modo de soporto la boquilla de una manga pastelera.', 44, 88),
-        (6, 'Pon el churro anterior recto, humedece con agua el extremo superior, coge el círculo blanco y coloca el centro del mismo sobre la punta del soporte. Presiona ligeramente para que quede bien pegado.  No presiones en exceso, puesto que quedará marcado sobre la cabeza del fantasma el soporte que se encuentra debajo.', 44, 89),
-        (7, 'Para dar más realismo al fantasma de fondant, realiza pliegues irregulares con los dedos. Fíjate en imágenes de este tipo de espectros para inspirarte y forma cuantas dobleces desees.', 44, 90),
-        (8, 'Ahora vamos a cubrir el muffin con fondant. Para hacerlo, nosotros hemos optado por el fondant rojo, que aporta un toque extra de terror y encaja a la perfección con la fiesta de Halloween, pero tú puedes utilizar el color que quieras. Extiende el fondant rojo con el rodillo, coloca el muffin encima y con ayuda de un cuchillo de plástico corta la pasta de azúcar rodeando la magdalena.', 44, 91),
-        (9, 'Humedece con agua la parte superior del muffin y coloca el fondant rojo encima, presionando con los dedos para que quede bien pegado.', 44, 92),
-        (10, 'Luego, coge el fantasma de fondant, humedece con agua la parte inferior del soporte que se esconde dentro de la capa y colócalo en la parte del muffin que desees. Presiona con cuidado para que quede bien pegado pero sin dañar la figura de fondant para Halloween.', 44, 93),
-        (11, 'Como podrás imaginar, falta caracterizar a nuestro fantasma de fondant. En este paso deberás dejar volar tu imaginación y formar dos ojos y una boca con el fondant negro. Para pegarlos al espectro, de aconsejamos utilizar unas pinzas o lápiz de bola, humedeciéndolo ligeramente con agua para que las piezas queden pegadas y puedas trabajar con ellas. Por supuesto, para pegar los ojos y la boca a la capa blanca deberás utilizar agua.  Para hacerlo más fácil, puedes dibujar la cara con un bolígrafo de tinta comestible.', 44, 94),
-        (12, 'Estos muffins decorados para Halloween son ideales para sorprender a los más pequeños en esta noche tan esperada para ellos.', 44, 95),
-        (1, 'Alista todos los ingredientes para preparar los cupcakes decorados para Halloween con mayor rapidez.', 45, 97),
-        (2, 'Una vez que lo tienes todo listo, bate los huevos con el azúcar, la sal y la esencia de vainilla hasta obtener una textura cremosa y homogénea.', 45, 98),
-        (3, 'Añade el aceite en forma de hilo y sin dejar de batir. Aunque nosotros hemos optado por elaborar unos cupcakes de yogur para Halloween.', 45, 99),
-        (4, 'Cuando los ingredientes anteriores estén bien integrados, añade la harina tamizada con los polvos de hornear y la maicena. Agrégala intercalándola con el yogur para que ambos ingredientes se mezclen adecuadamente.', 45, 100),
-        (5, 'Termina de preparar la masa de los cupcakes para Halloween con el yogur, hasta obtener una mezcla suave.', 45, 101),
-        (6, 'Añade la mezcla en los moldes para magdalenas y hornear a 175 °C durante 30 minutos, o hasta que observes que están listas. Para evitar que se salgan de los moldes, deberás llenarlos con la masa ocupando las 3/4 partes de su capacidad.', 45, 102),
-        (7, 'Saca los cupcakes del horno y deja que reposen hasta enfriar. Mientras tanto, puedes aprovechar para preparar el frosting que emplearás para la decoración de Halloween.', 45, 103),
+        (4, 'El círculo de fondant blanco será el cuerpo del fantasma, pero para que se sostenga en pie deberemos utilizar algún tipo de soporte. Para ello, cogeremos otro trozo de fontant blanco y haremos un churro grueso con las manos. La longitud del mismo dependerá de lo levantado que queramos que quede el fantasma del muffin, es decir, si queremos que la falda repose sobre la magdalena, lo haremos más corto, pero si pretendemos que quede totalmente erguido, lo realizaremos más largo.', 44, null),
+        (5, 'Si no quieres utilizar tanto fondant, puedes usar a modo de soporto la boquilla de una manga pastelera.', 44, null),
+        (6, 'Pon el churro anterior recto, humedece con agua el extremo superior, coge el círculo blanco y coloca el centro del mismo sobre la punta del soporte. Presiona ligeramente para que quede bien pegado.  No presiones en exceso, puesto que quedará marcado sobre la cabeza del fantasma el soporte que se encuentra debajo.', 44, null),
+        (7, 'Para dar más realismo al fantasma de fondant, realiza pliegues irregulares con los dedos. Fíjate en imágenes de este tipo de espectros para inspirarte y forma cuantas dobleces desees.', 44, null),
+        (8, 'Ahora vamos a cubrir el muffin con fondant. Para hacerlo, nosotros hemos optado por el fondant rojo, que aporta un toque extra de terror y encaja a la perfección con la fiesta de Halloween, pero tú puedes utilizar el color que quieras. Extiende el fondant rojo con el rodillo, coloca el muffin encima y con ayuda de un cuchillo de plástico corta la pasta de azúcar rodeando la magdalena.', 44, null),
+        (9, 'Humedece con agua la parte superior del muffin y coloca el fondant rojo encima, presionando con los dedos para que quede bien pegado.', 44, null),
+        (10, 'Luego, coge el fantasma de fondant, humedece con agua la parte inferior del soporte que se esconde dentro de la capa y colócalo en la parte del muffin que desees. Presiona con cuidado para que quede bien pegado pero sin dañar la figura de fondant para Halloween.', 44, null),
+        (11, 'Como podrás imaginar, falta caracterizar a nuestro fantasma de fondant. En este paso deberás dejar volar tu imaginación y formar dos ojos y una boca con el fondant negro. Para pegarlos al espectro, de aconsejamos utilizar unas pinzas o lápiz de bola, humedeciéndolo ligeramente con agua para que las piezas queden pegadas y puedas trabajar con ellas. Por supuesto, para pegar los ojos y la boca a la capa blanca deberás utilizar agua.  Para hacerlo más fácil, puedes dibujar la cara con un bolígrafo de tinta comestible.', 44, null),
+        (12, 'Estos muffins decorados para Halloween son ideales para sorprender a los más pequeños en esta noche tan esperada para ellos.', 44, null),
+        (1, 'Alista todos los ingredientes para preparar los cupcakes decorados para Halloween con mayor rapidez.', 45, null),
+        (2, 'Una vez que lo tienes todo listo, bate los huevos con el azúcar, la sal y la esencia de vainilla hasta obtener una textura cremosa y homogénea.', 45, null),
+        (3, 'Añade el aceite en forma de hilo y sin dejar de batir. Aunque nosotros hemos optado por elaborar unos cupcakes de yogur para Halloween.', 45, null),
+        (4, 'Cuando los ingredientes anteriores estén bien integrados, añade la harina tamizada con los polvos de hornear y la maicena. Agrégala intercalándola con el yogur para que ambos ingredientes se mezclen adecuadamente.', 45, null),
+        (5, 'Termina de preparar la masa de los cupcakes para Halloween con el yogur, hasta obtener una mezcla suave.', 45, null),
+        (6, 'Añade la mezcla en los moldes para magdalenas y hornear a 175 °C durante 30 minutos, o hasta que observes que están listas. Para evitar que se salgan de los moldes, deberás llenarlos con la masa ocupando las 3/4 partes de su capacidad.', 45, null),
+        (7, 'Saca los cupcakes del horno y deja que reposen hasta enfriar. Mientras tanto, puedes aprovechar para preparar el frosting que emplearás para la decoración de Halloween.', 45, null),
         (8, 'Para el frosting, nosotros hemos optado por una cobertura de queso crema, puesto que su suave sabor encaja a la perfección con el aroma a vainilla de las magdalenas. Para hacerlo, simplemente debes batir enérgicamente todos los ingredientes hasta conseguir una crema consistente y homogénea.', 45, null),
         (9, 'Añade colorante a tu gusto para dar a tus cupcakes para Halloween un toque más tétrico.', 45, null),
-        (10, 'Finalmente, introduce la cobertura en una manga pastelera y decora los cupcakes a tu gusto. Para una mejor presentación, haz figuras de fondant, que puede ser casero con nubes de azúcar o comprado ya hecho. Juega con los colores y las formas para hacer unos terroríficos cupcakes de yogur decorados para Halloween', 45, 96),
+        (10, 'Finalmente, introduce la cobertura en una manga pastelera y decora los cupcakes a tu gusto. Para una mejor presentación, haz figuras de fondant, que puede ser casero con nubes de azúcar o comprado ya hecho. Juega con los colores y las formas para hacer unos terroríficos cupcakes de yogur decorados para Halloween', 45, null),
         (1, 'Para hacer los sombreros de bruja con fondant necesitaremos algunas herramientas de modelaje de repostería. Ten a mano cortadores, rodillo, algunos lápices de bola y mucha imaginación.', 46, null),
-        (2, 'Lo primero que haremos es cortar una pieza circular de fondant negro. Esto nos servira para forrar el cupcake y a la vez será la base del sombrero.', 46, 105),
-        (3, 'Con otro trozo de fondant negro, moldea la copa del sombrero. Utiliza las manos para darle una forma triangular y alargada, haz la punta larga para poder torcerla.', 46, 106),
-        (4, 'Aparte, haz unas tiras planas de color verde para la base de la copa del sombrero de bruja. Recuerda unir el fondant untando cada pieza con un poco de agua.', 46, 107),
-        (5, 'Como complemento haremos una escoba de bruja. Para ello haz color marrón uniendo un poco de negro y amarillo. Haz el palo de la escoba de este color y el cepillo de color amarillo.', 46, 108),
-        (6, 'Finalmente, une las piezas y decora los bordes del muffins de sombrero de bruja para Halloween con glasa real de color rojo.', 46, 109),
-        (1, 'Para empezar a preparar la masa de estas sencillas magdalenas de araña, en un bol mezclamos los huevos con el azúcar blanco y batimos con las varillas. A continuación añadimos la leche, la esencia de vainilla y el aceite de oliva hasta que se integren todos los ingredientes.', 47, 111),
-        (2, 'Es el momento de tamizar la harina con la levadura y la sal, y añadir todo al bol. Seguimos moviendo con las varillas hasta que la harina se integre por completo. Mientras tanto, precalentamos el horno a 180 ºC.', 47, 113),
+        (2, 'Lo primero que haremos es cortar una pieza circular de fondant negro. Esto nos servira para forrar el cupcake y a la vez será la base del sombrero.', 46, null),
+        (3, 'Con otro trozo de fondant negro, moldea la copa del sombrero. Utiliza las manos para darle una forma triangular y alargada, haz la punta larga para poder torcerla.', 46, null),
+        (4, 'Aparte, haz unas tiras planas de color verde para la base de la copa del sombrero de bruja. Recuerda unir el fondant untando cada pieza con un poco de agua.', 46, null),
+        (5, 'Como complemento haremos una escoba de bruja. Para ello haz color marrón uniendo un poco de negro y amarillo. Haz el palo de la escoba de este color y el cepillo de color amarillo.', 46, null),
+        (6, 'Finalmente, une las piezas y decora los bordes del muffins de sombrero de bruja para Halloween con glasa real de color rojo.', 46, null),
+        (1, 'Para empezar a preparar la masa de estas sencillas magdalenas de araña, en un bol mezclamos los huevos con el azúcar blanco y batimos con las varillas. A continuación añadimos la leche, la esencia de vainilla y el aceite de oliva hasta que se integren todos los ingredientes.', 47, null),
+        (2, 'Es el momento de tamizar la harina con la levadura y la sal, y añadir todo al bol. Seguimos moviendo con las varillas hasta que la harina se integre por completo. Mientras tanto, precalentamos el horno a 180 ºC.', 47, null),
         (3, 'Rellenamos todos los moldes para magdalenas o cupcakes hasta la mitad del molde. Metemos nuestras magdalenas de araña al horno durante 20 minutos.', 47, null),
-        (4, 'Derretimos el chocolate para fundir en un recipiente o al baño María. Mientras, ponemos azúcar glass encima de cada muffin de araña y la extendemos con un pincel para que la superficie quede blanca.', 47, 114),
-        (5, 'Introducimos el chocolate en una jeringa para cocina. De este modo, podremos dibujar la tela de araña con mayor facilidad y decorar, así, las magdalenas para Halloween. Si no tienes este utensilio, puedes utilizar un palito de bambú.', 47, 115),
-        (6, 'Una vez terminadas las magdalenas de araña caseras para Halloween, divertidas y muy sencillas, las puedes acompañar con unos gusanos para Halloween o con unos terroríficos ojos de gelatina. ¡Los niños van a alucinar!', 47, 116),
-        (1, 'Para empezar a realizar nuestra receta de muffins de chocolate para niños, el primer paso es prealistar todos los ingredientes.', 48, 118),
-        (2, 'En un bol mezclar todos los ingredientes secos (harina de trigo, cocoa, azúcar y sal). Pasa la preparación por un colador para que nuestra mezcla quede más fina.', 48, 119),
-        (3, 'Adiciona uno a uno los huevos y mezcla con un batidor de mano, hasta obtener una masa homogénea y sin grumos.', 48, 120),
-        (4, 'Vierte la masa de los muffins en los moldes. Precalienta el horno a 200ºC y, cuando esté caliente, introduce los muffins, baja la temperatura a 160ºC y hornéalos durante 15-20 minutos.', 48, 121),
-        (5, 'Una vez fríos, retira del horno las magdalenas de chocolate y llévalos a un plato. Luego, decorar el plato con las nueces picadas de manera que simule las piedras de un cementerio.', 48, 122),
-        (6, 'Decora con el frosting rojo cada uno de los muffins de chocolate para niños con una cruz, simulando una tumba. ¡Y listo!', 48, 117),
-        (1, 'En un bol mezclamos con las varillas los ingredientes húmedos: huevos, azúcar o edulcorante, margarina y leche. Cabe destacar que, si se prefiere, la leche puede ser desnatada para hacer unas magdalenas de calabaza más ligeras.', 49, 124),
-        (2, 'A continuación, añadimos la calabaza asada y triturada. Volvemos a mezclar para integrarla a la mezcla.', 49, 125),
-        (3, 'En otro bol, mezclamos los ingredientes secos: las harinas de avena y centeno, el salvado, las especias y la levadura. Vamos añadiéndolo al bol húmedo tras tamizar la preparación para que no salgan grumos y luego queden más esponjosas las magdalenas de calabaza para Halloween.', 49, 126),
-        (4, 'Cuando tengamos la masa lista, bien mezclada y homogénea, engrasamos un poco los moldes de papel (imprescindible que sean con motivos de Halloween) y los llenamos unos 2/3 de su capacidad.', 49, 127),
-        (5, 'Metemos las magdalenas en el horno ya caliente a 180 ºC con calor arriba y abajo, y horneamos durante 20 minutos. Pasado el tiempo, sacamos la bandeja del horno y cuando ya no quemen, pasamos las magdalenas a una rejilla para que terminen de enfriarse.', 49, 128),
-        (6, 'Ya veréis qué olor más delicioso os queda en la cocina. Y aún más deliciosas están las magdalenas de calabaza para Halloween, ¡terroríficamente buenas! ', 49, 129),
-        (1, 'Para preparara esta divertida receta de cupcakes para Halloween, el primer paso es alistar todos los ingredientes.', 50, 131),
-        (2, 'Para hacer la masa de las magdalenas de Halloween, mezcla la mantequilla blanda con el azúcar y la esencia de vainilla hasta obtener una mezcla suave.', 50, 132),
-        (3, 'Agregar los huevos uno por uno y mezcla bien hasta que se integran por completo.', 50, 133),
-        (4, 'Añade la harina, previamente cernida con el polvo de hornear, y revuelve bien. Mezcla la harina poco a poco para evitar que se formen grumos en la masa.', 50, 134),
-        (5, 'Añade a la preparación la crema de leche y revuelve.', 50, 135),
-        (6, 'Dividir la mezcla en dos partes y en una de éstas, incorpora el cacao en polvo para hacerla de otro calor.', 50, 136),
-        (7, 'Prepara una bandeja de horno con capacillos especiales para muffins, añade pequeñas porciones de la mitad blanca de la mezcla.', 50, 137),
-        (8, 'Seguidamente, coloca otra porción pero de masa con cacao. El total de la mezcla no debe llenar el capciilo, recuerda que al cocinar la masa subirá. Lleva al horno a 170 °C. durante 20 minutos.', 50, 138),
-        (9, 'Sacar del horno y deja reposar hasta que estén fríos.', 50, 139),
-        (10, 'Cubre con nutella y decora con figuras de halloween realizadas con fondant. Utiliza tu creatividad para darle el toque final a los cupcakes de Halloween fáciles y diviértete con los más pequeños de casa.', 50, 130),
+        (4, 'Derretimos el chocolate para fundir en un recipiente o al baño María. Mientras, ponemos azúcar glass encima de cada muffin de araña y la extendemos con un pincel para que la superficie quede blanca.', 47, null),
+        (5, 'Introducimos el chocolate en una jeringa para cocina. De este modo, podremos dibujar la tela de araña con mayor facilidad y decorar, así, las magdalenas para Halloween. Si no tienes este utensilio, puedes utilizar un palito de bambú.', 47, null),
+        (6, 'Una vez terminadas las magdalenas de araña caseras para Halloween, divertidas y muy sencillas, las puedes acompañar con unos gusanos para Halloween o con unos terroríficos ojos de gelatina. ¡Los niños van a alucinar!', 47, null),
+        (1, 'Para empezar a realizar nuestra receta de muffins de chocolate para niños, el primer paso es prealistar todos los ingredientes.', 48, null),
+        (2, 'En un bol mezclar todos los ingredientes secos (harina de trigo, cocoa, azúcar y sal). Pasa la preparación por un colador para que nuestra mezcla quede más fina.', 48, null),
+        (3, 'Adiciona uno a uno los huevos y mezcla con un batidor de mano, hasta obtener una masa homogénea y sin grumos.', 48, null),
+        (4, 'Vierte la masa de los muffins en los moldes. Precalienta el horno a 200ºC y, cuando esté caliente, introduce los muffins, baja la temperatura a 160ºC y hornéalos durante 15-20 minutos.', 48, null),
+        (5, 'Una vez fríos, retira del horno las magdalenas de chocolate y llévalos a un plato. Luego, decorar el plato con las nueces picadas de manera que simule las piedras de un cementerio.', 48, null),
+        (6, 'Decora con el frosting rojo cada uno de los muffins de chocolate para niños con una cruz, simulando una tumba. ¡Y listo!', 48, null),
+        (1, 'En un bol mezclamos con las varillas los ingredientes húmedos: huevos, azúcar o edulcorante, margarina y leche. Cabe destacar que, si se prefiere, la leche puede ser desnatada para hacer unas magdalenas de calabaza más ligeras.', 49, null),
+        (2, 'A continuación, añadimos la calabaza asada y triturada. Volvemos a mezclar para integrarla a la mezcla.', 49, null),
+        (3, 'En otro bol, mezclamos los ingredientes secos: las harinas de avena y centeno, el salvado, las especias y la levadura. Vamos añadiéndolo al bol húmedo tras tamizar la preparación para que no salgan grumos y luego queden más esponjosas las magdalenas de calabaza para Halloween.', 49, null),
+        (4, 'Cuando tengamos la masa lista, bien mezclada y homogénea, engrasamos un poco los moldes de papel (imprescindible que sean con motivos de Halloween) y los llenamos unos 2/3 de su capacidad.', 49, null),
+        (5, 'Metemos las magdalenas en el horno ya caliente a 180 ºC con calor arriba y abajo, y horneamos durante 20 minutos. Pasado el tiempo, sacamos la bandeja del horno y cuando ya no quemen, pasamos las magdalenas a una rejilla para que terminen de enfriarse.', 49, null),
+        (6, 'Ya veréis qué olor más delicioso os queda en la cocina. Y aún más deliciosas están las magdalenas de calabaza para Halloween, ¡terroríficamente buenas! ', 49, null),
+        (1, 'Para preparara esta divertida receta de cupcakes para Halloween, el primer paso es alistar todos los ingredientes.', 50, null),
+        (2, 'Para hacer la masa de las magdalenas de Halloween, mezcla la mantequilla blanda con el azúcar y la esencia de vainilla hasta obtener una mezcla suave.', 50, null),
+        (3, 'Agregar los huevos uno por uno y mezcla bien hasta que se integran por completo.', 50, null),
+        (4, 'Añade la harina, previamente cernida con el polvo de hornear, y revuelve bien. Mezcla la harina poco a poco para evitar que se formen grumos en la masa.', 50, null),
+        (5, 'Añade a la preparación la crema de leche y revuelve.', 50, null),
+        (6, 'Dividir la mezcla en dos partes y en una de éstas, incorpora el cacao en polvo para hacerla de otro calor.', 50, null),
+        (7, 'Prepara una bandeja de horno con capacillos especiales para muffins, añade pequeñas porciones de la mitad blanca de la mezcla.', 50, null),
+        (8, 'Seguidamente, coloca otra porción pero de masa con cacao. El total de la mezcla no debe llenar el capciilo, recuerda que al cocinar la masa subirá. Lleva al horno a 170 °C. durante 20 minutos.', 50, null),
+        (9, 'Sacar del horno y deja reposar hasta que estén fríos.', 50, null),
+        (10, 'Cubre con nutella y decora con figuras de halloween realizadas con fondant. Utiliza tu creatividad para darle el toque final a los cupcakes de Halloween fáciles y diviértete con los más pequeños de casa.', 50, null),
         (1, 'Para trabajar con fondant es necesario contar con herramientas de modelaje de repostería. Para hacer estas lápidas de Halloween necesitaremos cortadores, rodillo, algunos lápices de bola y un marcador para alimentos.', 51, null),
-        (2, 'Teniendo esto en cuenta, mezcla un trozo de fondant negro con algo de blanco para crear un color gris oscuro con vetas blancas. Extiende y corta una pieza en forma de lápida.', 51, 141),
-        (3, 'Utiliza la imaginación y haz pequeñas marcas por toda la lápida para dar apariencia de piedra. Puedes hacer pequeñas líneas punteadas.', 51, 142),
-        (4, 'Corta un pequeño rectángulo que sea de un color ligeramente más claro que el resto de la lápida.', 51, 143),
-        (5, 'Unta el rectángulo con un poco de agua y págalo a la parte superior de la lápida. Escribe la palabra RIP en él con ayuda del marcador para repostería.', 51, 144),
-        (6, 'Haz un cilindro muy fino, como un espagueti, con el mismo fondant y págalo al borde de la lápida, esto le dará un poco de profundidad. recuerda untar siempre con agua para que las piezas de fondant se peguen entre sí.', 51, 145),
-        (7, 'Como detalles colocaremos dos huesos en forma de cruz. Para hacerlos, haz unos pequeños cilindros con fondant blanco y utiliza el lápiz de bola para hacer la forma de hueso en los bordes. Luego pégalos en la lápida.', 51, 146),
-        (8, 'Extiende un poco de fondant verde, dejándolo muy fino y forrar el cupcake. Luego, pega la lápida en la base, siempre untando con un poco de agua. Recuerda que puedes hacer tus propios muffins de distintos sabores', 51, 147),
-        (9, 'Finalmente, haz los detalles finales con glasa real. Puedes hacer arbustos de colores o verdes como en este caso. Para decorar con fondant siempre es importante usar la imaginación.', 51, 148),
-        (10, 'Decora todos los muffins que puedas y disfruta de estos cupcakes decorados para Halloween. Y si quieres triunfar en estas fiestas, combina esta receta para Halloween con otros motivos terroríficos.', 51, 149),
-        (1, 'Para realizar estos sabrosos cupcakes de chocolate para Halloween, vamos a comenzar por verter en un bol el azúcar con los huevos. Batir durante 2 minutos con batidora eléctrica, o 3 con un tenedor o batidor manual, para desarmar un poco el azúcar.', 52, 151),
-        (2, 'Añadir la manteca, previamente derretida. Mezclar durante unos segundos, con un tenedor o batidor, a modo de integrarla con el resto de los ingredientes de los cupcakes para Halloween.', 52, 152),
-        (3, 'Agregar la harina, previamente tamizada, junto con el polvo de hornear. Luego la leche, y revolver todo por aproximadamente 3 minutos hasta conseguir una mezcla espesa y sin grumos.', 52, 153),
+        (2, 'Teniendo esto en cuenta, mezcla un trozo de fondant negro con algo de blanco para crear un color gris oscuro con vetas blancas. Extiende y corta una pieza en forma de lápida.', 51, null),
+        (3, 'Utiliza la imaginación y haz pequeñas marcas por toda la lápida para dar apariencia de piedra. Puedes hacer pequeñas líneas punteadas.', 51, null),
+        (4, 'Corta un pequeño rectángulo que sea de un color ligeramente más claro que el resto de la lápida.', 51, null),
+        (5, 'Unta el rectángulo con un poco de agua y págalo a la parte superior de la lápida. Escribe la palabra RIP en él con ayuda del marcador para repostería.', 51, null),
+        (6, 'Haz un cilindro muy fino, como un espagueti, con el mismo fondant y págalo al borde de la lápida, esto le dará un poco de profundidad. recuerda untar siempre con agua para que las piezas de fondant se peguen entre sí.', 51, null),
+        (7, 'Como detalles colocaremos dos huesos en forma de cruz. Para hacerlos, haz unos pequeños cilindros con fondant blanco y utiliza el lápiz de bola para hacer la forma de hueso en los bordes. Luego pégalos en la lápida.', 51, null),
+        (8, 'Extiende un poco de fondant verde, dejándolo muy fino y forrar el cupcake. Luego, pega la lápida en la base, siempre untando con un poco de agua. Recuerda que puedes hacer tus propios muffins de distintos sabores', 51, null),
+        (9, 'Finalmente, haz los detalles finales con glasa real. Puedes hacer arbustos de colores o verdes como en este caso. Para decorar con fondant siempre es importante usar la imaginación.', 51, null),
+        (10, 'Decora todos los muffins que puedas y disfruta de estos cupcakes decorados para Halloween. Y si quieres triunfar en estas fiestas, combina esta receta para Halloween con otros motivos terroríficos.', 51, null),
+        (1, 'Para realizar estos sabrosos cupcakes de chocolate para Halloween, vamos a comenzar por verter en un bol el azúcar con los huevos. Batir durante 2 minutos con batidora eléctrica, o 3 con un tenedor o batidor manual, para desarmar un poco el azúcar.', 52, null),
+        (2, 'Añadir la manteca, previamente derretida. Mezclar durante unos segundos, con un tenedor o batidor, a modo de integrarla con el resto de los ingredientes de los cupcakes para Halloween.', 52, null),
+        (3, 'Agregar la harina, previamente tamizada, junto con el polvo de hornear. Luego la leche, y revolver todo por aproximadamente 3 minutos hasta conseguir una mezcla espesa y sin grumos.', 52, null),
         (4, 'Añadir a la masa de los cupcakes, la esencia de vainilla junto con el cacao en polvo para perfumar y saborizar nuestros muffins de chocolate. Mezclar por 2 minutos para integrar los ingredientes. Luego agregar el chocolate negro, derretido previamente. Mezclar por 1 minuto para incorporar.', 52, null),
-        (5, 'Si querés podés realizar cupcakes de otros sabores, añadiendo en lugar del cacao y el chocolate otro saborizante (ralladura de naranja, jugo de limón, coco, etc).', 52, 154),
+        (5, 'Si querés podés realizar cupcakes de otros sabores, añadiendo en lugar del cacao y el chocolate otro saborizante (ralladura de naranja, jugo de limón, coco, etc).', 52, null),
         (6, 'Verter la preparación de los cupcakes de chocolate en los pirotines hasta 3/4 de su capacidad, acomodados en una bandeja para luego poder llevarlos al horno a todos.', 52, null),
         (7, 'Llevar la bandeja con cupcakes para Halloween al horno previamente precalentado en 180ºC por aproximadamente 15-20 minutos. Hasta que al pincharlos con un palillo este salga limpio y seco.', 52, null),
-        (8, 'No agregués más cantidad de mezcla que la recomendada, dado que de lo contrario, cuando los muffins se cocinen y leuden se te van a desbordar de los pirotines.', 52, 155),
+        (8, 'No agregués más cantidad de mezcla que la recomendada, dado que de lo contrario, cuando los muffins se cocinen y leuden se te van a desbordar de los pirotines.', 52, null),
         (9, 'Una vez horneados nuestros cupcakes de chocolate, retirarlos del horno y dejarlos enfriar por aproximadamente 25 minutos.', 52, null),
         (10, 'Mezclar el chocolate, derretido previamente, junto con una pizca de colorante naranja, meterlo en una manga con pico (del tamaño que querramos hacer nuestra araña), y dibujarla en la cubierta de la magdalena. Primero haremos el cuerpo de la araña, un círculo ovalado manteniendo presionada la manga. Luego, a los costados finas líneas imitando a las patas.', 52, null),
-        (11, 'Si no tenés microondas, derretir el chocolate a baño maría. Poniendo un bol con agua hirviendo y encima otro con el chocolate.', 52, 156),
+        (11, 'Si no tenés microondas, derretir el chocolate a baño maría. Poniendo un bol con agua hirviendo y encima otro con el chocolate.', 52, null),
         (12, 'Por último, llevar a la heladera y dejar enfriar por 10 minutos, para que el chocolate de las arañas se endurezca y queden listas.', 52, null),
-        (1, 'Para realizar nuestros cupcakes de calabaza y chocolate, vamos a comenzar por verter en un bol el azúcar con los huevos y la esencia de vainilla. Mezclar por 2 minutos con tenedor o batidor manual hasta desarmar un poco el azúcar.', 53, 158),
-        (2, 'Agregar el aceite y el puré de calabaza hervida y pisada previamente (sin cáscara). Mezclar todo por 2 minutos hasta integrar los ingredientes.', 53, 159),
-        (3, 'Añadir la harina, el polvo de hornear y la leche. Batir todo con batidora eléctrica por 3 minutos aproximadamente, hasta obtener una mezcla homogénea y sin grumos para los cupcakes para Halloween.', 53, 160),
-        (4, 'Verter la preparación de los muffins de calabaza y chocolate en pirotines o moldes para cupcakes, hasta ocupar 3/4 de su capacidad. Colocarlos encima de una bandeja para poder llevarlos al horno, previamente calentado a 180 ºC, durante 20 minutos aproximadamente.', 53, 161),
-        (5, 'Una vez horneados, que notemos que estén dorados y que al pinchar con un palillo, el mismo salga limpio y seco, retirar los cupcakes de calabaza y chocolate del horno y dejar templar.', 53, 162),
-        (6, 'Para la decoración de los cupcakes para Halloween, derretir en el microondas o al baño María el chocolate blanco por un lado y el negro por el otro. Con una manga o cuchara, verter primeramente el chocolate blanco por todo el cupcake para cubrir la base en su totalidad. Luego, dejar enfriar y secar por unos 15 minutos en la heladera para que el chocolate se endurezca un poco. Repetir el proceso con el resto de los muffins caseros.', 53, 163),
+        (1, 'Para realizar nuestros cupcakes de calabaza y chocolate, vamos a comenzar por verter en un bol el azúcar con los huevos y la esencia de vainilla. Mezclar por 2 minutos con tenedor o batidor manual hasta desarmar un poco el azúcar.', 53, null),
+        (2, 'Agregar el aceite y el puré de calabaza hervida y pisada previamente (sin cáscara). Mezclar todo por 2 minutos hasta integrar los ingredientes.', 53, null),
+        (3, 'Añadir la harina, el polvo de hornear y la leche. Batir todo con batidora eléctrica por 3 minutos aproximadamente, hasta obtener una mezcla homogénea y sin grumos para los cupcakes para Halloween.', 53, null),
+        (4, 'Verter la preparación de los muffins de calabaza y chocolate en pirotines o moldes para cupcakes, hasta ocupar 3/4 de su capacidad. Colocarlos encima de una bandeja para poder llevarlos al horno, previamente calentado a 180 ºC, durante 20 minutos aproximadamente.', 53, null),
+        (5, 'Una vez horneados, que notemos que estén dorados y que al pinchar con un palillo, el mismo salga limpio y seco, retirar los cupcakes de calabaza y chocolate del horno y dejar templar.', 53, null),
+        (6, 'Para la decoración de los cupcakes para Halloween, derretir en el microondas o al baño María el chocolate blanco por un lado y el negro por el otro. Con una manga o cuchara, verter primeramente el chocolate blanco por todo el cupcake para cubrir la base en su totalidad. Luego, dejar enfriar y secar por unos 15 minutos en la heladera para que el chocolate se endurezca un poco. Repetir el proceso con el resto de los muffins caseros.', 53, null),
         (7, 'Tomar una manga descartable y cortarle un pico bien pequeño, con el que haremos el rostro de una calavera sobre nuestros muffins para Halloween. Para ello, haremos los ojos, haciendo unos pequeños círculos en la parte superior con un pequeño arco al medio, deben quedar ovalados y arqueados a la mitad.', 53, null),
         (8, 'Luego, dos puntitos cercanos entre ellos, en la parte central del cupcake de calabaza, que imitarán la nariz. Para la boca, dibujaremos un arco irregular al que luego le agregaremos pequeñas líneas por encima. Repetiremos el proceso con todas las magdalenas para Halloween.', 53, null),
-        (9, '¡Y voilà!, ya tienes listos estos sabrosos cupcakes de calabaza y chocolate para poder disfrutar con tus amigos o en familia. ¡Bon appétit!', 53, 164),
+        (9, '¡Y voilà!, ya tienes listos estos sabrosos cupcakes de calabaza y chocolate para poder disfrutar con tus amigos o en familia. ¡Bon appétit!', 53, null),
         (1, 'Empezaremos encendiendo el horno para precalentarlo a 180ºC. Cogemos un molde para cupcakes y cubrimos con pirotines o moldes de papel. Reservamos.', 54, null),
         (2, 'En un cuenco grande mezclaremos la harina, el polvo de hornear y la sal.', 54, null),
         (3, 'Luego, en otro cuenco, batiremos con batidora eléctrica la margarina y el azúcar a velocidad media hasta que esté suave y esponjosa, aproximadamente durante 2-3 minutos. Agregamos los huevos uno a uno y mezclamos bien. Incorporamos la esencia de vainilla y volvemos a batir.', 54, null),
-        (4, 'Con la batidora a velocidad baja, agregamos los ingredientes secos y la leche alternativamente en 3 partes, comenzando y terminando con los ingredientes secos, batiendo apenas hasta tener una mezcla homogénea.', 54, 166),
-        (5, 'Rellenamos nuestros moldes de cupcakes con la masa, más o menos ¾ de molde, teniendo en cuenta que elevará en el horno. Horneamos durante 15-20 minutos, o hasta que al pinchar en el centro con un palillo éste salga limpio. Retiramos del horno y dejamos enfriar completamente sobre una rejilla.', 54, 167),
+        (4, 'Con la batidora a velocidad baja, agregamos los ingredientes secos y la leche alternativamente en 3 partes, comenzando y terminando con los ingredientes secos, batiendo apenas hasta tener una mezcla homogénea.', 54, null),
+        (5, 'Rellenamos nuestros moldes de cupcakes con la masa, más o menos ¾ de molde, teniendo en cuenta que elevará en el horno. Horneamos durante 15-20 minutos, o hasta que al pinchar en el centro con un palillo éste salga limpio. Retiramos del horno y dejamos enfriar completamente sobre una rejilla.', 54, null),
         (6, 'La decoración es muy sencilla. Primero untamos con crema de avellanas y cacao por toda la superficie del cupcake, y luego echamos encima una buena cantidad de fideos de chocolate y damos la vuelta para retirar el sobrante.', 54, null),
-        (7, 'Colocaremos encima 2 ojos de caramelo al que hemos pintado la pupila en color negro con el el rotulador alimenticio.', 54, 168),
-        (8, 'Con ayuda de un palillo de madera haremos 3 agujeros en los lados opuestos de cada cupcake; dentro de cada agujero insertaremos el regaliz para hacer las patas de la araña.', 54, 169),
-        (9, 'Como veis se trata de una receta de Halloween bien sencilla, muy llamativa y con ingredientes que nos gustan a todos. Los cupcakes quedan muy ricos y esponjosos, y la crema de cacao le da el toque dulce justo.', 54, 170),
-        (1, 'Para estos adorables cupcakes de árbol de Navidad lo primero que debes hacer es alistar todos los ingredientes.', 55, 172),
-        (2, 'Bate la mantequilla con el azúcar hasta que quede bien cremosa, esto lo puedes hacer a mano o con una batidora eléctrica.', 55, 173),
-        (3, 'Agrega el aceite y la esencia de vainilla al gusto. Si quieres cambiar la esencia de vainilla por otra esencia como naranja o mora lo puedes hacer. Sigue batiendo hasta que quede muy blanda la mantequilla.', 55, 174),
-        (4, 'Para continuar con los cupcakes para Navidad, agrega el huevo y la leche. Sigue batiendo hasta que se integren todos los ingredientes.', 55, 175),
-        (5, 'Para finalizar, agrega la harina junto con el polvo de hornear y sigue batiendo hasta integrar y que quede una mezcla cremosa y homogénea.', 55, 176),
-        (6, 'Coloca la mezcla en moldes para cupcakes y lleva al horno durante 25 minutos a 170ºC.', 55, 177),
-        (7, 'Para decorar nuestros cupcakes de árbol de Navidad lo que debes hacer es preparar la crema chantilly. Para ello, bate la crema de leche con el azúcar impalpable y un toque de esencia de vainilla hasta que forme picos. Añade el colorante verde hasta que la crema tenga el tono de árbol de Navidad.', 55, 178),
-        (8, 'Decora tus cupcakes con la crema chantilly. Coloca la crema verde en una manga pastelera con boquilla rizada y sé creativo. Dale el toque final a los árboles comestibles a tu gusto con las virutas de colroes.', 55, 179),
-        (9, 'Sirve y sorprendre a tus invitados o familiares con estos hermosos cupcakes de árbol de Navidad, no olvides que puedes ponerles tus propios detalles. ¡Feliz Navidad!', 55, 180),
+        (7, 'Colocaremos encima 2 ojos de caramelo al que hemos pintado la pupila en color negro con el el rotulador alimenticio.', 54, null),
+        (8, 'Con ayuda de un palillo de madera haremos 3 agujeros en los lados opuestos de cada cupcake; dentro de cada agujero insertaremos el regaliz para hacer las patas de la araña.', 54, null),
+        (9, 'Como veis se trata de una receta de Halloween bien sencilla, muy llamativa y con ingredientes que nos gustan a todos. Los cupcakes quedan muy ricos y esponjosos, y la crema de cacao le da el toque dulce justo.', 54, null),
+        (1, 'Para estos adorables cupcakes de árbol de Navidad lo primero que debes hacer es alistar todos los ingredientes.', 55, null),
+        (2, 'Bate la mantequilla con el azúcar hasta que quede bien cremosa, esto lo puedes hacer a mano o con una batidora eléctrica.', 55, null),
+        (3, 'Agrega el aceite y la esencia de vainilla al gusto. Si quieres cambiar la esencia de vainilla por otra esencia como naranja o mora lo puedes hacer. Sigue batiendo hasta que quede muy blanda la mantequilla.', 55, null),
+        (4, 'Para continuar con los cupcakes para Navidad, agrega el huevo y la leche. Sigue batiendo hasta que se integren todos los ingredientes.', 55, null),
+        (5, 'Para finalizar, agrega la harina junto con el polvo de hornear y sigue batiendo hasta integrar y que quede una mezcla cremosa y homogénea.', 55, null),
+        (6, 'Coloca la mezcla en moldes para cupcakes y lleva al horno durante 25 minutos a 170ºC.', 55, null),
+        (7, 'Para decorar nuestros cupcakes de árbol de Navidad lo que debes hacer es preparar la crema chantilly. Para ello, bate la crema de leche con el azúcar impalpable y un toque de esencia de vainilla hasta que forme picos. Añade el colorante verde hasta que la crema tenga el tono de árbol de Navidad.', 55, null),
+        (8, 'Decora tus cupcakes con la crema chantilly. Coloca la crema verde en una manga pastelera con boquilla rizada y sé creativo. Dale el toque final a los árboles comestibles a tu gusto con las virutas de colroes.', 55, null),
+        (9, 'Sirve y sorprendre a tus invitados o familiares con estos hermosos cupcakes de árbol de Navidad, no olvides que puedes ponerles tus propios detalles. ¡Feliz Navidad!', 55, null),
         (1, 'Para comenzar a preparar nuestros muffins derretimos la mantequilla en el microondas ( o al baño María) y la ponemos en un bol amplio junto con la miel y el azúcar moreno. Dejamos reposar unos minutos para que el calor de la mantequilla haga manejable la miel y ayude a derretir el azúcar. Removemos hasta obtener una mezcla homogénea. Añadimos los huevos de uno en uno y mezclamos en cada adicción.', 56, null),
         (2, 'Incorporamos la leche y batimos hasta integrar. La masa se volverá muy líquida ¡es normal!', 56, null),
         (3, 'Por último añadimos poco a poco la harina y la levadura y vamos mezclando hasta obtener una mezcla cremosa y sin grumos. Disponemos dos boles y en cada uno de ellos ponemos la mitad de la masa de los cupcakes de chocolate y vainilla. En uno de los boles ponemos la esencia de vainilla y en el otro el cacao en polvo. Mezclamos bien, tapamos y dejamos reposar en el frigorífico.', 56, null),
@@ -2284,37 +2021,37 @@ INSERT INTO receta_segmentos (orden, descripcion, cupcake_id, imagen_id)
         (7, 'Truco: El tiempo dependerá del tamaño de las cápsulas, en mi caso fueron casi 25 minutos más pero porque son cápsulas muy grandes.', 56, null),
         (8, 'Dejamos los muffins de vainilla esponjosos en el horno con la puerta entreabierta 10 minutos, sacamos, retiramos de la bandeja y dejamos enfriar por completo sobre una rejilla. ¡Buen provecho!', 56, null),
         (9, 'Antes de servir podemos espolvorear los muffins de chocolate y vainilla con azúcar glas.', 56, null),
-        (1, 'Antes de realizar esta receta navideña, el primer paso es alistar todos los ingredientes.', 57, 183),
-        (2, 'En un bol agregar la mantequilla blanda y batir con el azúcar y la esencia de vainilla.El resultado debe ser una mezcla suave, en ese momento agregar el huevo y mezclar muy bien.', 57, 184),
-        (3, 'Agregar la mitad de la harina con el polvo de hornear y la mitad de la leche. Mezclar muy bien y cuando esté todo integrado, añadir el resto de ingredientes hasta obtener una mezcla suave y homogénea.', 57, 185),
-        (4, 'Finalmente, agrega las almendras fileteadas y mezclar. Disponer la masa de los cupcakes en capacillos o moldes de cupcakes, dejando un espacio para que crezcan al cocinar. Lleva todo al horno a 180ºC. durante 25 minutos hasta que estén dorados, esperar a que enfríen para decorar. Si quieres una explicación más detallada puedes revisar otras recetas de cupcakes como: Cupcakes de arcoiris, Cupcakes de plátano o Cupcakes de limón', 57, 186),
-        (5, 'Para realizar los cupcakes de muñeco de nieve necesitamos teñir el fondant con colorante color rosado, naranja, negro y azul. Cuando tengas todo el fondant, estira el de color azul y cortar en forma circular, cortar una linea un poco arriba de la mitad para realizar el gorro del muñeco de nieve. El fondant lo puedes comprar o hacer tu mismo.', 57, 187),
-        (6, 'Estirar el fondant color blanco y con un cortador circular del tamaño del cupcake, cortar y pegar sobre éste con un pincel con agua, de inmediato pegar el gorro y retirar el exceso de azúcar glass con el pincel. Luego, hacer una tira de fondant azul y pegar en la parte de abajo del gorro, hacer una bola azul y pegar en la parte de arriba. Para dar textura y mas realismo realizar unas líneas y puntos en las partes pegadas anteriormente.', 57, 188),
-        (7, 'Para terminar, haz los detalles de la cara del cupcake de muñeco de nieve: para los ojos dos puntos negros, para la nariz usa fondant naranja y realiza una sonrisa con dos bolitas rosadas en los extremos. Si te ha gustado esta receta navideña, tienes algún comentario o inquietud, danos tu opinión.', 57, 189),
-        (1, 'Antes de realizar esta receta navideña, el primer paso es alistar todos los ingredientes.', 58, 191),
-        (2, 'En un bowl agregar la mantequilla blanda, batir con el azúcar y la esencia de vainilla hasta obtener una mezcla suave, en ese momento agregar el huevo y mezclar muy bien.', 58, 192),
-        (3, 'Agregar la mitad harina con el polvo de hornear y la mitad de la leche, mezclar muy bien y añadir el resto hasta obtener una mezcla suave y homogénea. Disponer los capacillos rojos en los moldes de cupcakes y llenarlos con la mezcla, dejar un espacio para que crezcan en el horno, llevarlos a este a 180 grados C, durante 25 minutos hasta que estén dorados, esperar a que enfríen para decorar.', 58, 193),
+        (1, 'Antes de realizar esta receta navideña, el primer paso es alistar todos los ingredientes.', 57, null),
+        (2, 'En un bol agregar la mantequilla blanda y batir con el azúcar y la esencia de vainilla.El resultado debe ser una mezcla suave, en ese momento agregar el huevo y mezclar muy bien.', 57, null),
+        (3, 'Agregar la mitad de la harina con el polvo de hornear y la mitad de la leche. Mezclar muy bien y cuando esté todo integrado, añadir el resto de ingredientes hasta obtener una mezcla suave y homogénea.', 57, null),
+        (4, 'Finalmente, agrega las almendras fileteadas y mezclar. Disponer la masa de los cupcakes en capacillos o moldes de cupcakes, dejando un espacio para que crezcan al cocinar. Lleva todo al horno a 180ºC. durante 25 minutos hasta que estén dorados, esperar a que enfríen para decorar. Si quieres una explicación más detallada puedes revisar otras recetas de cupcakes como: Cupcakes de arcoiris, Cupcakes de plátano o Cupcakes de limón', 57, null),
+        (5, 'Para realizar los cupcakes de muñeco de nieve necesitamos teñir el fondant con colorante color rosado, naranja, negro y azul. Cuando tengas todo el fondant, estira el de color azul y cortar en forma circular, cortar una linea un poco arriba de la mitad para realizar el gorro del muñeco de nieve. El fondant lo puedes comprar o hacer tu mismo.', 57, null),
+        (6, 'Estirar el fondant color blanco y con un cortador circular del tamaño del cupcake, cortar y pegar sobre éste con un pincel con agua, de inmediato pegar el gorro y retirar el exceso de azúcar glass con el pincel. Luego, hacer una tira de fondant azul y pegar en la parte de abajo del gorro, hacer una bola azul y pegar en la parte de arriba. Para dar textura y mas realismo realizar unas líneas y puntos en las partes pegadas anteriormente.', 57, null),
+        (7, 'Para terminar, haz los detalles de la cara del cupcake de muñeco de nieve: para los ojos dos puntos negros, para la nariz usa fondant naranja y realiza una sonrisa con dos bolitas rosadas en los extremos. Si te ha gustado esta receta navideña, tienes algún comentario o inquietud, danos tu opinión.', 57, null),
+        (1, 'Antes de realizar esta receta navideña, el primer paso es alistar todos los ingredientes.', 58, null),
+        (2, 'En un bowl agregar la mantequilla blanda, batir con el azúcar y la esencia de vainilla hasta obtener una mezcla suave, en ese momento agregar el huevo y mezclar muy bien.', 58, null),
+        (3, 'Agregar la mitad harina con el polvo de hornear y la mitad de la leche, mezclar muy bien y añadir el resto hasta obtener una mezcla suave y homogénea. Disponer los capacillos rojos en los moldes de cupcakes y llenarlos con la mezcla, dejar un espacio para que crezcan en el horno, llevarlos a este a 180 grados C, durante 25 minutos hasta que estén dorados, esperar a que enfríen para decorar.', 58, null),
         (4, 'Para realizar los cupcakes de Papá Noel necesitamos teñir el fondant blanco con colorante color piel, rojo y negro, para saber como se realiza el fondant casero te invito a dirigirte al siguiente enlace.', 58, null),
-        (5, 'El primer paso es estirar el fondant color piel y con un cortador circular del tamaño del cupcake, cortar y pegar sobre este con un pincel con agua.', 58, 194),
-        (6, 'Para realizar la barba del Papá Noel, estirar el fondant blanco, cortar en forma circular y volver a cortar para formar una media luna, pegar la barba con el pincel con agua.', 58, 195),
-        (7, 'Para hacer los bigotes, coger dos bolitas de fondant y estirar hasta formar un cilindro mas estrecho en la punta, tratar que los dos queden lo mas parecido posible, pegarlo y sobre estos pegar una bolita color piel que seria la nariz, marcamos un circulo que vendría siendo la boca.', 58, 196),
-        (8, 'Para hacer el gorro, estiramos el fondant rojo (para evitar que se pegue, se puede utilizar azúcar glass), realizar una linea recta con un cuchillo, y marcar una media luna con el cortador circular, esta será la guía para realizar un triángulo.', 58, 197),
-        (9, 'Pegar el gorro y doblar la punta, de esta forma quedara con volumen, eliminar el exceso de azúcar glass con el pincel con agua.', 58, 198),
-        (10, 'Finalmente estirar un tira de fondant blanco y pegarla sobre el gorro, hacer una bolita blanca y pegarla en la punta de este también, por ultimo disponer dos puntos de fondant negro que serian los ojos.  Para dar mas realismo al Papá Noel, realizar unos puntos y lineas sobre la barbar, el bigote y las partes blancas del gorro. Estos cupcakes son ideales para regalar en esta navidad.', 58, 199),
-        (1, 'Para decorar estas magdalenas, lo primero que debemos hacer es derretir el chocolate. Para ello, caliéntalo a baño María como si fueses hacer la típica cobertura de chocolate. Cuando esté derretido, mezcla con un poco de mantequilla y revuelve bien para que no queden grumos.', 59, 201),
-        (2, 'A continuación, cubre las magdalenas con el chocolate caliente. Puedes ayudarte con una brocha de cocina o sumergir directamente la magdalena en el chocolate. Aquí tienes algunas recetas por si quieres hacer tus propias magdalenas: Muffins de vainilla, Muffins de naranja y Muffins con chispas de chocolate', 59, 202),
-        (3, 'Mientras el chocolate sigue caliente, primero pega las galletas tipo pretzel para formar las orejas de los renos. Colócalas en la misma posición que se ve en la foto.', 59, 203),
-        (4, 'Seguidamente, pega las galletitas en la parte inferior para que simulen la nariz. Puedes comprar mini galletas de cualquier tipo o hacerlas tu mismo.', 59, 204),
-        (5, 'Para terminar la decoración de los muffins de navidad, coloca una gota de chocolate para pegar la pastilla de colores en la punta de nariz. También coloca los ojos que se pegaran fácilmente en el chocolate y ya el reno tendrá vida! Deja reposar en la nevera para que el chocolate se solidifique.', 59, 205),
-        (6, 'Estos divertidos muffins navideños con forma de reno los podrás servir como postre estas navidades o incluso darlos como regalo a una persona especial. Y si te gustan muchos los renos también puedes hacer unos cake pops con forma de reno, a los más pequeños les encantarán.', 59, 206),
-        (1, 'Antes de realizar esta receta navideña para niños, el primer paso es alistar todos los ingredientes.', 60, 208),
-        (2, 'En un bol, bate la mantequilla con el azúcar y la esencia de vainilla hasta obtener una mezcla suave. Recuerda que la mantequilla debe estar ablandada previamente. Luego, agrega el huevo y mezclar muy bien.', 60, 209),
-        (3, 'Agregar la mitad harina con el polvo de hornear y la mitad de la leche. Mezclar hasta que se integre todo y entonces añade el resto de harina y leche resto hasta obtener una mezcla suave y homogénea.', 60, 210),
-        (4, 'Para terminar la masa de los cupcakes de chocolate, agrega la cocoa y las chispas de chocolate a la mezcla. Llena los capacillos en los moldes de cupcakes unas 3/4 partes y cocina en el horno a 180ºC. durante 25 minutos.', 60, 211),
-        (5, 'Para decorar los cupcakes de chocolate necesitamos teñir el fondant blanco con colorante color café oscuro, café claro, rojo y negro. Cuando los tengas, estira la pieza más oscura y corta una lámina para cubrir el cupcake, usa un pincel con agua para pegar el fondant al pastel. Recuerda que puedes hacerlo de forma casera siguiendo la receta de fondant con nubes de azúcar.', 60, 212),
-        (6, 'A continuación, estira el fondant más claro y corta una forma ovalada utilizando un cortador circular. Fíjate en la fotografía y pega al cupacke con una pincelada de agua.', 60, 213),
-        (7, 'Para realizar los cuernos y las orejas, utiliza un par de bolitas de fondant claro y moldea las formas puntiagudas siguiendo en el ejemplo de la fotografía. Pegar con un pincel con agua.', 60, 214),
-        (8, 'Para terminar el cupcake de reno para Navidad, haz una bola redonda roja con dos puntos para simular la nariz, pega dos bolitas ovaladas de fondant blanco y sobre ellas dos puntos de fondant negro para simular los ojos y finaliza con unos puntos en las mejillas y uno un poco más grande para simular la boca.', 60, 215),
+        (5, 'El primer paso es estirar el fondant color piel y con un cortador circular del tamaño del cupcake, cortar y pegar sobre este con un pincel con agua.', 58, null),
+        (6, 'Para realizar la barba del Papá Noel, estirar el fondant blanco, cortar en forma circular y volver a cortar para formar una media luna, pegar la barba con el pincel con agua.', 58, null),
+        (7, 'Para hacer los bigotes, coger dos bolitas de fondant y estirar hasta formar un cilindro mas estrecho en la punta, tratar que los dos queden lo mas parecido posible, pegarlo y sobre estos pegar una bolita color piel que seria la nariz, marcamos un circulo que vendría siendo la boca.', 58, null),
+        (8, 'Para hacer el gorro, estiramos el fondant rojo (para evitar que se pegue, se puede utilizar azúcar glass), realizar una linea recta con un cuchillo, y marcar una media luna con el cortador circular, esta será la guía para realizar un triángulo.', 58, null),
+        (9, 'Pegar el gorro y doblar la punta, de esta forma quedara con volumen, eliminar el exceso de azúcar glass con el pincel con agua.', 58, null),
+        (10, 'Finalmente estirar un tira de fondant blanco y pegarla sobre el gorro, hacer una bolita blanca y pegarla en la punta de este también, por ultimo disponer dos puntos de fondant negro que serian los ojos.  Para dar mas realismo al Papá Noel, realizar unos puntos y lineas sobre la barbar, el bigote y las partes blancas del gorro. Estos cupcakes son ideales para regalar en esta navidad.', 58, null),
+        (1, 'Para decorar estas magdalenas, lo primero que debemos hacer es derretir el chocolate. Para ello, caliéntalo a baño María como si fueses hacer la típica cobertura de chocolate. Cuando esté derretido, mezcla con un poco de mantequilla y revuelve bien para que no queden grumos.', 59, null),
+        (2, 'A continuación, cubre las magdalenas con el chocolate caliente. Puedes ayudarte con una brocha de cocina o sumergir directamente la magdalena en el chocolate. Aquí tienes algunas recetas por si quieres hacer tus propias magdalenas: Muffins de vainilla, Muffins de naranja y Muffins con chispas de chocolate', 59, null),
+        (3, 'Mientras el chocolate sigue caliente, primero pega las galletas tipo pretzel para formar las orejas de los renos. Colócalas en la misma posición que se ve en la foto.', 59, null),
+        (4, 'Seguidamente, pega las galletitas en la parte inferior para que simulen la nariz. Puedes comprar mini galletas de cualquier tipo o hacerlas tu mismo.', 59, null),
+        (5, 'Para terminar la decoración de los muffins de navidad, coloca una gota de chocolate para pegar la pastilla de colores en la punta de nariz. También coloca los ojos que se pegaran fácilmente en el chocolate y ya el reno tendrá vida! Deja reposar en la nevera para que el chocolate se solidifique.', 59, null),
+        (6, 'Estos divertidos muffins navideños con forma de reno los podrás servir como postre estas navidades o incluso darlos como regalo a una persona especial. Y si te gustan muchos los renos también puedes hacer unos cake pops con forma de reno, a los más pequeños les encantarán.', 59, null),
+        (1, 'Antes de realizar esta receta navideña para niños, el primer paso es alistar todos los ingredientes.', 60, null),
+        (2, 'En un bol, bate la mantequilla con el azúcar y la esencia de vainilla hasta obtener una mezcla suave. Recuerda que la mantequilla debe estar ablandada previamente. Luego, agrega el huevo y mezclar muy bien.', 60, null),
+        (3, 'Agregar la mitad harina con el polvo de hornear y la mitad de la leche. Mezclar hasta que se integre todo y entonces añade el resto de harina y leche resto hasta obtener una mezcla suave y homogénea.', 60, null),
+        (4, 'Para terminar la masa de los cupcakes de chocolate, agrega la cocoa y las chispas de chocolate a la mezcla. Llena los capacillos en los moldes de cupcakes unas 3/4 partes y cocina en el horno a 180ºC. durante 25 minutos.', 60, null),
+        (5, 'Para decorar los cupcakes de chocolate necesitamos teñir el fondant blanco con colorante color café oscuro, café claro, rojo y negro. Cuando los tengas, estira la pieza más oscura y corta una lámina para cubrir el cupcake, usa un pincel con agua para pegar el fondant al pastel. Recuerda que puedes hacerlo de forma casera siguiendo la receta de fondant con nubes de azúcar.', 60, null),
+        (6, 'A continuación, estira el fondant más claro y corta una forma ovalada utilizando un cortador circular. Fíjate en la fotografía y pega al cupacke con una pincelada de agua.', 60, null),
+        (7, 'Para realizar los cuernos y las orejas, utiliza un par de bolitas de fondant claro y moldea las formas puntiagudas siguiendo en el ejemplo de la fotografía. Pegar con un pincel con agua.', 60, null),
+        (8, 'Para terminar el cupcake de reno para Navidad, haz una bola redonda roja con dos puntos para simular la nariz, pega dos bolitas ovaladas de fondant blanco y sobre ellas dos puntos de fondant negro para simular los ojos y finaliza con unos puntos en las mejillas y uno un poco más grande para simular la boca.', 60, null),
         (1, 'Para empezar a preparar estos cupcakes de té verde matcha, lo primero que tenemos que hacer es precalentar el horno a 170º C sin ventilador.', 61, null),
         (2, 'A continuación, mezclamos la mantequilla pomada y el azúcar normal en un bol, y después añadimos el té matcha molido y lo mezclamos de nuevo hasta conseguir una crema espesa.', 61, null),
         (3, 'Después, añadimos la leche y los huevos batidos y batimos todo para que se mezcle bien.', 61, null),
@@ -2337,14 +2074,14 @@ INSERT INTO receta_segmentos (orden, descripcion, cupcake_id, imagen_id)
         (5, 'Horneamos durante 15 minutos y bajamos la temperatura a 180 ºC. Horneamos las magdalenas de turrón 10 minutos más o hasta que al pinchar el centro de la magdalena con un palillo este salga limpio.', 63, null),
         (6, 'El tiempo dependerá mucho del tamaño de las cápsulas para magdalenas que utilicemos, ¡estad muy pendientes de vuestro horno!', 63, null),
         (7, 'Cuando estén listas, apagamos el horno, dejamos dentro cinco minutos con la puerta entreabierta y sacamos. Las retiramos de la bandeja para madgalenas y las dejamos enfriar por completo sobre una rejilla. Ahora que conoces la receta de magdalenas de turrón de Jijona, no lo desperdicies las sobras de turrón y prepara deliciosos dulces ¡Buen provecho!', 63, null),
-        (1, 'Alistar todos los ingredientes.', 64, 220),
-        (2, 'Batir la mantequilla y el azúcar hasta obtener una mezcla cremosa.', 64, 221),
-        (3, 'Agregar el aceite y la esencia de vainilla en forma de hilo.', 64, 222),
-        (4, 'Por ultimo mezclar los huevos con la leche y la harina con el polvo de hornear(cernir).añadir de a poco estas mezclas al batido, la mezcla resultante debe ser cremosa y sin grumos.', 64, 223),
-        (5, 'En moldes de silicona disponer los capacillos y rellenar con la mezcla 3/4 partes,', 64, 224),
-        (6, 'llevar al horno a 170°c durante 30 minutos hasta dorar.', 64, 225),
-        (7, 'Con ayuda de cortadores y nuestras manos, hacer las diferentes formas navideñas con el fondant previamente tinturado con pinturas comestibles, pegar con leche condensada a los cupcakes.', 64, 226),
-        (8, 'Consumir fríos.', 64, 227),
+        (1, 'Alistar todos los ingredientes.', 64, null),
+        (2, 'Batir la mantequilla y el azúcar hasta obtener una mezcla cremosa.', 64, null),
+        (3, 'Agregar el aceite y la esencia de vainilla en forma de hilo.', 64, null),
+        (4, 'Por ultimo mezclar los huevos con la leche y la harina con el polvo de hornear(cernir).añadir de a poco estas mezclas al batido, la mezcla resultante debe ser cremosa y sin grumos.', 64, null),
+        (5, 'En moldes de silicona disponer los capacillos y rellenar con la mezcla 3/4 partes,', 64, null),
+        (6, 'llevar al horno a 170°c durante 30 minutos hasta dorar.', 64, null),
+        (7, 'Con ayuda de cortadores y nuestras manos, hacer las diferentes formas navideñas con el fondant previamente tinturado con pinturas comestibles, pegar con leche condensada a los cupcakes.', 64, null),
+        (8, 'Consumir fríos.', 64, null),
         (1, 'Precalienta el horno a 180°C.', 65, null),
         (2, 'En una batidora, bate la mantequilla, hasta que este cremosita, agrega el azúcar, y añade poco a poco los Huevos San Juan.', 65, null),
         (3, 'Agrega la harina y el polvo para hornear, vierte la leche, la esencia de vainilla y bate hasta integrar. Divide la mezcla en dos bowls.', 65, null),
@@ -2656,6 +2393,12 @@ INSERT INTO receta_segmentos (orden, descripcion, cupcake_id, imagen_id)
         (10, 'Además puedes añadir el sabor y color de tu preferencia.', 84, null),
         (11, 'Para darle el toque de pascua usa sprinkles de colores, huevitos de pascua y monedas de chocolate.', 84, null);
 
+SELECT setval(
+    'receta_segmentos_id',
+    COALESCE((SELECT MAX(receta_segmentos_id) FROM receta_segmentos), 1),
+    EXISTS (SELECT 1 FROM receta_segmentos)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
 CREATE SEQUENCE categoria_id;
 CREATE TABLE IF NOT EXISTS categorias (
     categoria_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('categoria_id'),
@@ -2672,7 +2415,11 @@ INSERT INTO categorias (categoria_id, descripcion)
         (5, 'Vegano'),
         (6, 'Dietetico');
 
-SELECT setval('categoria_id', 6, true);        -- Mantiene los IDs fijos hasta el 6 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'categoria_id',
+    COALESCE((SELECT MAX(categoria_id) FROM categorias), 1),
+    EXISTS (SELECT 1 FROM categorias)
+);       -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE imagen_categoria_id;
 CREATE TABLE IF NOT EXISTS imagenes_categorias (
@@ -2694,6 +2441,12 @@ INSERT INTO imagenes_categorias (main, imagen_id, categoria_id)
         (1, 78, 5),
         (1, 79, 6);
 
+SELECT setval(
+    'imagen_categoria_id',
+    COALESCE((SELECT MAX(imagen_categoria_id) FROM imagenes_categorias), 1),
+    EXISTS (SELECT 1 FROM imagenes_categorias)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
 CREATE SEQUENCE imagen_festividad_id;
 CREATE TABLE IF NOT EXISTS imagenes_festividades (
     imagen_festividad_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('imagen_festividad_id'),
@@ -2711,6 +2464,12 @@ INSERT INTO imagenes_festividades (main, imagen_id, festividad_id)
         (1, 81, 3),
         (1, 82, 4),
         (1, 95, 5);
+
+SELECT setval(
+    'imagen_festividad_id',
+    COALESCE((SELECT MAX(imagen_festividad_id) FROM imagenes_festividades), 1),
+    EXISTS (SELECT 1 FROM imagenes_festividades)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE imagen_paquete_id;
 CREATE TABLE IF NOT EXISTS imagenes_paquetes (
@@ -2730,6 +2489,12 @@ INSERT INTO imagenes_paquetes (main, imagen_id, paquete_id)
         (1, 81, 3),
         (1, 82, 4),
         (1, 95, 5);
+
+SELECT setval(
+    'imagen_paquete_id',
+    COALESCE((SELECT MAX(imagen_paquete_id) FROM imagenes_paquetes), 1),
+    EXISTS (SELECT 1 FROM imagenes_paquetes)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE propiedad_id;
 CREATE TABLE IF NOT EXISTS propiedades (
@@ -2833,6 +2598,12 @@ INSERT INTO propiedades (calorias, carbohidratos, proteinas, lipidos, fibra_diet
         (null, null, null, null, null, null, null, 83),
         (null, null, null, null, null, null, null, 84);
 
+SELECT setval(
+    'propiedad_id',
+    COALESCE((SELECT MAX(propiedad_id) FROM propiedades), 1),
+    EXISTS (SELECT 1 FROM propiedades)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
 CREATE SEQUENCE rol_id;
 CREATE TABLE IF NOT EXISTS roles (
     rol_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('rol_id'),
@@ -2850,6 +2621,12 @@ INSERT INTO roles (descripcion)
         ('cliente premium bronce'),
         ('cliente estandar');
 
+SELECT setval(
+    'rol_id',
+    COALESCE((SELECT MAX(rol_id) FROM roles), 1),
+    EXISTS (SELECT 1 FROM roles)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
 CREATE SEQUENCE estado_id;
 CREATE TABLE IF NOT EXISTS usuario_estados (
     estado_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('estado_id'),
@@ -2862,11 +2639,15 @@ INSERT INTO usuario_estados (estado_id, descripcion)
         (1, 'activo'),
         (2, 'inactivo');
 
-SELECT setval('estado_id', 2, true);        -- Mantiene los IDs fijos hasta el 2 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'estado_id',
+    COALESCE((SELECT MAX(estado_id) FROM usuario_estados), 1),
+    EXISTS (SELECT 1 FROM usuario_estados)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE usuario_id;
 CREATE TABLE IF NOT EXISTS usuarios (
-    usuario_id SERIAL PRIMARY KEY,
+    usuario_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('usuario_id'),
     primer_nombre VARCHAR(25) NOT NULL,
     segundo_nombre VARCHAR(25) DEFAULT 'indefinido',
     primer_apellido VARCHAR(25) DEFAULT 'indefinido',
@@ -2890,6 +2671,12 @@ INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_ap
         ('alminda', default, 'manoche', default, 'USA', 50, 'f', 'almindao@gmail.com', 7, 2),
         ('abigail', default, 'cunes', default, 'ARG', 29, 'i', 'cunesmac24@gmail.com', 7, 2),
         ('asdrubal', 'david', 'oviedo', 'oviedo', 'PER', 30, 'm', 'asdrubaloviedo2@gmail.com', 1, 1);
+
+SELECT setval(
+    'usuario_id',
+    COALESCE((SELECT MAX(usuario_id) FROM usuarios), 1),
+    EXISTS (SELECT 1 FROM usuarios)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE cupcake_categoria_id;
 CREATE TABLE IF NOT EXISTS cupcake_categorias (
@@ -2962,6 +2749,12 @@ INSERT INTO cupcake_categorias (cupcake_id, categoria_id)
         (83, 3),
         (84, 3);
 
+SELECT setval(
+    'cupcake_categoria_id',
+    COALESCE((SELECT MAX(cupcake_categoria_id) FROM cupcake_categorias), 1),
+    EXISTS (SELECT 1 FROM cupcake_categorias)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
 CREATE SEQUENCE lugar_id;
 CREATE TABLE IF NOT EXISTS lugares (
     lugar_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('lugar_id'),
@@ -2977,7 +2770,11 @@ INSERT INTO lugares (lugar_id, descripcion)
         (4, 'Lugares extravagantes'),
         (5, 'Clubes deportivos');
 
-SELECT setval('lugar_id', 5, true);        -- Mantiene los IDs fijos hasta el 5 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'lugar_id',
+    COALESCE((SELECT MAX(lugar_id) FROM lugares), 1),
+    EXISTS (SELECT 1 FROM lugares)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE cupcake_estado_id;
 CREATE TABLE IF NOT EXISTS cupcake_estados (
@@ -2992,7 +2789,11 @@ INSERT INTO cupcake_estados (estado_id, descripcion)
         (2, 'Hechos'),
         (3, 'Pendientes');
 
-SELECT setval('estado_id', 3, true);        -- Mantiene los IDs fijos hasta el 3 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'cupcake_estado_id',
+    COALESCE((SELECT MAX(estado_id) FROM cupcake_estados), 1),
+    EXISTS (SELECT 1 FROM cupcake_estados)
+);       -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE cupcake_usuario_estado_id;
 CREATE TABLE IF NOT EXISTS cupcake_usuario_estados (
@@ -3025,6 +2826,15 @@ INSERT INTO cupcake_usuario_estados (usuario_id, cupcake_id, estado_id, valor)
         (1, 10, 2, FALSE),
         (1, 10, 3, TRUE);
 
+SELECT setval(
+    'cupcake_usuario_estado_id',
+    COALESCE(
+        (SELECT MAX(usuario_estado_id) FROM cupcake_usuario_estados),
+        1
+    ),
+    EXISTS (SELECT 1 FROM cupcake_usuario_estados)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
 CREATE SEQUENCE liga_id;
 CREATE TABLE IF NOT EXISTS ligas (
     liga_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('liga_id'),
@@ -3039,7 +2849,11 @@ INSERT INTO ligas (liga_id, descripcion, rango)
         (2, 'Plata', 2),
         (3, 'Oro', 3);
 
-SELECT setval('liga_id', 3, true);        -- Mantiene los IDs fijos hasta el 3 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'liga_id',
+    COALESCE((SELECT MAX(liga_id) FROM ligas), 1),
+    EXISTS (SELECT 1 FROM ligas)
+);        -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE medalla_id;
 CREATE TABLE IF NOT EXISTS medallas (
@@ -3060,7 +2874,11 @@ INSERT INTO medallas (medalla_id, descripcion)
         (5, 'Porciones'),
         (6, 'Tiempo');
 
-SELECT setval('medalla_id', 6, true);        -- Mantiene los IDs fijos hasta el 63 y ajustar la secuencia al final para que vuelva a ser automatica
+SELECT setval(
+    'medalla_id',
+    COALESCE((SELECT MAX(medalla_id) FROM medallas), 1),
+    EXISTS (SELECT 1 FROM medallas)
+);        -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE medalla_liga_id;
 CREATE TABLE IF NOT EXISTS medallas_liga (
@@ -3094,6 +2912,12 @@ INSERT INTO medallas_liga (medalla_id, liga_id, requisito)
         (6, 2, 100),
         (6, 3, 250);
 
+SELECT setval(
+    'medalla_liga_id',
+    COALESCE((SELECT MAX(medalla_liga_id) FROM medallas_liga), 1),
+    EXISTS (SELECT 1 FROM medallas_liga)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
 CREATE SEQUENCE usuario_medalla_liga_id;
 CREATE TABLE IF NOT EXISTS usuario_medallas_liga (
     usuario_medalla_liga_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('usuario_medalla_liga_id'),
@@ -3126,6 +2950,15 @@ INSERT INTO usuario_medallas_liga (usuario_id, medalla_liga_id, requisito_alcanz
         (2, 16, 0, FALSE),
         (2, 17, 0, FALSE),
         (2, 18, 0, FALSE);
+
+SELECT setval(
+    'usuario_medalla_liga_id',
+    COALESCE(
+        (SELECT MAX(usuario_medalla_liga_id) FROM usuario_medallas_liga),
+        1
+    ),
+    EXISTS (SELECT 1 FROM usuario_medallas_liga)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
 CREATE SEQUENCE usuario_paquetes_id;
 CREATE TABLE IF NOT EXISTS usuario_paquetes (
@@ -3178,3 +3011,9 @@ INSERT INTO usuario_paquetes (
         (1, 4, NOW() - INTERVAL '12 days', 'PEN', 3499, 'PE', 'culqi',  'cq_010', TRUE, NULL),
         (6, 2, NOW() - INTERVAL '12 days', 'PEN', 3499, 'PE', 'culqi',  'cq_010', TRUE, NULL),
         (6, 4, NOW() - INTERVAL '12 days', 'PEN', 3499, 'PE', 'culqi',  'cq_010', TRUE, NULL);
+
+SELECT setval(
+    'usuario_paquetes_id',
+    COALESCE((SELECT MAX(usuario_paquetes_id) FROM usuario_paquetes), 1),
+    EXISTS (SELECT 1 FROM usuario_paquetes)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
