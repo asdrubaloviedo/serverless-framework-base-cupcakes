@@ -210,7 +210,7 @@ Content-Type: application/json
   "email": "asdrubaloviedo2@gmail.com",
   "cupcake": 1,
   "calificacion": 5,
-  "comentario": "Muy excelente"
+  "comentario": "Muy bueno"
 }
 
 ### Desarrollo
