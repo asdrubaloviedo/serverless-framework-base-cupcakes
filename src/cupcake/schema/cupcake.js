@@ -21,18 +21,7 @@ const z = require('zod');
 //   pelicula: z.boolean(),
 //   cupcake_acceso_id: z.number().int().min(1),
 //   paquete_id: z.number().int().min(1)
-//   // Todos los campos que no se especifican seran ignorados para evitar inyeccion de sql e intentos de modificacion del id
 // });
-
-// function validateCupcake(object) {
-//   // "safeParse" utiliza el objeto cupcakeSchema para validar todas las reglas establecidas
-//   return cupcakeSchema.safeParse(object);
-// }
-
-// function validatePartialCupcake(object) {
-//   // "partial" hace que los campos de cupcakeSchema no sean requeridos(Excelente para los Patch)
-//   return cupcakeSchema.partial().safeParse(object);
-// }
 
 const emailRequired = z.preprocess(
   (v) => (v === undefined || v === null ? '' : v),
@@ -45,11 +34,29 @@ const emailRequired = z.preprocess(
     .email('User email is invalid.')
 );
 
+
+/*
+ * =========================================================
+ * ESTADOS DE CUPCAKES
+ * =========================================================
+ */
+
 const cupcakeUserStateSchema = z.object({
   email: emailRequired,
-  cupcake: z.coerce.number().int().min(1),
-  estado:  z.coerce.number().int().min(1),
-  valor:   z.coerce.boolean().optional()
+
+  cupcake: z.coerce
+    .number()
+    .int()
+    .min(1),
+
+  estado: z.coerce
+    .number()
+    .int()
+    .min(1),
+
+  valor: z.coerce
+    .boolean()
+    .optional()
 });
 
 function validateCupcakeUserState(object) {
@@ -57,12 +64,79 @@ function validateCupcakeUserState(object) {
 }
 
 function validatePartialCupcakeUserState(object) {
-  return cupcakeUserStateSchema.partial().safeParse(object);
+  return cupcakeUserStateSchema
+    .partial()
+    .safeParse(object);
 }
 
+
+/*
+ * =========================================================
+ * CALIFICACIONES
+ * =========================================================
+ */
+
+const cupcakeRatingSchema = z.object({
+
+  email: emailRequired,
+
+  cupcake: z.coerce
+    .number()
+    .int()
+    .min(
+      1,
+      'Cupcake id must be greater than 0.'
+    ),
+
+  calificacion: z.coerce
+    .number()
+    .int(
+      'La calificación debe ser un número entero.'
+    )
+    .min(
+      1,
+      'La calificación mínima es 1.'
+    )
+    .max(
+      5,
+      'La calificación máxima es 5.'
+    ),
+
+  /*
+   * El comentario puede estar vacío,
+   * pero siempre debe ser texto.
+   */
+  comentario: z.preprocess(
+    (value) => {
+
+      if (value === undefined
+          || value === null) {
+
+        return '';
+      }
+
+      return value;
+    },
+    z.string({
+      invalid_type_error:
+        'El comentario debe ser texto.'
+    })
+  )
+});
+
+function validateCupcakeRating(object) {
+
+  return cupcakeRatingSchema.safeParse(
+    object
+  );
+}
+
+
 module.exports = {
-  // validateCupcake,
-  // validatePartialCupcake,
+
   validateCupcakeUserState,
-  validatePartialCupcakeUserState
+
+  validatePartialCupcakeUserState,
+
+  validateCupcakeRating
 };

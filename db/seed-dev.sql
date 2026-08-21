@@ -27,6 +27,7 @@ DROP TABLE IF EXISTS medallas CASCADE;
 DROP TABLE IF EXISTS medallas_liga CASCADE;
 DROP TABLE IF EXISTS usuario_medallas_liga CASCADE;
 DROP TABLE IF EXISTS usuario_paquetes CASCADE;
+DROP TABLE IF EXISTS cupcake_calificaciones CASCADE;
 
 -- Limpieza de secuencias
 DROP SEQUENCE IF EXISTS festividad_id CASCADE;
@@ -56,6 +57,7 @@ DROP SEQUENCE IF EXISTS medalla_id CASCADE;
 DROP SEQUENCE IF EXISTS medalla_liga_id CASCADE;
 DROP SEQUENCE IF EXISTS usuario_medalla_liga_id CASCADE;
 DROP SEQUENCE IF EXISTS usuario_paquetes_id CASCADE;
+DROP SEQUENCE IF EXISTS cupcake_calificacion_id CASCADE;
 -- Fin de la Limpieza previa
 
 CREATE SEQUENCE festividad_id;
@@ -2824,7 +2826,8 @@ INSERT INTO cupcake_usuario_estados (usuario_id, cupcake_id, estado_id, valor)
         (1, 1, 3, FALSE),
         (1, 10, 1, TRUE),
         (1, 10, 2, FALSE),
-        (1, 10, 3, TRUE);
+        (1, 10, 3, TRUE),
+        (6, 1, 2, TRUE);
 
 SELECT setval(
     'cupcake_usuario_estado_id',
@@ -2834,6 +2837,54 @@ SELECT setval(
     ),
     EXISTS (SELECT 1 FROM cupcake_usuario_estados)
 );      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
+CREATE SEQUENCE cupcake_calificacion_id;
+
+CREATE TABLE IF NOT EXISTS cupcake_calificaciones (
+    cupcake_calificacion_id INTEGER PRIMARY KEY NOT NULL
+        DEFAULT nextval('cupcake_calificacion_id'),
+
+    usuario_id INTEGER NOT NULL,
+    cupcake_id INTEGER NOT NULL,
+
+    calificacion INTEGER NOT NULL
+        CHECK (
+            calificacion >= 1
+            AND calificacion <= 5
+        ),
+
+    comentario TEXT,
+
+    fecha_creacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    fecha_actualizacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(usuario_id),
+
+    FOREIGN KEY (cupcake_id)
+        REFERENCES cupcakes(cupcake_id),
+
+    CONSTRAINT uq_cupcake_calificacion_usuario
+        UNIQUE (usuario_id, cupcake_id)
+);
+
+ALTER SEQUENCE cupcake_calificacion_id
+OWNED BY cupcake_calificaciones.cupcake_calificacion_id;
+
+SELECT setval(
+    'cupcake_calificacion_id',
+    COALESCE(
+        (
+            SELECT MAX(cupcake_calificacion_id)
+            FROM cupcake_calificaciones
+        ),
+        1
+    ),
+    EXISTS (
+        SELECT 1
+        FROM cupcake_calificaciones
+    )
+);
 
 CREATE SEQUENCE liga_id;
 CREATE TABLE IF NOT EXISTS ligas (

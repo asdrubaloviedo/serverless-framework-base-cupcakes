@@ -5,7 +5,7 @@ class CupcakeModel {
     return 'Test';
   }
 
-  static async getAll({ query }) {    
+  static async getAll({ query }) {
     return db.query(query);
   }
 
@@ -90,7 +90,9 @@ class CupcakeModel {
   }
 }
 
+
 class CupcakeUserStateModel {
+
   static async create({ query, params }) {
     return db.query(query, params);
   }
@@ -111,7 +113,42 @@ class CupcakeUserStateModel {
     return db.query(query, params);
   }
 }
+
+
+/*
+ * =========================================================
+ * CALIFICACIONES DE CUPCAKES
+ * =========================================================
+ */
+class CupcakeRatingModel {
+  /*
+   * Obtiene la calificación existente
+   * de un usuario para un cupcake.
+   */
+  static async getByUserEmailAndCupcakeId({ query, params }) {
+    return db.query(query, params);
+  }
+
+  /*
+   * Comprueba si el usuario ya marcó
+   * el cupcake como hecho.
+   */
+  static async isCupcakeDone({query, params }) {
+    return db.query(query, params);
+  }
+
+  /*
+   * Inserta una calificación nueva
+   * o actualiza la existente.
+   */
+  static async save({query, params}) {
+    return db.query(query, params);
+  }
+}
+
+
 module.exports = {
   CupcakeModel,
-  CupcakeUserStateModel
+  CupcakeUserStateModel,
+  CupcakeRatingModel
 };

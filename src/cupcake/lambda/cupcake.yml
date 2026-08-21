@@ -102,6 +102,14 @@ cupcake:
         method: patch
         cors: ${self:custom.corsCommon}
     - http:
+        path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/calificacion
+        method: get
+        cors: ${self:custom.corsCommon}
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/calificacion
+        method: post
+        cors: ${self:custom.corsCommon}
+    - http:
         path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/ramdom
         method: get
         cors: ${self:custom.corsCommon}

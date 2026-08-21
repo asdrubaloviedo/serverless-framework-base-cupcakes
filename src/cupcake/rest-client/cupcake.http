@@ -195,6 +195,35 @@ Content-Type: application/json
   "valor": false
 }
 
+### GET calificacion de cupcake por id.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/calificacion?email=asdrubaloviedo2@gmail.com&id=1
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/calificacion?email=asdrubaloviedo2@gmail.com&id=1
+
+### POST calificacion de cupcake por id.
+### Local
+POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/calificacion
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo2@gmail.com",
+  "cupcake": 1,
+  "calificacion": 5,
+  "comentario": "Muy excelente"
+}
+
+### Desarrollo
+POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/calificacion
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo2@gmail.com",
+  "cupcake": 1,
+  "calificacion": 5,
+  "comentario": "Muy bueno"
+}
+
 ### GET Id de 1 Registro aleatorio de la tabla cupcakes.
 ### Local
 GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/ramdom

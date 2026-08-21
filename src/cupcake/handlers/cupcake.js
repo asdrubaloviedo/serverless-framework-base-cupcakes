@@ -3,7 +3,8 @@ require('module-alias/register');
 const CupcakeController = require('@cupcake/controller/cupcake');
 const {
   validateCupcakeUserState,
-  validatePartialCupcakeUserState
+  validatePartialCupcakeUserState,
+  validateCupcakeRating
 } = require('@cupcake/schema/cupcake');
 
 const ok = (body, code = 200) => ({ statusCode: code, body: JSON.stringify(body) });
@@ -101,6 +102,8 @@ const routes = {
   'GET /logros':                                      (e) => CupcakeController.getByIdCupcakeUserState(qs(e)),
   'POST /insertar-cupcake-estados':                   (e) => CupcakeController.createOneCupcakeUserState(validBody(e, validateCupcakeUserState)),
   'PATCH /actualizar-cupcake-estados':                (e) => CupcakeController.patchOneCupcakeUserState(validBody(e, validatePartialCupcakeUserState)),
+  'GET /calificacion':                                (e) => CupcakeController.getCupcakeRating(qs(e)),
+  'POST /calificacion':                               (e) => CupcakeController.saveCupcakeRating(validBody(e, validateCupcakeRating)),
   'GET /ramdom':                                      (e) => CupcakeController.getAllRamdom(qs(e)),
   'GET /name-image-filtros':                          (e) => CupcakeController.getAllNameImageFiltros(qs(e)),
 };
