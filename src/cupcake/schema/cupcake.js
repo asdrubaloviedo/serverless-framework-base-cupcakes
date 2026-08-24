@@ -146,7 +146,7 @@ const cupcakeCollectionSchema = z.object({
     .string()
     .trim()
     .min(1)
-    .max(100)
+    .max(40)
 });
 
 const cupcakeCollectionCupcakeSchema = z.object({

@@ -3081,7 +3081,7 @@ CREATE TABLE IF NOT EXISTS colecciones (
 
     usuario_id INTEGER NOT NULL,
 
-    nombre VARCHAR(100) NOT NULL,
+    nombre VARCHAR(40) NOT NULL,
 
     fecha_creacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
