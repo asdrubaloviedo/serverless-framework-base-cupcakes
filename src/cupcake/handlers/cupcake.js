@@ -4,7 +4,9 @@ const CupcakeController = require('@cupcake/controller/cupcake');
 const {
   validateCupcakeUserState,
   validatePartialCupcakeUserState,
-  validateCupcakeRating
+  validateCupcakeRating,
+  validateCupcakeCollection,
+  validateCupcakeCollectionCupcake
 } = require('@cupcake/schema/cupcake');
 
 const ok = (body, code = 200) => ({ statusCode: code, body: JSON.stringify(body) });
@@ -104,6 +106,9 @@ const routes = {
   'PATCH /actualizar-cupcake-estados':                (e) => CupcakeController.patchOneCupcakeUserState(validBody(e, validatePartialCupcakeUserState)),
   'GET /calificacion':                                (e) => CupcakeController.getCupcakeRating(qs(e)),
   'POST /calificacion':                               (e) => CupcakeController.saveCupcakeRating(validBody(e, validateCupcakeRating)),
+  'GET /collections':                                 (e) => CupcakeController.getCupcakeCollections(qs(e)),
+  'POST /collections':                                (e) => CupcakeController.createCupcakeCollection(validBody(e, validateCupcakeCollection)),
+  'POST /collections/cupcake':                        (e) => CupcakeController.saveCupcakeCollection(validBody(e, validateCupcakeCollectionCupcake)),
   'GET /ramdom':                                      (e) => CupcakeController.getAllRamdom(qs(e)),
   'GET /name-image-filtros':                          (e) => CupcakeController.getAllNameImageFiltros(qs(e)),
 };

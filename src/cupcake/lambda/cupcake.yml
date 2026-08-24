@@ -117,3 +117,15 @@ cupcake:
         path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/name-image-filtros
         method: get
         cors: ${self:custom.corsCommon}
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/collections
+        method: get
+        cors: ${self:custom.corsCommon}
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/collections
+        method: post
+        cors: ${self:custom.corsCommon}
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/collections/cupcake
+        method: post
+        cors: ${self:custom.corsCommon}

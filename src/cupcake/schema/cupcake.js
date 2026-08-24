@@ -131,12 +131,51 @@ function validateCupcakeRating(object) {
   );
 }
 
+/*
+ * =========================================================
+ * COLECCIONES
+ * =========================================================
+ */
+
+const cupcakeCollectionSchema = z.object({
+  email: z
+    .string()
+    .email(),
+
+  nombre: z
+    .string()
+    .trim()
+    .min(1)
+    .max(100)
+});
+
+const cupcakeCollectionCupcakeSchema = z.object({
+  email: z
+    .string()
+    .email(),
+
+  collection: z
+    .number()
+    .int()
+    .positive(),
+
+  cupcake: z
+    .number()
+    .int()
+    .positive()
+});
+
+const validateCupcakeCollection = (data) =>
+  cupcakeCollectionSchema.safeParse(data);
+
+const validateCupcakeCollectionCupcake = (data) =>
+  cupcakeCollectionCupcakeSchema.safeParse(data);
+
 
 module.exports = {
-
   validateCupcakeUserState,
-
   validatePartialCupcakeUserState,
-
-  validateCupcakeRating
+  validateCupcakeRating,
+  validateCupcakeCollection,
+  validateCupcakeCollectionCupcake
 };

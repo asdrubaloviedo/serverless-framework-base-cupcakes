@@ -146,9 +146,66 @@ class CupcakeRatingModel {
   }
 }
 
+/*
+ * =========================================================
+ * COLECCIONES DE CUPCAKES
+ * =========================================================
+ */
+class CupcakeCollectionModel {
+
+    static async getByUserEmail({
+        query,
+        params
+    }) {
+
+        const result =
+            await db.query(
+                query,
+                params
+            );
+
+        return result.rows
+                ? result.rows
+                : result;
+    }
+
+    static async create({
+        query,
+        params
+    }) {
+
+        const result =
+            await db.query(
+                query,
+                params
+            );
+
+        return result.rows
+                ? result.rows
+                : result;
+    }
+
+    static async saveCupcake({
+        query,
+        params
+    }) {
+
+        const result =
+            await db.query(
+                query,
+                params
+            );
+
+        return result.rows
+                ? result.rows
+                : result;
+    }
+}
+
 
 module.exports = {
   CupcakeModel,
   CupcakeUserStateModel,
-  CupcakeRatingModel
+  CupcakeRatingModel,
+  CupcakeCollectionModel
 };

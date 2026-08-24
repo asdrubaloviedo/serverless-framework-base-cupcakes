@@ -28,6 +28,8 @@ DROP TABLE IF EXISTS medallas_liga CASCADE;
 DROP TABLE IF EXISTS usuario_medallas_liga CASCADE;
 DROP TABLE IF EXISTS usuario_paquetes CASCADE;
 DROP TABLE IF EXISTS cupcake_calificaciones CASCADE;
+DROP TABLE IF EXISTS coleccion_cupcakes CASCADE;
+DROP TABLE IF EXISTS colecciones CASCADE;
 
 -- Limpieza de secuencias
 DROP SEQUENCE IF EXISTS festividad_id CASCADE;
@@ -58,6 +60,8 @@ DROP SEQUENCE IF EXISTS medalla_liga_id CASCADE;
 DROP SEQUENCE IF EXISTS usuario_medalla_liga_id CASCADE;
 DROP SEQUENCE IF EXISTS usuario_paquetes_id CASCADE;
 DROP SEQUENCE IF EXISTS cupcake_calificacion_id CASCADE;
+DROP SEQUENCE IF EXISTS coleccion_id CASCADE;
+DROP SEQUENCE IF EXISTS coleccion_cupcake_id CASCADE;
 -- Fin de la Limpieza previa
 
 CREATE SEQUENCE festividad_id;
@@ -3067,4 +3071,87 @@ SELECT setval(
     'usuario_paquetes_id',
     COALESCE((SELECT MAX(usuario_paquetes_id) FROM usuario_paquetes), 1),
     EXISTS (SELECT 1 FROM usuario_paquetes)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
+CREATE SEQUENCE coleccion_id;
+
+CREATE TABLE IF NOT EXISTS colecciones (
+    coleccion_id INTEGER PRIMARY KEY NOT NULL
+        DEFAULT nextval('coleccion_id'),
+
+    usuario_id INTEGER NOT NULL,
+
+    nombre VARCHAR(100) NOT NULL,
+
+    fecha_creacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    fecha_actualizacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(usuario_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_coleccion_usuario_nombre
+        UNIQUE (usuario_id, nombre)
+);
+
+ALTER SEQUENCE coleccion_id
+OWNED BY colecciones.coleccion_id;
+
+CREATE SEQUENCE coleccion_cupcake_id;
+
+CREATE TABLE IF NOT EXISTS coleccion_cupcakes (
+    coleccion_cupcake_id INTEGER PRIMARY KEY NOT NULL
+        DEFAULT nextval('coleccion_cupcake_id'),
+
+    coleccion_id INTEGER NOT NULL,
+
+    cupcake_id INTEGER NOT NULL,
+
+    fecha_creacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    FOREIGN KEY (coleccion_id)
+        REFERENCES colecciones(coleccion_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (cupcake_id)
+        REFERENCES cupcakes(cupcake_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_coleccion_cupcake
+        UNIQUE (coleccion_id, cupcake_id)
+);
+
+ALTER SEQUENCE coleccion_cupcake_id
+OWNED BY coleccion_cupcakes.coleccion_cupcake_id;
+
+SELECT setval(
+    'coleccion_id',
+    COALESCE(
+        (
+            SELECT MAX(coleccion_id)
+            FROM colecciones
+        ),
+        1
+    ),
+    EXISTS (
+        SELECT 1
+        FROM colecciones
+    )
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
+
+SELECT setval(
+    'coleccion_cupcake_id',
+    COALESCE(
+        (
+            SELECT MAX(coleccion_cupcake_id)
+            FROM coleccion_cupcakes
+        ),
+        1
+    ),
+    EXISTS (
+        SELECT 1
+        FROM coleccion_cupcakes
+    )
 );      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion

@@ -235,3 +235,49 @@ GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/ramdom
 GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-filtros?tiempo=150&dificultad=todas&festividad=todas&colorpredominante=todos&colorsecundario=todos
 ### Desarrollo
 GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-filtros?tiempo=150&dificultad=todas&festividad=todas&colorpredominante=todos&colorsecundario=todos
+
+### GET collections del usuario y verificamos si el un cupcake por id existe en dichas colecciones
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo2@gmail.com&cupcake=2
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo2@gmail.com&cupcake=2
+
+### POST crear collection
+### Local
+POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo2@gmail.com",
+  "nombre": "Cumpleaños"
+}
+
+### Desarrollo
+POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo2@gmail.com",
+  "nombre": "Cumpleaños"
+}
+
+### POST guardar cupcake en collection
+### Local
+POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections/cupcake
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo2@gmail.com",
+  "collection": 1,
+  "cupcake": 2
+}
+
+### Desarrollo
+POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections/cupcake
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo2@gmail.com",
+  "collection": 1,
+  "cupcake": 2
+}

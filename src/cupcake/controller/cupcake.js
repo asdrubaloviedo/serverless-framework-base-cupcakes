@@ -21,6 +21,12 @@ const {
   SaveCupcakeRating
 } = require('@cupcake/services/cupcakeRating');
 
+const {
+  GetCupcakeCollections,
+  CreateCupcakeCollection,
+  SaveCupcakeCollection
+} = require('@cupcake/services/cupcakeCollection');
+
 class CupcakeController {
 
   static async doTest() {
@@ -234,6 +240,53 @@ class CupcakeController {
       cupcake,
       calificacion,
       comentario
+    });
+  }
+
+  /*
+   * =========================================================
+   * COLLECTIONS
+   * =========================================================
+   */
+
+  static async getCupcakeCollections(params = {}) {
+
+    const {
+      email,
+      cupcake
+    } = params;
+
+    return GetCupcakeCollections.execute({
+      email,
+      cupcake
+    });
+  }
+
+  static async createCupcakeCollection(params = {}) {
+
+    const {
+      email,
+      nombre
+    } = params;
+
+    return CreateCupcakeCollection.execute({
+      email,
+      nombre
+    });
+  }
+
+  static async saveCupcakeCollection(params = {}) {
+
+    const {
+      email,
+      collection,
+      cupcake
+    } = params;
+
+    return SaveCupcakeCollection.execute({
+      email,
+      collection,
+      cupcake
     });
   }
 
