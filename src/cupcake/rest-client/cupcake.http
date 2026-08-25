@@ -121,6 +121,12 @@ GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/cupcake?id=1
 ### Desarrollo
 GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/cupcake?id=1
 
+### GET Info del cupcake por id relacionado con un usuario.
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/cupcake?id=1&email=asdrubaloviedo@gmail.com
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/cupcake?id=1&email=asdrubaloviedo@gmail.com
+
 ### GET Registros de la tabla cupcakes que coincidan con los parametros especificados que esten disponibles para un usuario por id.
 ### Local
 GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/busqueda/usuario?email=asdrubaloviedo@gmail.com&tiempo=33&dificultad=1&festividad=1&predominante=rosado&secundario=azul

@@ -624,6 +624,125 @@ class CupcakeRepository {
         return CupcakeModel.getById({ query, params });
     }
 
+    async getByIdAndUserEmail({
+        id,
+        lowerCaseEmail
+    }) {
+
+        const query = `
+            SELECT
+                cu.cupcake_id,
+                cu.nombre,
+                im.codigo,
+                cu.tiempo,
+                cu.porciones,
+
+                COALESCE(
+                    cue_hecho.valor,
+                    FALSE
+                ) AS hecho,
+
+                COALESCE(
+                    cue_favorito.valor,
+                    FALSE
+                ) AS favorito,
+
+                CASE
+                    /*
+                    * Paquete 1 = Público.
+                    *
+                    * Siempre está disponible,
+                    * aunque el usuario no tenga
+                    * registro en usuario_paquetes.
+                    */
+                    WHEN cu.paquete_id = 1
+                        THEN TRUE
+
+                    /*
+                    * Para paquetes de pago,
+                    * comprobamos que el usuario
+                    * tenga el paquete activo.
+                    */
+                    WHEN EXISTS (
+                        SELECT 1
+
+                        FROM usuario_paquetes up
+
+                        WHERE up.usuario_id =
+                            us.usuario_id
+
+                            AND up.paquete_id =
+                                cu.paquete_id
+
+                            AND up.activo = TRUE
+                    )
+                        THEN TRUE
+
+                    ELSE FALSE
+                END AS disponible,
+
+                p.descripcion AS paquete
+
+            FROM cupcakes cu
+
+            INNER JOIN paquetes p
+                ON p.paquete_id =
+                    cu.paquete_id
+
+            LEFT JOIN imagenes_cupcakes imc
+                ON imc.cupcake_id =
+                    cu.cupcake_id
+
+                AND imc.main = 1
+
+            LEFT JOIN imagenes im
+                ON im.imagen_id =
+                    imc.imagen_id
+
+            /*
+            * El usuario se incorpora mediante LEFT JOIN
+            * para que el cupcake pueda encontrarse aunque
+            * no tenga comprado el paquete.
+            */
+            LEFT JOIN usuarios us
+                ON LOWER(us.email) =
+                    $2
+
+            LEFT JOIN cupcake_usuario_estados cue_hecho
+                ON cue_hecho.usuario_id =
+                    us.usuario_id
+
+                AND cue_hecho.cupcake_id =
+                    cu.cupcake_id
+
+                AND cue_hecho.estado_id = 2
+
+            LEFT JOIN cupcake_usuario_estados cue_favorito
+                ON cue_favorito.usuario_id =
+                    us.usuario_id
+
+                AND cue_favorito.cupcake_id =
+                    cu.cupcake_id
+
+                AND cue_favorito.estado_id = 1
+
+            WHERE cu.cupcake_id =
+                $1
+
+            LIMIT 1;
+        `;
+
+        const params = [
+            id,
+            lowerCaseEmail
+        ];
+
+        return CupcakeModel.getById({
+            query,
+            params
+        });
+    }
+
     async getRandomByUserEmail({ lowerCaseEmail }) {
         const query = 
             `
