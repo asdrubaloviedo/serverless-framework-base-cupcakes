@@ -19,9 +19,15 @@ jest.mock('@cupcake/services/cupcakeCollection', () => ({
   GetCupcakeCollections: {
     execute: jest.fn().mockResolvedValue(['collections']),
   },
+
+  GetCupcakesByCollection: {
+    execute: jest.fn().mockResolvedValue(['collection-cupcakes']),
+  },
+
   CreateCupcakeCollection: {
     execute: jest.fn().mockResolvedValue(['collection-created']),
   },
+
   SaveCupcakeCollection: {
     execute: jest.fn().mockResolvedValue(['cupcake-saved']),
   },
@@ -240,6 +246,52 @@ describe('CupcakeController', () => {
 
     expect(r).toEqual([
       'collections',
+    ]);
+  });
+
+  test('getCupcakeCollections permite cupcake undefined', async () => {
+    const p = {
+      email: 'asdrubaloviedo2@gmail.com',
+    };
+
+    const r =
+      await C.getCupcakeCollections(p);
+
+    expect(
+      SCollection
+        .GetCupcakeCollections
+        .execute
+    ).toHaveBeenCalledWith({
+      email: 'asdrubaloviedo2@gmail.com',
+      cupcake: undefined,
+    });
+
+    expect(r).toEqual([
+      'collections',
+    ]);
+  });
+
+  test('getCupcakesByCollection pasa email y collection', async () => {
+
+    const p = {
+      email: 'asdrubaloviedo2@gmail.com',
+      collection: '3',
+    };
+
+    const r =
+      await C.getCupcakesByCollection(p);
+
+    expect(
+      SCollection
+        .GetCupcakesByCollection
+        .execute
+    ).toHaveBeenCalledWith({
+      email: 'asdrubaloviedo2@gmail.com',
+      collection: '3',
+    });
+
+    expect(r).toEqual([
+      'collection-cupcakes',
     ]);
   });
 

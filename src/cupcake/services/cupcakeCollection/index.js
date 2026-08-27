@@ -5,6 +5,11 @@ const GetCupcakeCollections =
         "@cupcake/services/cupcakeCollection/GetCupcakeCollections"
     );
 
+const GetCupcakesByCollection =
+    require(
+        "@cupcake/services/cupcakeCollection/GetCupcakesByCollection"
+    );
+
 const CreateCupcakeCollection =
     require(
         "@cupcake/services/cupcakeCollection/CreateCupcakeCollection"
@@ -17,6 +22,7 @@ const SaveCupcakeCollection =
 
 module.exports = {
     GetCupcakeCollections,
+    GetCupcakesByCollection,
     CreateCupcakeCollection,
     SaveCupcakeCollection
 };

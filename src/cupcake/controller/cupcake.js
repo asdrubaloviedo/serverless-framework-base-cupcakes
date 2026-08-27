@@ -23,6 +23,7 @@ const {
 
 const {
   GetCupcakeCollections,
+  GetCupcakesByCollection,
   CreateCupcakeCollection,
   SaveCupcakeCollection
 } = require('@cupcake/services/cupcakeCollection');
@@ -259,6 +260,19 @@ class CupcakeController {
     return GetCupcakeCollections.execute({
       email,
       cupcake
+    });
+  }
+
+  static async getCupcakesByCollection(params = {}) {
+
+    const {
+      email,
+      collection
+    } = params;
+
+    return GetCupcakesByCollection.execute({
+      email,
+      collection
     });
   }
 

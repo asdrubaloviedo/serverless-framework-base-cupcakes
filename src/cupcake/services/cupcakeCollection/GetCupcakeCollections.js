@@ -11,6 +11,12 @@ class GetCupcakeCollections {
         cupcake
     }) {
 
+        /*
+         * =====================================================
+         * EMAIL
+         * =====================================================
+         */
+
         if (!email) {
 
             throw new Error(
@@ -18,29 +24,57 @@ class GetCupcakeCollections {
             );
         }
 
-        if (!cupcake) {
+        /*
+         * =====================================================
+         * CUPCAKE OPCIONAL
+         * =====================================================
+         *
+         * Si viene desde DetalleCupcakeActivity:
+         *
+         * cupcake > 0
+         *
+         * y podremos indicar en qué collection
+         * está guardado.
+         *
+         * Si viene desde Perfil -> Mis colecciones:
+         *
+         * cupcake no es necesario.
+         *
+         * En ese caso utilizamos null.
+         */
 
-            throw new Error(
-                "El cupcake es requerido"
-            );
-        }
-
-        const cupcakeNumero =
-                Number(
-                    cupcake
-                );
+        let cupcakeNumero =
+                null;
 
         if (
-            !Number.isInteger(
-                cupcakeNumero
-            )
-            || cupcakeNumero <= 0
+            cupcake !== undefined
+            && cupcake !== null
+            && cupcake !== ""
+            && Number(cupcake) > 0
         ) {
 
-            throw new Error(
-                "El cupcake debe ser un identificador válido"
-            );
+            cupcakeNumero =
+                    Number(
+                        cupcake
+                    );
+
+            if (
+                !Number.isInteger(
+                    cupcakeNumero
+                )
+            ) {
+
+                throw new Error(
+                    "El cupcake debe ser un identificador válido"
+                );
+            }
         }
+
+        /*
+         * =====================================================
+         * REPOSITORY
+         * =====================================================
+         */
 
         const cupcakeCollectionRepository =
                 new CupcakeCollectionRepository();

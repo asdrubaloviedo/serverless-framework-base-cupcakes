@@ -1,128 +1,290 @@
-jest.mock('@cupcake/repositories/index', () => ({
-  CupcakeCollectionRepository: jest.fn()
-}));
+jest.mock(
+    '@cupcake/repositories/index',
+    () => {
+
+        const repo = {
+
+            getByUserEmail:
+                jest.fn()
+        };
+
+        return {
+
+            CupcakeCollectionRepository:
+                jest.fn(
+                    () => repo
+                )
+        };
+    }
+);
 
 const {
-  CupcakeCollectionRepository
-} = require('@cupcake/repositories/index');
+    CupcakeCollectionRepository
+} =
+    require(
+        '@cupcake/repositories/index'
+    );
 
 const GetCupcakeCollections =
-  require('../../../services/cupcakeCollection/GetCupcakeCollections');
-
-describe('GetCupcakeCollections', () => {
-
-  let repositoryMock;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-
-    repositoryMock = {
-      getByUserEmail: jest.fn()
-    };
-
-    CupcakeCollectionRepository
-      .mockImplementation(() => repositoryMock);
-  });
-
-  test('lanza error si no se envía email', async () => {
-
-    await expect(
-      GetCupcakeCollections.execute({
-        email: '',
-        cupcake: 2
-      })
-    ).rejects.toThrow(
-      'El email es requerido'
+    require(
+        '../../../services/cupcakeCollection/GetCupcakeCollections'
     );
-  });
 
-  test('lanza error si no se envía cupcake', async () => {
+describe(
+    'GetCupcakeCollections Service',
+    () => {
 
-    await expect(
-      GetCupcakeCollections.execute({
-        email: 'asdrubaloviedo2@gmail.com',
-        cupcake: null
-      })
-    ).rejects.toThrow(
-      'El cupcake es requerido'
-    );
-  });
+        beforeEach(
+            () => {
 
-  test('lanza error si cupcake no es un identificador válido', async () => {
+                jest.clearAllMocks();
+            }
+        );
 
-    await expect(
-        GetCupcakeCollections.execute({
-        email: 'asdrubaloviedo2@gmail.com',
-        cupcake: -1
-        })
-    ).rejects.toThrow(
-        'El cupcake debe ser un identificador válido'
-    );
-    });
+        test(
+            'devuelve collections con cupcake válido',
+            async () => {
 
-  test('convierte cupcake string a número', async () => {
+                const repo =
+                    new CupcakeCollectionRepository();
 
-    repositoryMock
-      .getByUserEmail
-      .mockResolvedValueOnce([]);
+                repo
+                    .getByUserEmail
+                    .mockResolvedValueOnce([
+                        {
+                            collection_id: 1,
+                            nombre: 'Cumpleaños',
+                            seleccionada: true
+                        }
+                    ]);
 
-    await GetCupcakeCollections.execute({
-      email: 'asdrubaloviedo2@gmail.com',
-      cupcake: '2'
-    });
+                const result =
+                    await GetCupcakeCollections.execute({
+                        email:
+                            'user@mail.com',
+                        cupcake:
+                            5
+                    });
 
-    expect(
-      repositoryMock.getByUserEmail
-    ).toHaveBeenCalledWith({
-      email: 'asdrubaloviedo2@gmail.com',
-      cupcake: 2
-    });
-  });
+                expect(
+                    repo.getByUserEmail
+                ).toHaveBeenCalledWith({
+                    email:
+                        'user@mail.com',
+                    cupcake:
+                        5
+                });
 
-  test('devuelve las collections del usuario', async () => {
+                expect(
+                    result
+                ).toEqual([
+                    {
+                        collection_id: 1,
+                        nombre: 'Cumpleaños',
+                        seleccionada: true
+                    }
+                ]);
+            }
+        );
 
-    const esperado = [
-      {
-        collection_id: 1,
-        nombre: 'Cumpleaños',
-        total_recetas: 1,
-        seleccionada: true,
-        imagen: 'https://example.com/cupcake.jpg'
-      }
-    ];
+        test(
+            'acepta cupcake como string numérico',
+            async () => {
 
-    repositoryMock
-      .getByUserEmail
-      .mockResolvedValueOnce(
-        esperado
-      );
+                const repo =
+                    new CupcakeCollectionRepository();
 
-    const result =
-      await GetCupcakeCollections.execute({
-        email: 'asdrubaloviedo2@gmail.com',
-        cupcake: 2
-      });
+                repo
+                    .getByUserEmail
+                    .mockResolvedValueOnce([]);
 
-    expect(result).toEqual(
-      esperado
-    );
-  });
+                await GetCupcakeCollections.execute({
+                    email:
+                        'user@mail.com',
+                    cupcake:
+                        '7'
+                });
 
-  test('devuelve array vacío si repository devuelve null', async () => {
+                expect(
+                    repo.getByUserEmail
+                ).toHaveBeenCalledWith({
+                    email:
+                        'user@mail.com',
+                    cupcake:
+                        7
+                });
+            }
+        );
 
-    repositoryMock
-      .getByUserEmail
-      .mockResolvedValueOnce(
-        null
-      );
+        test(
+            'permite omitir cupcake',
+            async () => {
 
-    const result =
-      await GetCupcakeCollections.execute({
-        email: 'asdrubaloviedo2@gmail.com',
-        cupcake: 2
-      });
+                const repo =
+                    new CupcakeCollectionRepository();
 
-    expect(result).toEqual([]);
-  });
+                repo
+                    .getByUserEmail
+                    .mockResolvedValueOnce([
+                        {
+                            collection_id: 1,
+                            nombre: 'Cumpleaños',
+                            seleccionada: false
+                        }
+                    ]);
 
-});
+                const result =
+                    await GetCupcakeCollections.execute({
+                        email:
+                            'user@mail.com'
+                    });
+
+                expect(
+                    repo.getByUserEmail
+                ).toHaveBeenCalledWith({
+                    email:
+                        'user@mail.com',
+                    cupcake:
+                        null
+                });
+
+                expect(
+                    result
+                ).toEqual([
+                    {
+                        collection_id: 1,
+                        nombre: 'Cumpleaños',
+                        seleccionada: false
+                    }
+                ]);
+            }
+        );
+
+        test.each([
+            undefined,
+            null,
+            '',
+            0,
+            '0',
+            -1,
+            '-3'
+        ])(
+            'cupcake inválido/no positivo se transforma en null: %p',
+            async cupcake => {
+
+                const repo =
+                    new CupcakeCollectionRepository();
+
+                repo
+                    .getByUserEmail
+                    .mockResolvedValueOnce([]);
+
+                await GetCupcakeCollections.execute({
+                    email:
+                        'user@mail.com',
+                    cupcake
+                });
+
+                expect(
+                    repo.getByUserEmail
+                ).toHaveBeenCalledWith({
+                    email:
+                        'user@mail.com',
+                    cupcake:
+                        null
+                });
+            }
+        );
+
+        test(
+            'lanza error si cupcake positivo no es entero',
+            async () => {
+
+                await expect(
+                    GetCupcakeCollections.execute({
+                        email:
+                            'user@mail.com',
+                        cupcake:
+                            1.5
+                    })
+                ).rejects.toThrow(
+                    'El cupcake debe ser un identificador válido'
+                );
+            }
+        );
+
+        test(
+            'devuelve [] si repository devuelve null',
+            async () => {
+
+                const repo =
+                    new CupcakeCollectionRepository();
+
+                repo
+                    .getByUserEmail
+                    .mockResolvedValueOnce(
+                        null
+                    );
+
+                const result =
+                    await GetCupcakeCollections.execute({
+                        email:
+                            'user@mail.com'
+                    });
+
+                expect(
+                    result
+                ).toEqual(
+                    []
+                );
+            }
+        );
+
+        test(
+            'devuelve [] si repository devuelve undefined',
+            async () => {
+
+                const repo =
+                    new CupcakeCollectionRepository();
+
+                repo
+                    .getByUserEmail
+                    .mockResolvedValueOnce(
+                        undefined
+                    );
+
+                const result =
+                    await GetCupcakeCollections.execute({
+                        email:
+                            'user@mail.com'
+                    });
+
+                expect(
+                    result
+                ).toEqual(
+                    []
+                );
+            }
+        );
+
+        test.each([
+            undefined,
+            null,
+            '',
+            0,
+            false
+        ])(
+            'lanza error si email es inválido: %p',
+            async email => {
+
+                await expect(
+                    GetCupcakeCollections.execute({
+                        email
+                    })
+                ).rejects.toThrow(
+                    'El email es requerido'
+                );
+            }
+        );
+    }
+);

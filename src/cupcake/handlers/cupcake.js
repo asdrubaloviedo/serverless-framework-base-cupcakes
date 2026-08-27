@@ -107,6 +107,7 @@ const routes = {
   'GET /calificacion':                                (e) => CupcakeController.getCupcakeRating(qs(e)),
   'POST /calificacion':                               (e) => CupcakeController.saveCupcakeRating(validBody(e, validateCupcakeRating)),
   'GET /collections':                                 (e) => CupcakeController.getCupcakeCollections(qs(e)),
+  'GET /collections/cupcakes':                        (e) => CupcakeController.getCupcakesByCollection(qs(e)),
   'POST /collections':                                (e) => CupcakeController.createCupcakeCollection(validBody(e, validateCupcakeCollection)),
   'POST /collections/cupcake':                        (e) => CupcakeController.saveCupcakeCollection(validBody(e, validateCupcakeCollectionCupcake)),
   'GET /ramdom':                                      (e) => CupcakeController.getAllRamdom(qs(e)),

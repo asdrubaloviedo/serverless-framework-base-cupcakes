@@ -242,11 +242,23 @@ GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/name-image-fil
 ### Desarrollo
 GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-filtros?tiempo=150&dificultad=todas&festividad=todas&colorpredominante=todos&colorsecundario=todos
 
+### GET collections del usuario
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo2@gmail.com
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo2@gmail.com
+
 ### GET collections del usuario y verificamos si el un cupcake por id existe en dichas colecciones
 ### Local
 GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo2@gmail.com&cupcake=2
 ### Desarrollo
 GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo2@gmail.com&cupcake=2
+
+### GET cupcakes de una collection
+### Local
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections/cupcakes?email=asdrubaloviedo2@gmail.com&collection=1
+### Desarrollo
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections/cupcakes?email=asdrubaloviedo2@gmail.com&collection=1
 
 ### POST crear collection
 ### Local
