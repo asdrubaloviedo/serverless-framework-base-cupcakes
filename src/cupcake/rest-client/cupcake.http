@@ -244,19 +244,19 @@ GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/name-image-filtros
 
 ### GET collections del usuario
 ### Local
-GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo2@gmail.com
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo@gmail.com
 ### Desarrollo
-GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo2@gmail.com
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo@gmail.com
 
 ### GET collections del usuario y verificamos si el un cupcake por id existe en dichas colecciones
 ### Local
-GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo2@gmail.com&cupcake=2
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo1@gmail.com&cupcake=1
 ### Desarrollo
-GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo2@gmail.com&cupcake=2
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections?email=asdrubaloviedo@gmail.com&cupcake=1
 
 ### GET cupcakes de una collection
 ### Local
-GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections/cupcakes?email=asdrubaloviedo2@gmail.com&collection=1
+GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections/cupcakes?email=asdrubaloviedo@gmail.com&collection=1
 ### Desarrollo
 GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections/cupcakes?email=asdrubaloviedo2@gmail.com&collection=1
 

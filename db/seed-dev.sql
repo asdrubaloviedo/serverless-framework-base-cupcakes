@@ -3073,6 +3073,10 @@ SELECT setval(
     EXISTS (SELECT 1 FROM usuario_paquetes)
 );      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
+-- ============================================================
+-- COLECCIONES
+-- ============================================================
+
 CREATE SEQUENCE coleccion_id;
 
 CREATE TABLE IF NOT EXISTS colecciones (
@@ -3097,6 +3101,11 @@ CREATE TABLE IF NOT EXISTS colecciones (
 
 ALTER SEQUENCE coleccion_id
 OWNED BY colecciones.coleccion_id;
+
+
+-- ============================================================
+-- COLECCION CUPCAKES
+-- ============================================================
 
 CREATE SEQUENCE coleccion_cupcake_id;
 
@@ -3125,6 +3134,166 @@ CREATE TABLE IF NOT EXISTS coleccion_cupcakes (
 ALTER SEQUENCE coleccion_cupcake_id
 OWNED BY coleccion_cupcakes.coleccion_cupcake_id;
 
+
+-- ============================================================
+-- DATOS DE PRUEBA: COLECCIONES
+-- ============================================================
+--
+-- Usuario:
+-- asdrubaloviedo@gmail.com
+--
+-- Se crean tres colecciones:
+--
+-- 1. Favoritos para fiestas
+--      cupcake 1
+--      cupcake 10
+--
+-- 2. Para preparar
+--      cupcake 2
+--      cupcake 3
+--
+-- 3. Colección vacía
+--      sin cupcakes
+--
+-- Esto permite probar tanto colecciones con contenido
+-- como una colección sin recetas.
+-- ============================================================
+
+INSERT INTO colecciones (
+    usuario_id,
+    nombre
+)
+VALUES
+(
+    (
+        SELECT usuario_id
+        FROM usuarios
+        WHERE LOWER(email) =
+            LOWER('asdrubaloviedo@gmail.com')
+    ),
+    'Favoritos para fiestas'
+),
+(
+    (
+        SELECT usuario_id
+        FROM usuarios
+        WHERE LOWER(email) =
+            LOWER('asdrubaloviedo@gmail.com')
+    ),
+    'Para preparar'
+),
+(
+    (
+        SELECT usuario_id
+        FROM usuarios
+        WHERE LOWER(email) =
+            LOWER('asdrubaloviedo@gmail.com')
+    ),
+    'Colección vacía'
+);
+
+
+-- ============================================================
+-- DATOS DE PRUEBA: CUPCAKES DE LAS COLECCIONES
+-- ============================================================
+
+
+-- ------------------------------------------------------------
+-- Favoritos para fiestas
+-- ------------------------------------------------------------
+
+INSERT INTO coleccion_cupcakes (
+    coleccion_id,
+    cupcake_id
+)
+VALUES
+(
+    (
+        SELECT coleccion_id
+        FROM colecciones
+        WHERE
+            nombre = 'Favoritos para fiestas'
+            AND usuario_id = (
+                SELECT usuario_id
+                FROM usuarios
+                WHERE LOWER(email) =
+                    LOWER('asdrubaloviedo@gmail.com')
+            )
+    ),
+    1
+),
+(
+    (
+        SELECT coleccion_id
+        FROM colecciones
+        WHERE
+            nombre = 'Favoritos para fiestas'
+            AND usuario_id = (
+                SELECT usuario_id
+                FROM usuarios
+                WHERE LOWER(email) =
+                    LOWER('asdrubaloviedo@gmail.com')
+            )
+    ),
+    10
+);
+
+
+-- ------------------------------------------------------------
+-- Para preparar
+-- ------------------------------------------------------------
+
+INSERT INTO coleccion_cupcakes (
+    coleccion_id,
+    cupcake_id
+)
+VALUES
+(
+    (
+        SELECT coleccion_id
+        FROM colecciones
+        WHERE
+            nombre = 'Para preparar'
+            AND usuario_id = (
+                SELECT usuario_id
+                FROM usuarios
+                WHERE LOWER(email) =
+                    LOWER('asdrubaloviedo@gmail.com')
+            )
+    ),
+    2
+),
+(
+    (
+        SELECT coleccion_id
+        FROM colecciones
+        WHERE
+            nombre = 'Para preparar'
+            AND usuario_id = (
+                SELECT usuario_id
+                FROM usuarios
+                WHERE LOWER(email) =
+                    LOWER('asdrubaloviedo@gmail.com')
+            )
+    ),
+    3
+);
+
+
+-- ------------------------------------------------------------
+-- Colección vacía
+-- ------------------------------------------------------------
+--
+-- No insertamos registros en coleccion_cupcakes.
+-- Esto es intencional para poder probar el estado vacío
+-- de la nueva vista de Mis colecciones.
+-- ------------------------------------------------------------
+
+
+-- ============================================================
+-- AJUSTAR SECUENCIA DE COLECCIONES
+-- ============================================================
+
 SELECT setval(
     'coleccion_id',
     COALESCE(
@@ -3138,8 +3307,12 @@ SELECT setval(
         SELECT 1
         FROM colecciones
     )
-);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+);
 
+
+-- ============================================================
+-- AJUSTAR SECUENCIA DE COLECCION CUPCAKES
+-- ============================================================
 
 SELECT setval(
     'coleccion_cupcake_id',
@@ -3154,4 +3327,4 @@ SELECT setval(
         SELECT 1
         FROM coleccion_cupcakes
     )
-);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+);

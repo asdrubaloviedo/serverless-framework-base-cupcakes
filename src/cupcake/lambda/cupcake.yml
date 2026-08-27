@@ -122,6 +122,10 @@ cupcake:
         method: get
         cors: ${self:custom.corsCommon}
     - http:
+        path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/collections/cupcakes
+        method: get
+        cors: ${self:custom.corsCommon}
+    - http:
         path: ${self:custom.endpointRoot}/${self:custom.cupcakeModule}/collections
         method: post
         cors: ${self:custom.corsCommon}
