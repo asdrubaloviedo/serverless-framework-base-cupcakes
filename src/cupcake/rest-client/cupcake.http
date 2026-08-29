@@ -258,7 +258,7 @@ GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections?email=
 ### Local
 GET {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{cupcakeModule}}/collections/cupcakes?email=asdrubaloviedo@gmail.com&collection=1
 ### Desarrollo
-GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections/cupcakes?email=asdrubaloviedo2@gmail.com&collection=1
+GET {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{cupcakeModule}}/collections/cupcakes?email=asdrubaloviedo@gmail.com&collection=1
 
 ### POST crear collection
 ### Local

@@ -85,6 +85,24 @@ provider:
   stage: ${self:custom.stage}
   vpc: ${self:custom.vpcByStage.${self:custom.stage}}
 
+  # =========================================================
+  # IAM
+  # =========================================================
+  #
+  # Permite que las funciones Lambda envíen correos mediante
+  # Amazon SES.
+  #
+  # Por ahora solo concedemos la acción que realmente necesita
+  # el flujo de recuperación de contraseña.
+  #
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+          Resource: "*"
+
   environment:
     ENDPOINT_ROOT: ${self:custom.endpointRoot}
     CATEGORY_MODULE: ${self:custom.categoryModule}
@@ -101,6 +119,13 @@ provider:
     DB_PASSWORD: ${self:custom.db.${self:custom.stage}.password, ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/DB_PASSWORD}
     DB_NAME: ${self:custom.db.${self:custom.stage}.name, ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/DB_NAME}
     PGSSLMODE: ${self:custom.db.${self:custom.stage}.sslmode, ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/PGSSLMODE}
+
+    # Correo remitente utilizado para emails personalizados.
+    SES_FROM_EMAIL: ${env:SES_FROM_EMAIL}
+
+    FIREBASE_PROJECT_ID: ${ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/FIREBASE_PROJECT_ID}
+    FIREBASE_CLIENT_EMAIL: ${ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/FIREBASE_CLIENT_EMAIL}
+    FIREBASE_PRIVATE_KEY: ${ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/FIREBASE_PRIVATE_KEY}
 
   versionFunctions: true
 

@@ -1,19 +1,54 @@
 user:
   handler: ./src/user/handlers/user.handler
+
   events:
+
+    # =========================================================
+    # USER MEDAL
+    # =========================================================
+
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/insertar-usuario-medalla
         method: post
         cors: ${self:custom.corsCommon}
+
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/actualizar-usuario-medalla
         method: patch
         cors: ${self:custom.corsCommon}
+
+
+    # =========================================================
+    # USER PACKAGE
+    # =========================================================
+
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/insertar-usuario-paquete
         method: post
         cors: ${self:custom.corsCommon}
+
+
+    # =========================================================
+    # USER
+    # =========================================================
+
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/insertar-usuario-nuevo
+        method: post
+        cors: ${self:custom.corsCommon}
+
+
+    # =========================================================
+    # PASSWORD RESET
+    # =========================================================
+    #
+    # Recibe el correo del usuario y dispara el flujo:
+    #
+    # Firebase Admin
+    #   -> genera el enlace seguro
+    #   -> SES envía el correo personalizado
+    #
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.userModule}/recuperar-contrasena
         method: post
         cors: ${self:custom.corsCommon}
