@@ -6,3 +6,4 @@ ingredient: ${file(./src/ingredient/lambda/ingredient.yml):ingredient}
 package: ${file(./src/package/lambda/package.yml):package}
 recipe: ${file(./src/recipe/lambda/recipe.yml):recipe}
 user: ${file(./src/user/lambda/user.yml):user}
+password-reset: ${file(./src/user/lambda/password-reset.yml):password-reset}

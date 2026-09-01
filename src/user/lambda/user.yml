@@ -36,19 +36,3 @@ user:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/insertar-usuario-nuevo
         method: post
         cors: ${self:custom.corsCommon}
-
-
-    # =========================================================
-    # PASSWORD RESET
-    # =========================================================
-    #
-    # Recibe el correo del usuario y dispara el flujo:
-    #
-    # Firebase Admin
-    #   -> genera el enlace seguro
-    #   -> SES envía el correo personalizado
-    #
-    - http:
-        path: ${self:custom.endpointRoot}/${self:custom.userModule}/recuperar-contrasena
-        method: post
-        cors: ${self:custom.corsCommon}

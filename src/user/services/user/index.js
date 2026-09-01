@@ -1,21 +1,50 @@
-const CreateOneUser = require("@user/services/user/CreateOneUser");
-const GeneratePasswordResetLink = require("@user/services/user/GeneratePasswordResetLink");
-const SendPasswordResetEmail = require("@user/services/user/SendPasswordResetEmail");
-
 /*
  * =========================================================
  * USER SERVICES
  * =========================================================
  *
- * Punto central de exportación de los servicios relacionados
- * con usuarios.
+ * Exportamos los servicios de forma diferida mediante getters.
  *
- * Mantener los servicios exportados desde aquí permite que
- * controladores y otros módulos los importen sin conocer la
- * ubicación física de cada archivo.
+ * De esta manera Node.js no carga todos los servicios apenas se
+ * importa este index.
+ *
+ * Esto es importante porque CreateOneUser puede terminar
+ * inicializando dependencias relacionadas con PostgreSQL,
+ * mientras que el flujo de recuperación de contraseña no
+ * necesita base de datos.
  */
+
 module.exports = {
-    CreateOneUser,
-    GeneratePasswordResetLink,
-    SendPasswordResetEmail
+
+    /*
+     * Servicio para crear un usuario en nuestra base de datos.
+     *
+     * Se carga únicamente cuando alguien accede a:
+     * services.CreateOneUser
+     */
+    get CreateOneUser() {
+        return require(
+            '@user/services/user/CreateOneUser'
+        );
+    },
+
+    /*
+     * Genera mediante Firebase Authentication el enlace seguro
+     * para cambiar la contraseña.
+     */
+    get GeneratePasswordResetLink() {
+        return require(
+            '@user/services/user/GeneratePasswordResetLink'
+        );
+    },
+
+    /*
+     * Envía mediante Amazon SES el correo personalizado con el
+     * enlace generado por Firebase.
+     */
+    get SendPasswordResetEmail() {
+        return require(
+            '@user/services/user/SendPasswordResetEmail'
+        );
+    }
 };

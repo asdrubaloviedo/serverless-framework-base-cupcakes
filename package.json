@@ -48,6 +48,11 @@
     "serverless-domain-manager": "^8.0.0",
     "serverless-offline": "13.6.0"
   },
+  "overrides": {
+    "jwks-rsa": {
+      "jose": "4.15.9"
+    }
+  },
   "_moduleAliases": {
     "@db": "db",
     "@": "src",

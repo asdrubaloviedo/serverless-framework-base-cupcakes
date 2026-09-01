@@ -1,46 +1,49 @@
-const admin = require('firebase-admin');
+const {
+    initializeApp,
+    getApps,
+    cert
+} = require('firebase-admin/app');
+
+const {
+    getAuth
+} = require('firebase-admin/auth');
 
 /*
  * =========================================================
  * FIREBASE AUTH SERVICE
  * =========================================================
  *
- * Centraliza la inicialización de Firebase Admin.
+ * Centraliza la inicialización de Firebase Admin SDK.
  *
- * Firebase Admin debe inicializarse una sola vez por proceso.
- * En AWS Lambda, una instancia puede reutilizarse entre varias
- * ejecuciones, por eso verificamos admin.apps antes de llamar
- * initializeApp().
+ * La aplicación Firebase se inicializa una sola vez por
+ * instancia de Lambda. En invocaciones posteriores reutilizamos
+ * la aplicación existente.
  *
- * Este servicio se utilizará para generar enlaces seguros de
- * recuperación de contraseña sin cambiar la lógica de Firebase
- * que actualmente ya funciona en Android.
+ * Las credenciales se reciben mediante variables de entorno.
+ * En AWS dev esas variables provienen de Parameter Store.
  */
 class FirebaseAuthService {
 
-    /*
-     * =========================================================
-     * INITIALIZE
-     * =========================================================
-     *
-     * Devuelve una instancia de Firebase Auth.
-     *
-     * Las credenciales se obtendrán mediante las variables de
-     * entorno del backend. No se deben guardar claves privadas
-     * directamente dentro del código fuente.
-     */
     static getAuth() {
 
-        if (admin.apps.length === 0) {
+        /*
+         * Firebase Admin puede reutilizar una instancia de Lambda.
+         *
+         * Por eso verificamos primero si ya existe una aplicación
+         * inicializada. Esto evita intentar inicializar Firebase
+         * dos veces dentro del mismo proceso.
+         */
+        if (getApps().length === 0) {
 
             const projectId = process.env.FIREBASE_PROJECT_ID;
             const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
             const privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
             /*
-             * Evitamos inicializar Firebase con una configuración
-             * incompleta. Esto también facilita detectar errores de
-             * configuración durante despliegues o pruebas locales.
+             * Fallamos inmediatamente si falta alguna credencial.
+             *
+             * Esto ayuda a distinguir un problema de configuración
+             * de otros posibles errores de Firebase Authentication.
              */
             if (!projectId || !clientEmail || !privateKey) {
                 throw new Error(
@@ -48,23 +51,27 @@ class FirebaseAuthService {
                 );
             }
 
-            admin.initializeApp({
-                credential: admin.credential.cert({
+            /*
+             * La clave privada se almacenó en SSM manteniendo los
+             * caracteres "\n" del JSON original.
+             *
+             * Firebase necesita saltos de línea reales, por eso los
+             * convertimos justo antes de crear la credencial.
+             */
+            initializeApp({
+                credential: cert({
                     projectId,
                     clientEmail,
-
-                    /*
-                     * Las variables de entorno normalmente almacenan
-                     * los saltos de línea de la clave privada como \n.
-                     *
-                     * Firebase necesita saltos de línea reales.
-                     */
                     privateKey: privateKey.replace(/\\n/g, '\n')
                 })
             });
         }
 
-        return admin.auth();
+        /*
+         * Devuelve Firebase Authentication asociado a la aplicación
+         * predeterminada ya inicializada.
+         */
+        return getAuth();
     }
 }
 

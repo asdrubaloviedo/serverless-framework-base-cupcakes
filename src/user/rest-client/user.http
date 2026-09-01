@@ -87,3 +87,20 @@ Content-Type: application/json
   "nombre": "Test17Node",
   "email": "test17node@gmail.com"
 }
+
+### Recuperar contraseña
+### Local
+POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{userModule}}/recuperar-contrasena
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo@gmail.com"
+}
+
+### Desarrollo
+POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{userModule}}/recuperar-contrasena
+Content-Type: application/json
+
+{
+  "email": "asdrubaloviedo@gmail.com"
+}
