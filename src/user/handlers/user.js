@@ -7,6 +7,7 @@ const {
   validatePatchUserMedalLeage,
   validateCreateUserPackage,
   validateCreateUser,
+  validateUpdateUser,
   validateSendPasswordResetEmail
 } = require('@user/schema/user');
 
@@ -297,6 +298,23 @@ const routes = {
         validBody(
           e,
           validateCreateUser
+        )
+      ),
+
+
+  /*
+   * =========================================================
+   * UPDATE USER
+   * =========================================================
+   *
+   * Actualiza el nombre y el avatar del usuario.
+   */
+  'PATCH /actualizar-usuario':
+    (e) =>
+      UserController.updateOneUser(
+        validBody(
+          e,
+          validateUpdateUser
         )
       ),
 

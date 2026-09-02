@@ -1,6 +1,7 @@
 const db = require('@db/db');
 
 class UserModel {
+
   static async create({ query, params }) {
     return db.query(query, params);
   }
@@ -8,9 +9,15 @@ class UserModel {
   static async getCreated({ query, params }) {
     return db.query(query, params);
   }
+
+  // Actualiza los datos del perfil de un usuario.
+  static async update({ query, params }) {
+    return db.query(query, params);
+  }
 }
 
 class UserMedalLeageModel {
+
   static async create({ query, params }) {
     return db.query(query, params);
   }
@@ -29,6 +36,7 @@ class UserMedalLeageModel {
 }
 
 class UserPackageModel {
+
   static async create({ query, params }) {
     return db.query(query, params);
   }

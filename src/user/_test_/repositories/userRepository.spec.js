@@ -1,5 +1,5 @@
 jest.mock('@user/models/user', () => ({
-  UserModel: { create: jest.fn(), getCreated: jest.fn() },
+  UserModel: { create: jest.fn(), getCreated: jest.fn(), update: jest.fn() },
 }));
 
 const { UserModel } = require('@user/models/user');
@@ -87,5 +87,25 @@ describe('UserRepository', () => {
     expect(query).toContain('WHERE u.email = LOWER($1)');
 
     expect(params).toEqual(['b@b.com']);
+  });
+
+  test('update actualiza nombre y avatar del usuario', async () => {
+    const repo = new UserRepository();
+
+    await repo.update({
+      nombre: 'asdrubal david',
+      email: 'asdrubaloviedo@gmail.com',
+      avatarId: 5
+    });
+
+    expect(UserModel.update).toHaveBeenCalledWith({
+      query: expect.stringContaining('UPDATE usuarios'),
+      params: [
+        'asdrubal',
+        'david',
+        5,
+        'asdrubaloviedo@gmail.com'
+      ],
+    });
   });
 });

@@ -29,6 +29,16 @@ module.exports = {
     },
 
     /*
+     * Servicio para actualizar los datos del perfil
+     * de un usuario existente.
+     */
+    get UpdateOneUser() {
+        return require(
+            '@user/services/user/UpdateOneUser'
+        );
+    },
+
+    /*
      * Genera mediante Firebase Authentication el enlace seguro
      * para cambiar la contraseña.
      */

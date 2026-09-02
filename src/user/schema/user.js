@@ -188,6 +188,27 @@ const createUserSchema = z.object({
 
 /*
  * =========================================================
+ * UPDATE USER
+ * =========================================================
+ *
+ * Para actualizar el perfil necesitamos:
+ * - nombre
+ * - email
+ * - avatarId
+ *
+ * El email identifica al usuario.
+ * avatarId debe corresponder a un avatar existente en
+ * la tabla avatares.
+ */
+const updateUserSchema = z.object({
+  nombre: nameRequired,
+  email: emailRequired,
+  avatarId: idRequired('avatarId')
+}).strict();
+
+
+/*
+ * =========================================================
  * PASSWORD RESET
  * =========================================================
  *
@@ -223,6 +244,9 @@ const validateCreateUserPackage = (o) =>
 const validateCreateUser = (o) =>
   createUserSchema.safeParse(o);
 
+const validateUpdateUser = (o) =>
+  updateUserSchema.safeParse(o);
+
 
 /*
  * Valida el body recibido cuando el usuario solicita
@@ -242,6 +266,7 @@ module.exports = {
   validatePatchUserMedalLeage,
   validateCreateUserPackage,
   validateCreateUser,
+  validateUpdateUser,
 
   // Recuperación de contraseña.
   validateSendPasswordResetEmail

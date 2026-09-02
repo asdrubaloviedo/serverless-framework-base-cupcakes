@@ -101,10 +101,10 @@ class UserController {
 
 
     /*
-     * =====================================================
-     * USER
-     * =====================================================
-     */
+    * =====================================================
+    * USER
+    * =====================================================
+    */
 
     static async createOneUser(params = {}) {
 
@@ -122,6 +122,29 @@ class UserController {
             nombre,
             email,
             pais
+        });
+    }
+
+
+    /*
+    * Actualiza los datos del perfil de un usuario.
+    */
+    static async updateOneUser(params = {}) {
+
+        const {
+            UpdateOneUser
+        } = require('@user/services/user');
+
+        const {
+            nombre,
+            email,
+            avatarId
+        } = params;
+
+        return UpdateOneUser.execute({
+            nombre,
+            email,
+            avatarId
         });
     }
 

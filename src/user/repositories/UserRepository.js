@@ -45,7 +45,31 @@ class UserRepository {
         return UserModel.create({ query, params });
     }
 
-    // Obtiene el usuario creado junto con la información de su avatar.
+    // Actualiza el nombre y avatar del usuario.
+    async update({ nombre, email, avatarId }) {
+        const { primerNombre, segundoNombre } = this.splitName(nombre);
+
+        const query =
+            `
+                UPDATE usuarios
+                SET
+                    primer_nombre = $1,
+                    segundo_nombre = $2,
+                    avatar_id = $3
+                WHERE email = LOWER($4)
+            `;
+
+        const params = [
+            primerNombre,
+            segundoNombre,
+            avatarId,
+            email
+        ];
+
+        return UserModel.update({ query, params });
+    }
+
+    // Obtiene el usuario junto con la información de su avatar.
     async getCreated({ email }) {
         const query =
             `
