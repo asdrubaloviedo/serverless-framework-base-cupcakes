@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS imagenes_paquetes CASCADE;
 DROP TABLE IF EXISTS propiedades CASCADE;
 DROP TABLE IF EXISTS roles CASCADE;
 DROP TABLE IF EXISTS usuario_estados CASCADE;
+DROP TABLE IF EXISTS avatares CASCADE;
 DROP TABLE IF EXISTS usuarios CASCADE;
 DROP TABLE IF EXISTS cupcake_categorias CASCADE;
 DROP TABLE IF EXISTS lugares CASCADE;
@@ -49,6 +50,7 @@ DROP SEQUENCE IF EXISTS imagen_paquete_id CASCADE;
 DROP SEQUENCE IF EXISTS propiedad_id CASCADE;
 DROP SEQUENCE IF EXISTS rol_id CASCADE;
 DROP SEQUENCE IF EXISTS estado_id CASCADE;
+DROP SEQUENCE IF EXISTS avatar_id CASCADE;
 DROP SEQUENCE IF EXISTS usuario_id CASCADE;
 DROP SEQUENCE IF EXISTS cupcake_categoria_id CASCADE;
 DROP SEQUENCE IF EXISTS lugar_id CASCADE;
@@ -2651,7 +2653,49 @@ SELECT setval(
     EXISTS (SELECT 1 FROM usuario_estados)
 );      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
 
+-- Avatares disponibles para los usuarios
+CREATE SEQUENCE avatar_id;
+
+CREATE TABLE IF NOT EXISTS avatares (
+    avatar_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('avatar_id'),
+    nombre VARCHAR(50) NOT NULL UNIQUE,
+    codigo VARCHAR NOT NULL UNIQUE
+);
+
+ALTER SEQUENCE avatar_id OWNED BY avatares.avatar_id;
+
+INSERT INTO avatares (avatar_id, nombre, codigo)
+    VALUES
+        (1, 'avatar_generico', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_generico.png'),
+        (2, 'avatar_nino', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_nino.png'),
+        (3, 'avatar_nina', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_nina.png'),
+        (4, 'avatar_perro', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_perro.png'),
+        (5, 'avatar_gato', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_gato.png'),
+        (6, 'avatar_zorro', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_zorro.png'),
+        (7, 'avatar_panda', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_panda.png'),
+        (8, 'avatar_mono', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_mono.png'),
+        (9, 'avatar_conejo', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_conejo.png'),
+        (10, 'avatar_pinguino', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_pinguino.png'),
+        (11, 'avatar_elefante', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_elefante.png'),
+        (12, 'avatar_dino', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_dino.png'),
+        (13, 'avatar_tortuga', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_tortuga.png'),
+        (14, 'avatar_pajarito', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_pajarito.png'),
+        (15, 'avatar_bicicleta', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_bicicleta.png'),
+        (16, 'avatar_queso', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_queso.png'),
+        (17, 'avatar_sushi', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_sushi.png'),
+        (18, 'avatar_lentes', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_lentes.png'),
+        (19, 'avatar_aguacate', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_aguacate.png'),
+        (20, 'avatar_naranja', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_naranja.png'),
+        (21, 'avatar_cupcake', 'https://storage.googleapis.com/cupcakeslife/avatars/avatar_cupcake.png');
+
+SELECT setval(
+    'avatar_id',
+    COALESCE((SELECT MAX(avatar_id) FROM avatares), 1),
+    EXISTS (SELECT 1 FROM avatares)
+);      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
 CREATE SEQUENCE usuario_id;
+
 CREATE TABLE IF NOT EXISTS usuarios (
     usuario_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('usuario_id'),
     primer_nombre VARCHAR(25) NOT NULL,
@@ -2662,21 +2706,40 @@ CREATE TABLE IF NOT EXISTS usuarios (
     edad INTEGER CHECK (edad >= 1 AND edad <= 150),
     sexo VARCHAR(1) DEFAULT 'i',
     email VARCHAR(50) UNIQUE,
+
+    -- Todos los usuarios comienzan con el avatar genérico.
+    avatar_id INTEGER NOT NULL DEFAULT 1,
+
     rol_id INTEGER,
     estado_id INTEGER,
+
+    FOREIGN KEY (avatar_id) REFERENCES avatares(avatar_id),
     FOREIGN KEY (rol_id) REFERENCES roles(rol_id),
     FOREIGN KEY (estado_id) REFERENCES usuario_estados(estado_id)
 );
+
 ALTER SEQUENCE usuario_id OWNED BY usuarios.usuario_id;
 
-INSERT INTO usuarios (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, pais, edad, sexo, email, rol_id, estado_id)
+INSERT INTO usuarios (
+    primer_nombre,
+    segundo_nombre,
+    primer_apellido,
+    segundo_apellido,
+    pais,
+    edad,
+    sexo,
+    email,
+    avatar_id,
+    rol_id,
+    estado_id
+)
     VALUES
-        ('asdrubal', 'david', 'oviedo', 'oviedo', 'PER', 30, 'm', 'asdrubaloviedo@gmail.com', 1, 1),
-        ('katrine', 'del valle', 'ortiz', 'manoche', 'PER', 26, 'f', 'katyorman.10@gmail.com', 4, 1),
-        ('evert', default, 'ortiz', default, 'FRA', 28, 'm', 'evert.ortiz.m@gmail.com', 7, 1),
-        ('alminda', default, 'manoche', default, 'USA', 50, 'f', 'almindao@gmail.com', 7, 2),
-        ('abigail', default, 'cunes', default, 'ARG', 29, 'i', 'cunesmac24@gmail.com', 7, 2),
-        ('asdrubal', 'david', 'oviedo', 'oviedo', 'PER', 30, 'm', 'asdrubaloviedo2@gmail.com', 1, 1);
+        ('asdrubal', 'david', 'oviedo', 'oviedo', 'PER', 30, 'm', 'asdrubaloviedo@gmail.com', 1, 1, 1),
+        ('katrine', 'del valle', 'ortiz', 'manoche', 'PER', 26, 'f', 'katyorman.10@gmail.com', 1, 4, 1),
+        ('evert', default, 'ortiz', default, 'FRA', 28, 'm', 'evert.ortiz.m@gmail.com', 1, 7, 1),
+        ('alminda', default, 'manoche', default, 'USA', 50, 'f', 'almindao@gmail.com', 1, 7, 2),
+        ('abigail', default, 'cunes', default, 'ARG', 29, 'i', 'cunesmac24@gmail.com', 1, 7, 2),
+        ('asdrubal', 'david', 'oviedo', 'oviedo', 'PER', 30, 'm', 'asdrubaloviedo2@gmail.com', 1, 1, 1);
 
 SELECT setval(
     'usuario_id',

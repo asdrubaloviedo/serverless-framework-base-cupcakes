@@ -3,6 +3,8 @@
 const { UserModel } = require("@user/models/user");
 
 class UserRepository {
+
+    // Divide el nombre recibido en primer y segundo nombre.
     splitName(nombre = '') {
         const normalized = String(nombre)
             .trim()
@@ -16,10 +18,11 @@ class UserRepository {
         };
     }
 
+    // Crea un nuevo usuario.
     async create({ nombre, email, pais = 'PER' }) {
         const { primerNombre, segundoNombre } = this.splitName(nombre);
 
-        const query = 
+        const query =
             `
                 INSERT INTO usuarios (
                     primer_nombre,
@@ -42,12 +45,18 @@ class UserRepository {
         return UserModel.create({ query, params });
     }
 
+    // Obtiene el usuario creado junto con la información de su avatar.
     async getCreated({ email }) {
-        const query = 
+        const query =
             `
-                SELECT *
-                FROM usuarios
-                WHERE email = LOWER($1)
+                SELECT
+                    u.*,
+                    a.nombre AS avatar_nombre,
+                    a.codigo AS avatar_url
+                FROM usuarios u
+                INNER JOIN avatares a
+                    ON a.avatar_id = u.avatar_id
+                WHERE u.email = LOWER($1)
             `;
 
         const params = [email];
