@@ -102,7 +102,8 @@ class UserRepository {
                     up.recordatorios,
                     up.mensajes,
                     up.promociones,
-                    up.sonido,
+                    up.musica,
+                    up.efectos_sonido,
                     up.vibracion
                 FROM usuario_preferencias up
                 INNER JOIN usuarios u
@@ -124,7 +125,8 @@ class UserRepository {
         recordatorios,
         mensajes,
         promociones,
-        sonido,
+        musica,
+        efectos_sonido,
         vibracion
     }) {
         const query =
@@ -134,12 +136,13 @@ class UserRepository {
                     recordatorios = $1,
                     mensajes = $2,
                     promociones = $3,
-                    sonido = $4,
-                    vibracion = $5
+                    musica = $4,
+                    efectos_sonido = $5,
+                    vibracion = $6
                 WHERE usuario_id = (
                     SELECT usuario_id
                     FROM usuarios
-                    WHERE email = LOWER($6)
+                    WHERE email = LOWER($7)
                 )
             `;
 
@@ -147,7 +150,8 @@ class UserRepository {
             recordatorios,
             mensajes,
             promociones,
-            sonido,
+            musica,
+            efectos_sonido,
             vibracion,
             email
         ];

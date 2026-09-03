@@ -345,7 +345,7 @@ const routes = {
 
 
   /*
-   * Actualiza las cinco preferencias del usuario.
+   * Actualiza las seis preferencias del usuario.
    */
   'PATCH /actualizar-preferencias':
     (e) =>

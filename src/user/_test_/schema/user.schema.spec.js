@@ -378,13 +378,14 @@ describe('user/schema/user', () => {
 
   describe('validateUpdateUserPreferences', () => {
 
-    test('ok: acepta las cinco preferencias booleanas', () => {
+    test('ok: acepta las seis preferencias booleanas', () => {
       const out = S.validateUpdateUserPreferences({
         email: 'ASDRUBALOVIEDO@GMAIL.COM',
         recordatorios: true,
         mensajes: false,
         promociones: true,
-        sonido: false,
+        musica: false,
+        efectos_sonido: true,
         vibracion: true
       });
 
@@ -395,7 +396,8 @@ describe('user/schema/user', () => {
         recordatorios: true,
         mensajes: false,
         promociones: true,
-        sonido: false,
+        musica: false,
+        efectos_sonido: true,
         vibracion: true
       });
     });
@@ -407,7 +409,8 @@ describe('user/schema/user', () => {
         recordatorios: true,
         mensajes: false,
         promociones: true,
-        sonido: false
+        musica: false,
+        efectos_sonido: true
 
         /*
          * vibracion falta intencionalmente.
@@ -424,7 +427,8 @@ describe('user/schema/user', () => {
         recordatorios: 'true',
         mensajes: false,
         promociones: true,
-        sonido: false,
+        musica: false,
+        efectos_sonido: true,
         vibracion: true
       });
 
@@ -438,7 +442,8 @@ describe('user/schema/user', () => {
         recordatorios: true,
         mensajes: false,
         promociones: true,
-        sonido: false,
+        musica: false,
+        efectos_sonido: true,
         vibracion: true
       });
 
@@ -456,7 +461,8 @@ describe('user/schema/user', () => {
         recordatorios: true,
         mensajes: false,
         promociones: true,
-        sonido: false,
+        musica: false,
+        efectos_sonido: true,
         vibracion: true,
         campoExtra: 'no permitido'
       });

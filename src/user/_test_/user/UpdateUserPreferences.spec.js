@@ -32,7 +32,8 @@ describe('UpdateUserPreferences Service', () => {
         recordatorios: false,
         mensajes: true,
         promociones: false,
-        sonido: true,
+        musica: true,
+        efectos_sonido: false,
         vibracion: false,
       }
     ];
@@ -49,7 +50,8 @@ describe('UpdateUserPreferences Service', () => {
         recordatorios: false,
         mensajes: true,
         promociones: false,
-        sonido: true,
+        musica: true,
+        efectos_sonido: false,
         vibracion: false
       });
 
@@ -61,7 +63,8 @@ describe('UpdateUserPreferences Service', () => {
       recordatorios: false,
       mensajes: true,
       promociones: false,
-      sonido: true,
+      musica: true,
+      efectos_sonido: false,
       vibracion: false
     });
 
@@ -89,7 +92,8 @@ describe('UpdateUserPreferences Service', () => {
         recordatorios: true,
         mensajes: false,
         promociones: true,
-        sonido: false,
+        musica: false,
+        efectos_sonido: false,
         vibracion: true
       });
 
@@ -118,7 +122,8 @@ describe('UpdateUserPreferences Service', () => {
         recordatorios: true,
         mensajes: true,
         promociones: true,
-        sonido: true,
+        musica: true,
+        efectos_sonido: true,
         vibracion: true
       });
 
@@ -142,7 +147,8 @@ describe('UpdateUserPreferences Service', () => {
         recordatorios: true,
         mensajes: false,
         promociones: true,
-        sonido: false,
+        musica: false,
+        efectos_sonido: false,
         vibracion: true
       })
     ).rejects.toThrow('Database error');

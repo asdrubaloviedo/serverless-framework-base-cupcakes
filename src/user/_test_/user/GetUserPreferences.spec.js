@@ -29,7 +29,8 @@ describe('GetUserPreferences Service', () => {
         recordatorios: true,
         mensajes: false,
         promociones: true,
-        sonido: false,
+        musica: false,
+        efectos_sonido: false,
         vibracion: true,
       }
     ];

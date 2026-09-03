@@ -227,7 +227,7 @@ const getUserPreferencesSchema = z.object({
 
 /*
  * Para actualizar las preferencias recibimos siempre el estado
- * completo de las cinco opciones mostradas en la aplicación.
+ * completo de las seis opciones mostradas en la aplicación.
  *
  * Utilizamos z.boolean() intencionalmente para exigir booleanos
  * JSON reales:
@@ -242,7 +242,8 @@ const updateUserPreferencesSchema = z.object({
   recordatorios: z.boolean(),
   mensajes: z.boolean(),
   promociones: z.boolean(),
-  sonido: z.boolean(),
+  musica: z.boolean(),
+  efectos_sonido: z.boolean(),
   vibracion: z.boolean()
 }).strict();
 

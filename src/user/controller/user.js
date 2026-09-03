@@ -188,7 +188,8 @@ class UserController {
             recordatorios,
             mensajes,
             promociones,
-            sonido,
+            musica,
+            efectos_sonido,
             vibracion
         } = params;
 
@@ -197,7 +198,8 @@ class UserController {
             recordatorios,
             mensajes,
             promociones,
-            sonido,
+            musica,
+            efectos_sonido,
             vibracion
         });
     }

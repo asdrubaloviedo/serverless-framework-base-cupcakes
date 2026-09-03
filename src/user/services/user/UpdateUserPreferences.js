@@ -14,20 +14,22 @@ class UpdateUserPreferences {
         recordatorios,
         mensajes,
         promociones,
-        sonido,
+        musica,
+        efectos_sonido,
         vibracion
     }) {
         const userRepository = new UserRepository();
 
         /*
-         * Actualizamos las cinco preferencias del usuario.
+         * Actualizamos las seis preferencias del usuario.
          */
         await userRepository.updatePreferences({
             email,
             recordatorios,
             mensajes,
             promociones,
-            sonido,
+            musica,
+            efectos_sonido,
             vibracion
         });
 
