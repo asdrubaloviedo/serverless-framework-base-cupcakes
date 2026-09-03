@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS propiedades CASCADE;
 DROP TABLE IF EXISTS roles CASCADE;
 DROP TABLE IF EXISTS usuario_estados CASCADE;
 DROP TABLE IF EXISTS avatares CASCADE;
+DROP TABLE IF EXISTS usuario_preferencias CASCADE;
 DROP TABLE IF EXISTS usuarios CASCADE;
 DROP TABLE IF EXISTS cupcake_categorias CASCADE;
 DROP TABLE IF EXISTS lugares CASCADE;
@@ -2746,6 +2747,102 @@ SELECT setval(
     COALESCE((SELECT MAX(usuario_id) FROM usuarios), 1),
     EXISTS (SELECT 1 FROM usuarios)
 );      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
+-- ============================================================
+-- PREFERENCIAS DE USUARIO
+-- ============================================================
+-- Cada usuario tiene una única configuración de preferencias.
+--
+-- Valores por defecto según el diseño actual de Figma:
+--   Recordatorios = activado
+--   Mensajes      = desactivado
+--   Promociones   = activado
+--   Sonido        = desactivado
+--   Vibración     = activado
+--
+-- usuario_id funciona al mismo tiempo como:
+--   1. PRIMARY KEY
+--   2. FOREIGN KEY hacia usuarios
+--
+-- De esta forma garantizamos una relación 1:1:
+-- un usuario solamente puede tener una fila de preferencias.
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS usuario_preferencias (
+    usuario_id INTEGER PRIMARY KEY NOT NULL,
+
+    recordatorios BOOLEAN NOT NULL DEFAULT TRUE,
+    mensajes BOOLEAN NOT NULL DEFAULT FALSE,
+    promociones BOOLEAN NOT NULL DEFAULT TRUE,
+    sonido BOOLEAN NOT NULL DEFAULT FALSE,
+    vibracion BOOLEAN NOT NULL DEFAULT TRUE,
+
+    FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(usuario_id)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- PREFERENCIAS INICIALES
+-- ============================================================
+-- Creamos las preferencias para todos los usuarios que ya
+-- existen en la base de datos al ejecutar este script.
+--
+-- Los valores booleanos no se especifican porque PostgreSQL
+-- utilizará automáticamente los DEFAULT definidos en la tabla.
+-- ============================================================
+
+INSERT INTO usuario_preferencias (usuario_id)
+SELECT usuario_id
+FROM usuarios
+ON CONFLICT (usuario_id) DO NOTHING;
+
+
+-- ============================================================
+-- PREFERENCIAS PARA NUEVOS USUARIOS
+-- ============================================================
+-- Esta función será ejecutada automáticamente después de crear
+-- un nuevo usuario.
+--
+-- Solo insertamos usuario_id para que PostgreSQL utilice los
+-- valores DEFAULT definidos en usuario_preferencias.
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION crear_preferencias_usuario()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    INSERT INTO usuario_preferencias (usuario_id)
+    VALUES (NEW.usuario_id)
+    ON CONFLICT (usuario_id) DO NOTHING;
+
+    RETURN NEW;
+
+END;
+$$;
+
+
+-- ============================================================
+-- TRIGGER DE NUEVO USUARIO
+-- ============================================================
+-- Cada vez que se inserta un registro en usuarios, PostgreSQL
+-- crea automáticamente sus preferencias.
+--
+-- De esta manera la aplicación y el backend no necesitan
+-- recordar crear manualmente usuario_preferencias.
+-- ============================================================
+
+DROP TRIGGER IF EXISTS trigger_crear_preferencias_usuario
+ON usuarios;
+
+CREATE TRIGGER trigger_crear_preferencias_usuario
+AFTER INSERT
+ON usuarios
+FOR EACH ROW
+EXECUTE FUNCTION crear_preferencias_usuario();
 
 CREATE SEQUENCE cupcake_categoria_id;
 CREATE TABLE IF NOT EXISTS cupcake_categorias (

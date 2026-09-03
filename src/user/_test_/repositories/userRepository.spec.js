@@ -1,5 +1,9 @@
 jest.mock('@user/models/user', () => ({
-  UserModel: { create: jest.fn(), getCreated: jest.fn(), update: jest.fn() },
+  UserModel: {
+    create: jest.fn(),
+    getCreated: jest.fn(),
+    update: jest.fn()
+  },
 }));
 
 const { UserModel } = require('@user/models/user');
@@ -107,5 +111,75 @@ describe('UserRepository', () => {
         'asdrubaloviedo@gmail.com'
       ],
     });
+  });
+
+  test('getPreferences obtiene las preferencias del usuario por email', async () => {
+    const repo = new UserRepository();
+
+    await repo.getPreferences({
+      email: 'asdrubaloviedo@gmail.com'
+    });
+
+    expect(UserModel.getCreated).toHaveBeenCalledTimes(1);
+
+    const {
+      query,
+      params
+    } = UserModel.getCreated.mock.calls[0][0];
+
+    expect(query).toContain('FROM usuario_preferencias up');
+    expect(query).toContain('INNER JOIN usuarios u');
+    expect(query).toContain('ON u.usuario_id = up.usuario_id');
+    expect(query).toContain('WHERE u.email = LOWER($1)');
+
+    expect(query).toContain('up.recordatorios');
+    expect(query).toContain('up.mensajes');
+    expect(query).toContain('up.promociones');
+    expect(query).toContain('up.sonido');
+    expect(query).toContain('up.vibracion');
+
+    expect(params).toEqual([
+      'asdrubaloviedo@gmail.com'
+    ]);
+  });
+
+  test('updatePreferences actualiza todas las preferencias del usuario', async () => {
+    const repo = new UserRepository();
+
+    await repo.updatePreferences({
+      email: 'asdrubaloviedo@gmail.com',
+      recordatorios: false,
+      mensajes: true,
+      promociones: false,
+      sonido: true,
+      vibracion: false
+    });
+
+    expect(UserModel.update).toHaveBeenCalledTimes(1);
+
+    const {
+      query,
+      params
+    } = UserModel.update.mock.calls[0][0];
+
+    expect(query).toContain('UPDATE usuario_preferencias');
+    expect(query).toContain('recordatorios = $1');
+    expect(query).toContain('mensajes = $2');
+    expect(query).toContain('promociones = $3');
+    expect(query).toContain('sonido = $4');
+    expect(query).toContain('vibracion = $5');
+
+    expect(query).toContain('SELECT usuario_id');
+    expect(query).toContain('FROM usuarios');
+    expect(query).toContain('WHERE email = LOWER($6)');
+
+    expect(params).toEqual([
+      false,
+      true,
+      false,
+      true,
+      false,
+      'asdrubaloviedo@gmail.com'
+    ]);
   });
 });

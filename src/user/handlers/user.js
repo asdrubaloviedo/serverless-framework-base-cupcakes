@@ -8,6 +8,8 @@ const {
   validateCreateUserPackage,
   validateCreateUser,
   validateUpdateUser,
+  validateGetUserPreferences,
+  validateUpdateUserPreferences,
   validateSendPasswordResetEmail
 } = require('@user/schema/user');
 
@@ -315,6 +317,42 @@ const routes = {
         validBody(
           e,
           validateUpdateUser
+        )
+      ),
+
+
+  /*
+   * =========================================================
+   * USER PREFERENCES
+   * =========================================================
+   */
+
+  /*
+   * Obtiene las preferencias guardadas del usuario.
+   *
+   * Recibimos el email en el body para mantener el mismo
+   * patrón de validación utilizado por los demás endpoints
+   * de usuario.
+   */
+  'POST /obtener-preferencias':
+    (e) =>
+      UserController.getUserPreferences(
+        validBody(
+          e,
+          validateGetUserPreferences
+        )
+      ),
+
+
+  /*
+   * Actualiza las cinco preferencias del usuario.
+   */
+  'PATCH /actualizar-preferencias':
+    (e) =>
+      UserController.updateUserPreferences(
+        validBody(
+          e,
+          validateUpdateUserPreferences
         )
       ),
 

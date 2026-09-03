@@ -39,6 +39,26 @@ module.exports = {
     },
 
     /*
+     * Servicio para obtener las preferencias guardadas
+     * de un usuario.
+     */
+    get GetUserPreferences() {
+        return require(
+            '@user/services/user/GetUserPreferences'
+        );
+    },
+
+    /*
+     * Servicio para actualizar las preferencias
+     * de un usuario existente.
+     */
+    get UpdateUserPreferences() {
+        return require(
+            '@user/services/user/UpdateUserPreferences'
+        );
+    },
+
+    /*
      * Genera mediante Firebase Authentication el enlace seguro
      * para cambiar la contraseña.
      */

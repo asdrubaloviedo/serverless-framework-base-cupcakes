@@ -209,6 +209,46 @@ const updateUserSchema = z.object({
 
 /*
  * =========================================================
+ * USER PREFERENCES
+ * =========================================================
+ */
+
+/*
+ * Para consultar las preferencias únicamente necesitamos
+ * identificar al usuario mediante su email.
+ *
+ * .strict() evita aceptar campos adicionales que no formen
+ * parte de esta operación.
+ */
+const getUserPreferencesSchema = z.object({
+  email: emailRequired
+}).strict();
+
+
+/*
+ * Para actualizar las preferencias recibimos siempre el estado
+ * completo de las cinco opciones mostradas en la aplicación.
+ *
+ * Utilizamos z.boolean() intencionalmente para exigir booleanos
+ * JSON reales:
+ *
+ * true
+ * false
+ *
+ * No convertimos strings como "true" o "false".
+ */
+const updateUserPreferencesSchema = z.object({
+  email: emailRequired,
+  recordatorios: z.boolean(),
+  mensajes: z.boolean(),
+  promociones: z.boolean(),
+  sonido: z.boolean(),
+  vibracion: z.boolean()
+}).strict();
+
+
+/*
+ * =========================================================
  * PASSWORD RESET
  * =========================================================
  *
@@ -249,6 +289,22 @@ const validateUpdateUser = (o) =>
 
 
 /*
+ * Valida los parámetros recibidos cuando se consultan
+ * las preferencias del usuario.
+ */
+const validateGetUserPreferences = (o) =>
+  getUserPreferencesSchema.safeParse(o);
+
+
+/*
+ * Valida el body recibido cuando se actualizan
+ * las preferencias del usuario.
+ */
+const validateUpdateUserPreferences = (o) =>
+  updateUserPreferencesSchema.safeParse(o);
+
+
+/*
  * Valida el body recibido cuando el usuario solicita
  * recuperar su contraseña.
  */
@@ -267,6 +323,10 @@ module.exports = {
   validateCreateUserPackage,
   validateCreateUser,
   validateUpdateUser,
+
+  // Preferencias del usuario.
+  validateGetUserPreferences,
+  validateUpdateUserPreferences,
 
   // Recuperación de contraseña.
   validateSendPasswordResetEmail

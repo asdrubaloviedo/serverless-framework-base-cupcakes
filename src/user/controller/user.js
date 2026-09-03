@@ -101,10 +101,10 @@ class UserController {
 
 
     /*
-    * =====================================================
-    * USER
-    * =====================================================
-    */
+     * =====================================================
+     * USER
+     * =====================================================
+     */
 
     static async createOneUser(params = {}) {
 
@@ -127,8 +127,8 @@ class UserController {
 
 
     /*
-    * Actualiza los datos del perfil de un usuario.
-    */
+     * Actualiza los datos del perfil de un usuario.
+     */
     static async updateOneUser(params = {}) {
 
         const {
@@ -145,6 +145,60 @@ class UserController {
             nombre,
             email,
             avatarId
+        });
+    }
+
+
+    /*
+     * =====================================================
+     * USER PREFERENCES
+     * =====================================================
+     */
+
+    /*
+     * Obtiene las preferencias guardadas del usuario.
+     */
+    static async getUserPreferences(params = {}) {
+
+        const {
+            GetUserPreferences
+        } = require('@user/services/user');
+
+        const {
+            email
+        } = params;
+
+        return GetUserPreferences.execute({
+            email
+        });
+    }
+
+
+    /*
+     * Actualiza las preferencias del usuario.
+     */
+    static async updateUserPreferences(params = {}) {
+
+        const {
+            UpdateUserPreferences
+        } = require('@user/services/user');
+
+        const {
+            email,
+            recordatorios,
+            mensajes,
+            promociones,
+            sonido,
+            vibracion
+        } = params;
+
+        return UpdateUserPreferences.execute({
+            email,
+            recordatorios,
+            mensajes,
+            promociones,
+            sonido,
+            vibracion
         });
     }
 

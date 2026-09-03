@@ -87,6 +87,73 @@ class UserRepository {
 
         return UserModel.getCreated({ query, params });
     }
+
+    // Obtiene las preferencias asociadas al usuario.
+    //
+    // La búsqueda se realiza por email porque es el dato que tenemos
+    // disponible desde Firebase en la aplicación Android.
+    //
+    // usuario_preferencias se relaciona con usuarios mediante usuario_id.
+    async getPreferences({ email }) {
+        const query =
+            `
+                SELECT
+                    up.usuario_id,
+                    up.recordatorios,
+                    up.mensajes,
+                    up.promociones,
+                    up.sonido,
+                    up.vibracion
+                FROM usuario_preferencias up
+                INNER JOIN usuarios u
+                    ON u.usuario_id = up.usuario_id
+                WHERE u.email = LOWER($1)
+            `;
+
+        const params = [email];
+
+        return UserModel.getCreated({ query, params });
+    }
+
+    // Actualiza las preferencias del usuario.
+    //
+    // No recibimos usuario_id desde Android. El usuario se identifica
+    // mediante su email y PostgreSQL obtiene internamente su usuario_id.
+    async updatePreferences({
+        email,
+        recordatorios,
+        mensajes,
+        promociones,
+        sonido,
+        vibracion
+    }) {
+        const query =
+            `
+                UPDATE usuario_preferencias
+                SET
+                    recordatorios = $1,
+                    mensajes = $2,
+                    promociones = $3,
+                    sonido = $4,
+                    vibracion = $5
+                WHERE usuario_id = (
+                    SELECT usuario_id
+                    FROM usuarios
+                    WHERE email = LOWER($6)
+                )
+            `;
+
+        const params = [
+            recordatorios,
+            mensajes,
+            promociones,
+            sonido,
+            vibracion,
+            email
+        ];
+
+        return UserModel.update({ query, params });
+    }
 }
 
 module.exports = UserRepository;
