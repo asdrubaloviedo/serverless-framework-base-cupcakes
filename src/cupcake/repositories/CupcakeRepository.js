@@ -532,6 +532,109 @@ class CupcakeRepository {
         });
     }
 
+    async getFeaturedPackageByUserEmail({ lowerCaseEmail }) {
+        const query = `
+            WITH usuario_actual AS (
+                SELECT
+                    usuario_id,
+                    pais
+                FROM usuarios
+                WHERE LOWER(email) = $1
+                LIMIT 1
+            )
+            SELECT
+                p.paquete_id,
+                p.descripcion AS paquete,
+                p.paquete_destacado,
+                p.fecha_creacion,
+
+                pp.moneda,
+                pp.monto_centavos,
+
+                cu.cupcake_id,
+                cu.nombre,
+                im.codigo,
+
+                FALSE AS hecho,
+
+                cu.tiempo,
+                cu.porciones,
+
+                COUNT(cu.cupcake_id) OVER (
+                    PARTITION BY p.paquete_id
+                ) AS total_cupcakes
+
+            FROM usuario_actual ua
+
+            CROSS JOIN paquetes p
+
+            INNER JOIN cupcakes cu
+                ON cu.paquete_id = p.paquete_id
+
+            /*
+            * Selecciona el precio más adecuado según
+            * el país configurado para el usuario.
+            */
+            LEFT JOIN LATERAL (
+                SELECT
+                    pp.moneda,
+                    pp.monto_centavos
+                FROM paquete_precios pp
+                WHERE pp.paquete_id = p.paquete_id
+                AND pp.pais = ua.pais
+                ORDER BY
+                    pp.defecto DESC,
+                    pp.paquete_precios_id ASC
+                LIMIT 1
+            ) pp ON TRUE
+
+            /*
+            * Imagen principal de cada cupcake.
+            */
+            LEFT JOIN imagenes_cupcakes imc
+                ON cu.cupcake_id = imc.cupcake_id
+                AND imc.main = 1
+
+            LEFT JOIN imagenes im
+                ON imc.imagen_id = im.imagen_id
+
+            WHERE
+                /*
+                * Únicamente obtenemos el paquete
+                * seleccionado como destacado.
+                */
+                p.paquete_destacado = TRUE
+
+                /*
+                * El paquete público nunca debe aparecer
+                * como producto destacado de compra.
+                */
+                AND p.paquete_id <> 1
+
+                /*
+                * El usuario solamente debe verlo como
+                * promoción si todavía no posee el paquete.
+                */
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM usuario_paquetes up
+                    WHERE up.usuario_id = ua.usuario_id
+                        AND up.paquete_id = p.paquete_id
+                )
+
+            ORDER BY cu.cupcake_id;
+        `;
+
+        const params = [
+            lowerCaseEmail
+        ];
+
+        return CupcakeModel.getAllNameImageInfoMissingPackagesByUserEmail({
+            query,
+            params,
+        });
+    }
+
     async getAllNameImageMovies() {
         const query = 
             `

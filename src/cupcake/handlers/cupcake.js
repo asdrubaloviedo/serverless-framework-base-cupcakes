@@ -112,6 +112,7 @@ const routes = {
   'POST /collections/cupcake':                        (e) => CupcakeController.saveCupcakeCollection(validBody(e, validateCupcakeCollectionCupcake)),
   'GET /ramdom':                                      (e) => CupcakeController.getAllRamdom(qs(e)),
   'GET /name-image-filtros':                          (e) => CupcakeController.getAllNameImageFiltros(qs(e)),
+  'GET /paquete-destacado/usuario':                   (e) => CupcakeController.getFeaturedPackageByUserEmail(qs(e)),
 };
 
 const handler = withHandler(async (event) => {

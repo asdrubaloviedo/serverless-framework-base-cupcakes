@@ -7,7 +7,8 @@ const {
   GetByIdInfoImageCupcake,
   GetAllRamdomCupcake,
   GetAllNameImageFiltrosCupcake,
-  GetAllNameImageInfoCupcake
+  GetAllNameImageInfoCupcake,
+  GetFeaturedPackageByUserEmail
 } = require('@cupcake/services/cupcake');
 
 const {
@@ -93,6 +94,23 @@ class CupcakeController {
     return GetAllNameImageInfoCupcake.execute({
       email,
       tipo
+    });
+  }
+
+  /*
+   * =========================================================
+   * PAQUETE DESTACADO
+   * =========================================================
+   */
+
+  static async getFeaturedPackageByUserEmail(params = {}) {
+
+    const {
+      email
+    } = params;
+
+    return GetFeaturedPackageByUserEmail.execute({
+      email
     });
   }
 

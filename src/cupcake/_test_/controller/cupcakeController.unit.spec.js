@@ -7,6 +7,8 @@ jest.mock('@cupcake/services/cupcake', () => ({
   GetByIdInfoImageCupcake: { execute: jest.fn().mockResolvedValue(['infoimg']) },
   GetAllRamdomCupcake: { execute: jest.fn().mockResolvedValue(['rand']) },
   GetAllNameImageFiltrosCupcake: { execute: jest.fn().mockResolvedValue(['filtros']) },
+  GetAllNameImageInfoCupcake: { execute: jest.fn().mockResolvedValue(['info-user']) },
+  GetFeaturedPackageByUserEmail: { execute: jest.fn().mockResolvedValue({ paquete_id: 2 }) },
 }));
 
 jest.mock('@cupcake/services/cupcakeUserState', () => ({
@@ -33,11 +35,26 @@ jest.mock('@cupcake/services/cupcakeCollection', () => ({
   },
 }));
 
+jest.mock('@cupcake/services/cupcakeRating', () => ({
+  GetCupcakeRating: {
+    execute: jest.fn().mockResolvedValue({
+      calificacion: 5
+    })
+  },
+
+  SaveCupcakeRating: {
+    execute: jest.fn().mockResolvedValue({
+      ok: true
+    })
+  }
+}));
+
 const C = require('../../controller/cupcake');
 
 const SC = require('@cupcake/services/cupcake');
 const SU = require('@cupcake/services/cupcakeUserState');
 const SCollection = require('@cupcake/services/cupcakeCollection');
+const SRating = require('@cupcake/services/cupcakeRating');
 
 describe('CupcakeController', () => {
 
@@ -371,5 +388,89 @@ describe('CupcakeController', () => {
     expect(
       SC.GetAllNameImageFiltrosCupcake.execute
     ).toHaveBeenCalledWith(p);
+  });
+
+  test('getAllNameImageInfoByUserEmail pasa email y tipo', async () => {
+
+    const result =
+      await C.getAllNameImageInfoByUserEmail({
+        email: 'usuario@gmail.com',
+        tipo: 'paquetes'
+      });
+
+    expect(
+      SC.GetAllNameImageInfoCupcake.execute
+    ).toHaveBeenCalledWith({
+      email: 'usuario@gmail.com',
+      tipo: 'paquetes'
+    });
+
+    expect(result).toEqual([
+      'info-user'
+    ]);
+  });
+
+
+  test('getFeaturedPackageByUserEmail pasa el email al servicio', async () => {
+
+    const result =
+      await C.getFeaturedPackageByUserEmail({
+        email: 'usuario@gmail.com'
+      });
+
+    expect(
+      SC.GetFeaturedPackageByUserEmail.execute
+    ).toHaveBeenCalledWith({
+      email: 'usuario@gmail.com'
+    });
+
+    expect(result).toEqual({
+      paquete_id: 2
+    });
+  });
+
+
+  test('getCupcakeRating pasa email e id como cupcake', async () => {
+
+    const result =
+      await C.getCupcakeRating({
+        email: 'usuario@gmail.com',
+        id: 65
+      });
+
+    expect(
+      SRating.GetCupcakeRating.execute
+    ).toHaveBeenCalledWith({
+      email: 'usuario@gmail.com',
+      cupcake: 65
+    });
+
+    expect(result).toEqual({
+      calificacion: 5
+    });
+  });
+
+  test('saveCupcakeRating pasa los datos al servicio', async () => {
+
+    const result =
+      await C.saveCupcakeRating({
+        email: 'usuario@gmail.com',
+        cupcake: 65,
+        calificacion: 5,
+        comentario: 'Excelente'
+      });
+
+    expect(
+      SRating.SaveCupcakeRating.execute
+    ).toHaveBeenCalledWith({
+      email: 'usuario@gmail.com',
+      cupcake: 65,
+      calificacion: 5,
+      comentario: 'Excelente'
+    });
+
+    expect(result).toEqual({
+      ok: true
+    });
   });
 });

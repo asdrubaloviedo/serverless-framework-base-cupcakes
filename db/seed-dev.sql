@@ -133,17 +133,31 @@ CREATE SEQUENCE paquete_id;
 CREATE TABLE IF NOT EXISTS paquetes (
     paquete_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('paquete_id'),
     habilitado BOOLEAN NOT NULL DEFAULT FALSE,
+    /*
+     * Solo el paquete que queremos promocionar actualmente
+     * deberá tener este valor en TRUE.
+     */
+    paquete_destacado BOOLEAN NOT NULL DEFAULT FALSE,
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     descripcion VARCHAR(50) NOT NULL
 );
 ALTER SEQUENCE paquete_id OWNED BY paquetes.paquete_id;
 
-INSERT INTO paquetes (paquete_id, habilitado, descripcion)
+/*
+ * Garantiza que solamente pueda existir
+ * un paquete destacado a la vez.
+ */
+CREATE UNIQUE INDEX uq_paquete_destacado
+ON paquetes (paquete_destacado)
+WHERE paquete_destacado = TRUE;
+
+INSERT INTO paquetes (paquete_id, habilitado, paquete_destacado, descripcion)
     VALUES
-        (1, TRUE, 'Publico'),
-        (2, TRUE, 'San Valentín basico'),
-        (3, FALSE, 'Pascua basico'),
-        (4, TRUE, 'Navidad basico'),
-        (5, TRUE, 'Halloween basico');
+        (1, TRUE,  FALSE, 'Publico'),
+        (2, TRUE,  TRUE,  'San Valentín basico'),
+        (3, FALSE, FALSE, 'Pascua basico'),
+        (4, TRUE,  FALSE, 'Navidad basico'),
+        (5, TRUE,  FALSE, 'Halloween basico');
 
 SELECT setval(
     'paquete_id',
