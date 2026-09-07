@@ -542,11 +542,34 @@ class CupcakeRepository {
                 WHERE LOWER(email) = $1
                 LIMIT 1
             )
+
             SELECT
                 p.paquete_id,
                 p.descripcion AS paquete,
                 p.paquete_destacado,
                 p.fecha_creacion,
+
+                /*
+                * ---------------------------------------------------------
+                * INDICA SI EL USUARIO YA POSEE EL PAQUETE DESTACADO
+                * ---------------------------------------------------------
+                *
+                * Antes este repository excluía completamente el paquete
+                * cuando existía en usuario_paquetes.
+                *
+                * Ahora siempre devolvemos el paquete destacado y solamente
+                * indicamos si el usuario ya lo posee.
+                *
+                * Consideramos comprado únicamente un paquete que tenga
+                * activo = TRUE.
+                */
+                EXISTS (
+                    SELECT 1
+                    FROM usuario_paquetes up
+                    WHERE up.usuario_id = ua.usuario_id
+                        AND up.paquete_id = p.paquete_id
+                        AND up.activo = TRUE
+                ) AS comprado,
 
                 pp.moneda,
                 pp.monto_centavos,
@@ -579,12 +602,16 @@ class CupcakeRepository {
                 SELECT
                     pp.moneda,
                     pp.monto_centavos
+
                 FROM paquete_precios pp
+
                 WHERE pp.paquete_id = p.paquete_id
-                AND pp.pais = ua.pais
+                    AND pp.pais = ua.pais
+
                 ORDER BY
                     pp.defecto DESC,
                     pp.paquete_precios_id ASC
+
                 LIMIT 1
             ) pp ON TRUE
 
@@ -607,20 +634,9 @@ class CupcakeRepository {
 
                 /*
                 * El paquete público nunca debe aparecer
-                * como producto destacado de compra.
+                * como paquete destacado de compra.
                 */
                 AND p.paquete_id <> 1
-
-                /*
-                * El usuario solamente debe verlo como
-                * promoción si todavía no posee el paquete.
-                */
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM usuario_paquetes up
-                    WHERE up.usuario_id = ua.usuario_id
-                        AND up.paquete_id = p.paquete_id
-                )
 
             ORDER BY cu.cupcake_id;
         `;

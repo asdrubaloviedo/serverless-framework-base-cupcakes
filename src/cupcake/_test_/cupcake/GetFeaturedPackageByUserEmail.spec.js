@@ -1,5 +1,4 @@
 jest.mock('@cupcake/repositories/index', () => {
-
   const repo = {
     getFeaturedPackageByUserEmail: jest.fn()
   };
@@ -23,7 +22,6 @@ describe('GetFeaturedPackageByUserEmail', () => {
   });
 
   test('devuelve [] cuando no se recibe email', async () => {
-
     const result =
       await GetFeaturedPackageByUserEmail.execute({});
 
@@ -34,9 +32,7 @@ describe('GetFeaturedPackageByUserEmail', () => {
     ).not.toHaveBeenCalled();
   });
 
-
   test('convierte el email a minúsculas antes de consultar el repository', async () => {
-
     const repo =
       new CupcakeRepository();
 
@@ -54,9 +50,7 @@ describe('GetFeaturedPackageByUserEmail', () => {
     });
   });
 
-
   test('devuelve [] cuando el repository no encuentra paquete destacado', async () => {
-
     const repo =
       new CupcakeRepository();
 
@@ -71,9 +65,7 @@ describe('GetFeaturedPackageByUserEmail', () => {
     expect(result).toEqual([]);
   });
 
-
   test('devuelve [] cuando el repository devuelve null', async () => {
-
     const repo =
       new CupcakeRepository();
 
@@ -88,9 +80,7 @@ describe('GetFeaturedPackageByUserEmail', () => {
     expect(result).toEqual([]);
   });
 
-
   test('construye correctamente el paquete destacado con precio y cupcakes', async () => {
-
     const repo =
       new CupcakeRepository();
 
@@ -101,6 +91,8 @@ describe('GetFeaturedPackageByUserEmail', () => {
           paquete: 'San Valentín basico',
           paquete_destacado: true,
           fecha_creacion: '2026-09-04T20:57:19.985Z',
+
+          comprado: false,
 
           moneda: 'PEN',
           monto_centavos: 3499,
@@ -119,6 +111,8 @@ describe('GetFeaturedPackageByUserEmail', () => {
           paquete: 'San Valentín basico',
           paquete_destacado: true,
           fecha_creacion: '2026-09-04T20:57:19.985Z',
+
+          comprado: false,
 
           moneda: 'PEN',
           monto_centavos: 3499,
@@ -151,6 +145,8 @@ describe('GetFeaturedPackageByUserEmail', () => {
       paquete_destacado: true,
       fecha_creacion: '2026-09-04T20:57:19.985Z',
 
+      comprado: false,
+
       precio: {
         moneda: 'PEN',
         monto_centavos: 3499,
@@ -180,9 +176,7 @@ describe('GetFeaturedPackageByUserEmail', () => {
     });
   });
 
-
-  test('maneja correctamente un paquete sin precio', async () => {
-
+  test('devuelve comprado true cuando el usuario ya posee el paquete destacado', async () => {
     const repo =
       new CupcakeRepository();
 
@@ -193,6 +187,72 @@ describe('GetFeaturedPackageByUserEmail', () => {
           paquete: 'San Valentín basico',
           paquete_destacado: true,
           fecha_creacion: '2026-09-04T20:57:19.985Z',
+
+          comprado: true,
+
+          moneda: 'PEN',
+          monto_centavos: 3499,
+
+          total_cupcakes: '10',
+
+          cupcake_id: 65,
+          nombre: 'Cupcake Napolitano',
+          codigo: 'https://storage.googleapis.com/cupcakeslife/test1.png',
+          hecho: false,
+          tiempo: 15,
+          porciones: 9
+        }
+      ]);
+
+    const result =
+      await GetFeaturedPackageByUserEmail.execute({
+        email: 'usuario@gmail.com'
+      });
+
+    expect(result.comprado).toBe(true);
+
+    expect(result).toEqual({
+      paquete_id: 2,
+      paquete: 'San Valentín basico',
+      paquete_destacado: true,
+      fecha_creacion: '2026-09-04T20:57:19.985Z',
+
+      comprado: true,
+
+      precio: {
+        moneda: 'PEN',
+        monto_centavos: 3499,
+        monto: 34.99
+      },
+
+      total_cupcakes: 10,
+
+      cupcakes: [
+        {
+          cupcake_id: 65,
+          nombre: 'Cupcake Napolitano',
+          codigo: 'https://storage.googleapis.com/cupcakeslife/test1.png',
+          hecho: false,
+          tiempo: 15,
+          porciones: 9
+        }
+      ]
+    });
+  });
+
+  test('maneja correctamente un paquete sin precio', async () => {
+    const repo =
+      new CupcakeRepository();
+
+    repo.getFeaturedPackageByUserEmail
+      .mockResolvedValue([
+        {
+          paquete_id: 2,
+          paquete: 'San Valentín basico',
+          paquete_destacado: true,
+          fecha_creacion: '2026-09-04T20:57:19.985Z',
+
+          comprado: false,
 
           moneda: null,
           monto_centavos: null,
@@ -218,11 +278,11 @@ describe('GetFeaturedPackageByUserEmail', () => {
       monto_centavos: null,
       monto: null
     });
+
+    expect(result.comprado).toBe(false);
   });
 
-
   test('maneja monto_centavos undefined como precio nulo', async () => {
-
     const repo =
       new CupcakeRepository();
 
@@ -233,6 +293,8 @@ describe('GetFeaturedPackageByUserEmail', () => {
           paquete: 'San Valentín basico',
           paquete_destacado: true,
           fecha_creacion: '2026-09-04T20:57:19.985Z',
+
+          comprado: false,
 
           moneda: undefined,
           monto_centavos: undefined,
@@ -258,5 +320,7 @@ describe('GetFeaturedPackageByUserEmail', () => {
       monto_centavos: null,
       monto: null
     });
+
+    expect(result.comprado).toBe(false);
   });
 });

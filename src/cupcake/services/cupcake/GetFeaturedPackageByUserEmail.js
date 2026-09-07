@@ -4,10 +4,18 @@ const { CupcakeRepository } = require("@cupcake/repositories/index");
  * GET paquete destacado para un usuario.
  *
  * Obtiene el paquete marcado como:
+ *
  * paquete_destacado = TRUE
  *
- * El repository también se encarga de verificar
- * que el usuario todavía no posea ese paquete.
+ * El repository devuelve ahora el paquete destacado
+ * independientemente de si el usuario ya lo posee.
+ *
+ * Además devuelve:
+ *
+ * comprado = true
+ * comprado = false
+ *
+ * según exista un registro activo en usuario_paquetes.
  */
 class GetFeaturedPackageByUserEmail {
 
@@ -40,6 +48,7 @@ class GetFeaturedPackageByUserEmail {
      * - imagen principal
      * - tiempo
      * - porciones
+     * - estado de compra del usuario
      */
     const cupcakes =
       await cupcakeRepository.getFeaturedPackageByUserEmail({
@@ -48,8 +57,17 @@ class GetFeaturedPackageByUserEmail {
 
     /*
      * Si no existe paquete destacado,
-     * o el usuario ya posee el paquete,
      * devolvemos un arreglo vacío.
+     *
+     * IMPORTANTE:
+     *
+     * Que el usuario ya posea el paquete YA NO provoca
+     * que lleguemos aquí con un arreglo vacío.
+     *
+     * En ese caso el repository devuelve igualmente
+     * el paquete con:
+     *
+     * comprado = true
      */
     if (!cupcakes || cupcakes.length === 0) {
       return [];
@@ -57,14 +75,17 @@ class GetFeaturedPackageByUserEmail {
 
     /*
      * Todos los registros pertenecen al mismo
-     * paquete destacado. Tomamos el primero
-     * para obtener la información general.
+     * paquete destacado.
+     *
+     * Tomamos el primero para obtener
+     * la información general.
      */
     const {
       paquete_id,
       paquete,
       paquete_destacado,
       fecha_creacion,
+      comprado,
       moneda,
       monto_centavos,
       total_cupcakes,
@@ -86,6 +107,14 @@ class GetFeaturedPackageByUserEmail {
       paquete_destacado,
       fecha_creacion,
 
+      /*
+       * Estado de adquisición del paquete destacado.
+       *
+       * Boolean(...) garantiza que la respuesta final
+       * siempre sea true o false.
+       */
+      comprado: Boolean(comprado),
+
       precio: {
         moneda: moneda || null,
         monto_centavos: montoCentavos,
@@ -104,6 +133,7 @@ class GetFeaturedPackageByUserEmail {
           paquete,
           paquete_destacado,
           fecha_creacion,
+          comprado,
           moneda,
           monto_centavos,
           total_cupcakes,
@@ -114,5 +144,4 @@ class GetFeaturedPackageByUserEmail {
   }
 }
 
-module.exports =
-  GetFeaturedPackageByUserEmail;
+module.exports = GetFeaturedPackageByUserEmail;
