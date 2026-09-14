@@ -8,9 +8,11 @@ const FirebaseAuthService = require('@user/services/user/FirebaseAuthService');
  * Genera el enlace oficial de Firebase para que el usuario
  * pueda cambiar su contraseña.
  *
- * Este servicio NO cambia la contraseña y tampoco envía
- * correos. Firebase sigue siendo responsable de validar el
- * enlace y realizar el cambio de contraseña de forma segura.
+ * Antes de generar el enlace verificamos explícitamente que
+ * el correo exista en Firebase Authentication.
+ *
+ * Esto nos permite informar al frontend cuando un correo no
+ * se encuentra registrado.
  */
 class GeneratePasswordResetLink {
 
@@ -18,48 +20,97 @@ class GeneratePasswordResetLink {
      * =========================================================
      * EXECUTE
      * =========================================================
-     *
-     * Recibe el correo del usuario y devuelve el enlace de
-     * recuperación generado por Firebase Authentication.
      */
     static async execute({ email }) {
 
         if (!email) {
-            throw new Error('User email is required.');
+
+            const error =
+                new Error(
+                    'User email is required.'
+                );
+
+            error.statusCode = 400;
+
+            throw error;
         }
+
+
+        const auth =
+            FirebaseAuthService.getAuth();
+
 
         try {
 
-            const auth = FirebaseAuthService.getAuth();
+            /*
+             * =================================================
+             * VERIFICAR QUE EL USUARIO EXISTA
+             * =================================================
+             *
+             * No dependemos de generatePasswordResetLink()
+             * para saber si el correo está registrado.
+             *
+             * Consultamos directamente Firebase Authentication.
+             */
+            await auth.getUserByEmail(
+                email
+            );
+
 
             /*
-             * Firebase genera un enlace de un solo uso asociado
-             * al usuario y al proyecto de Firebase.
-             *
-             * El enlace seguirá llevando al flujo seguro de
-             * Firebase para establecer la nueva contraseña.
+             * =================================================
+             * GENERAR ENLACE
+             * =================================================
              */
-            return await auth.generatePasswordResetLink(email);
+            return await auth.generatePasswordResetLink(
+                email
+            );
 
         } catch (error) {
 
-            /*
-             * No exponemos al cliente errores internos de Firebase,
-             * IDs de proyecto ni información sensible.
-             *
-             * También evitamos utilizar aquí mensajes diferentes
-             * para "usuario encontrado" y "usuario inexistente",
-             * porque posteriormente el endpoint responderá de forma
-             * neutra para reducir enumeración de cuentas.
-             */
             console.error(
                 'Error generating Firebase password reset link:',
                 error
             );
 
-            throw new Error(
-                'Error generating password reset link'
-            );
+
+            /*
+             * =================================================
+             * CORREO NO REGISTRADO
+             * =================================================
+             *
+             * getUserByEmail() devuelve auth/user-not-found
+             * cuando Firebase no encuentra ningún usuario
+             * asociado al correo.
+             */
+            if (
+                error?.code === 'auth/user-not-found'
+            ) {
+
+                const userNotFoundError =
+                    new Error(
+                        'Este correo no se encuentra registrado'
+                    );
+
+                userNotFoundError.statusCode = 404;
+
+                throw userNotFoundError;
+            }
+
+
+            /*
+             * =================================================
+             * OTROS ERRORES
+             * =================================================
+             */
+            const internalError =
+                new Error(
+                    'Error generating password reset link'
+                );
+
+            internalError.statusCode = 500;
+
+            throw internalError;
         }
     }
 }
