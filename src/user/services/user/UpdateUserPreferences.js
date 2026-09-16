@@ -16,7 +16,8 @@ class UpdateUserPreferences {
         promociones,
         musica,
         efectos_sonido,
-        vibracion
+        vibracion,
+        tema
     }) {
         const userRepository = new UserRepository();
 
@@ -30,7 +31,8 @@ class UpdateUserPreferences {
             promociones,
             musica,
             efectos_sonido,
-            vibracion
+            vibracion,
+            tema
         });
 
         /*

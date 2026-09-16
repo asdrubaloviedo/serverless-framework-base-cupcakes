@@ -138,6 +138,7 @@ describe('UserRepository', () => {
     expect(query).toContain('up.musica');
     expect(query).toContain('up.efectos_sonido');
     expect(query).toContain('up.vibracion');
+    expect(query).toContain('up.tema');
 
     expect(params).toEqual([
       'asdrubaloviedo@gmail.com'
@@ -154,7 +155,8 @@ describe('UserRepository', () => {
       promociones: false,
       musica: true,
       efectos_sonido: false,
-      vibracion: true
+      vibracion: true,
+      tema: 'dark'
     });
 
     expect(UserModel.update).toHaveBeenCalledTimes(1);
@@ -171,10 +173,11 @@ describe('UserRepository', () => {
     expect(query).toContain('musica = $4');
     expect(query).toContain('efectos_sonido = $5');
     expect(query).toContain('vibracion = $6');
+    expect(query).toContain('tema = $7');
 
     expect(query).toContain('SELECT usuario_id');
     expect(query).toContain('FROM usuarios');
-    expect(query).toContain('WHERE email = LOWER($7)');
+    expect(query).toContain('WHERE email = LOWER($8)');
 
     expect(params).toEqual([
       false,
@@ -183,6 +186,7 @@ describe('UserRepository', () => {
       true,
       false,
       true,
+      'dark',
       'asdrubaloviedo@gmail.com'
     ]);
   });

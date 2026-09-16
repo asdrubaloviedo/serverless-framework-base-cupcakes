@@ -378,7 +378,7 @@ describe('user/schema/user', () => {
 
   describe('validateUpdateUserPreferences', () => {
 
-    test('ok: acepta las seis preferencias booleanas', () => {
+    test('ok: acepta las preferencias booleanas y el tema', () => {
       const out = S.validateUpdateUserPreferences({
         email: 'ASDRUBALOVIEDO@GMAIL.COM',
         recordatorios: true,
@@ -386,7 +386,8 @@ describe('user/schema/user', () => {
         promociones: true,
         musica: false,
         efectos_sonido: true,
-        vibracion: true
+        vibracion: true,
+        tema: 'dark'
       });
 
       expect(out.success).toBe(true);
@@ -398,9 +399,34 @@ describe('user/schema/user', () => {
         promociones: true,
         musica: false,
         efectos_sonido: true,
-        vibracion: true
+        vibracion: true,
+        tema: 'dark'
       });
     });
+
+
+    test.each([
+      'system',
+      'light',
+      'dark'
+    ])(
+      'ok: acepta tema "%s"',
+      (tema) => {
+        const out = S.validateUpdateUserPreferences({
+          email: 'a@a.com',
+          recordatorios: true,
+          mensajes: false,
+          promociones: true,
+          musica: false,
+          efectos_sonido: true,
+          vibracion: true,
+          tema
+        });
+
+        expect(out.success).toBe(true);
+        expect(out.data.tema).toBe(tema);
+      }
+    );
 
 
     test('error: una preferencia faltante', () => {
@@ -410,11 +436,43 @@ describe('user/schema/user', () => {
         mensajes: false,
         promociones: true,
         musica: false,
-        efectos_sonido: true
+        efectos_sonido: true,
+        tema: 'system'
 
         /*
          * vibracion falta intencionalmente.
          */
+      });
+
+      expect(out.success).toBe(false);
+    });
+
+
+    test('error: tema faltante', () => {
+      const out = S.validateUpdateUserPreferences({
+        email: 'a@a.com',
+        recordatorios: true,
+        mensajes: false,
+        promociones: true,
+        musica: false,
+        efectos_sonido: true,
+        vibracion: true
+      });
+
+      expect(out.success).toBe(false);
+    });
+
+
+    test('error: rechaza un tema no permitido', () => {
+      const out = S.validateUpdateUserPreferences({
+        email: 'a@a.com',
+        recordatorios: true,
+        mensajes: false,
+        promociones: true,
+        musica: false,
+        efectos_sonido: true,
+        vibracion: true,
+        tema: 'blue'
       });
 
       expect(out.success).toBe(false);
@@ -429,7 +487,8 @@ describe('user/schema/user', () => {
         promociones: true,
         musica: false,
         efectos_sonido: true,
-        vibracion: true
+        vibracion: true,
+        tema: 'light'
       });
 
       expect(out.success).toBe(false);
@@ -444,7 +503,8 @@ describe('user/schema/user', () => {
         promociones: true,
         musica: false,
         efectos_sonido: true,
-        vibracion: true
+        vibracion: true,
+        tema: 'dark'
       });
 
       expect(out.success).toBe(false);
@@ -464,6 +524,7 @@ describe('user/schema/user', () => {
         musica: false,
         efectos_sonido: true,
         vibracion: true,
+        tema: 'system',
         campoExtra: 'no permitido'
       });
 

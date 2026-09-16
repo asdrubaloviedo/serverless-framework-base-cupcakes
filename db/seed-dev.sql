@@ -2791,6 +2791,7 @@ CREATE TABLE IF NOT EXISTS usuario_preferencias (
     musica BOOLEAN NOT NULL DEFAULT FALSE,
     efectos_sonido BOOLEAN NOT NULL DEFAULT FALSE,
     vibracion BOOLEAN NOT NULL DEFAULT TRUE,
+    tema VARCHAR(10) NOT NULL DEFAULT 'system' CHECK (tema IN ('system', 'light', 'dark')),
 
     FOREIGN KEY (usuario_id)
         REFERENCES usuarios(usuario_id)

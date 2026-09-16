@@ -244,7 +244,12 @@ const updateUserPreferencesSchema = z.object({
   promociones: z.boolean(),
   musica: z.boolean(),
   efectos_sonido: z.boolean(),
-  vibracion: z.boolean()
+  vibracion: z.boolean(),
+  tema: z.enum([
+    'system',
+    'light',
+    'dark'
+  ])
 }).strict();
 
 

@@ -190,7 +190,8 @@ class UserController {
             promociones,
             musica,
             efectos_sonido,
-            vibracion
+            vibracion,
+            tema
         } = params;
 
         return UpdateUserPreferences.execute({
@@ -200,7 +201,8 @@ class UserController {
             promociones,
             musica,
             efectos_sonido,
-            vibracion
+            vibracion,
+            tema
         });
     }
 
