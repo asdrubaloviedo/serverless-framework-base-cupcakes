@@ -167,13 +167,41 @@ describe('UserRepository', () => {
     } = UserModel.update.mock.calls[0][0];
 
     expect(query).toContain('UPDATE usuario_preferencias');
-    expect(query).toContain('recordatorios = $1');
-    expect(query).toContain('mensajes = $2');
-    expect(query).toContain('promociones = $3');
-    expect(query).toContain('musica = $4');
-    expect(query).toContain('efectos_sonido = $5');
-    expect(query).toContain('vibracion = $6');
-    expect(query).toContain('tema = $7');
+
+    /*
+     * Las preferencias utilizan COALESCE porque el endpoint
+     * permite ahora actualizaciones parciales.
+     *
+     * Si el parámetro llega como null, PostgreSQL conserva
+     * el valor actual de la columna.
+     */
+    expect(query).toContain(
+      'recordatorios = COALESCE($1, recordatorios)'
+    );
+
+    expect(query).toContain(
+      'mensajes = COALESCE($2, mensajes)'
+    );
+
+    expect(query).toContain(
+      'promociones = COALESCE($3, promociones)'
+    );
+
+    expect(query).toContain(
+      'musica = COALESCE($4, musica)'
+    );
+
+    expect(query).toContain(
+      'efectos_sonido = COALESCE($5, efectos_sonido)'
+    );
+
+    expect(query).toContain(
+      'vibracion = COALESCE($6, vibracion)'
+    );
+
+    expect(query).toContain(
+      'tema = COALESCE($7, tema)'
+    );
 
     expect(query).toContain('SELECT usuario_id');
     expect(query).toContain('FROM usuarios');
@@ -186,6 +214,53 @@ describe('UserRepository', () => {
       true,
       false,
       true,
+      'dark',
+      'asdrubaloviedo@gmail.com'
+    ]);
+  });
+
+
+  /*
+   * =========================================================
+   * UPDATE PARCIAL DE PREFERENCIAS
+   * =========================================================
+   *
+   * AparienciaActivity necesita poder modificar únicamente
+   * el tema sin alterar las demás preferencias del usuario.
+   */
+  test('updatePreferences permite actualizar únicamente el tema', async () => {
+    const repo = new UserRepository();
+
+    await repo.updatePreferences({
+      email: 'asdrubaloviedo@gmail.com',
+      tema: 'dark'
+    });
+
+    expect(UserModel.update).toHaveBeenCalledTimes(1);
+
+    const {
+      query,
+      params
+    } = UserModel.update.mock.calls[0][0];
+
+    expect(query).toContain(
+      'tema = COALESCE($7, tema)'
+    );
+
+    /*
+     * Las preferencias que no fueron enviadas deben llegar
+     * al modelo como null.
+     *
+     * PostgreSQL conservará sus valores actuales mediante
+     * COALESCE.
+     */
+    expect(params).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       'dark',
       'asdrubaloviedo@gmail.com'
     ]);

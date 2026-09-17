@@ -378,7 +378,7 @@ describe('user/schema/user', () => {
 
   describe('validateUpdateUserPreferences', () => {
 
-    test('ok: acepta las preferencias booleanas y el tema', () => {
+    test('ok: acepta todas las preferencias booleanas y el tema', () => {
       const out = S.validateUpdateUserPreferences({
         email: 'ASDRUBALOVIEDO@GMAIL.COM',
         recordatorios: true,
@@ -405,6 +405,10 @@ describe('user/schema/user', () => {
     });
 
 
+    /*
+     * El endpoint continúa aceptando los tres temas
+     * permitidos por la aplicación.
+     */
     test.each([
       'system',
       'light',
@@ -414,12 +418,6 @@ describe('user/schema/user', () => {
       (tema) => {
         const out = S.validateUpdateUserPreferences({
           email: 'a@a.com',
-          recordatorios: true,
-          mensajes: false,
-          promociones: true,
-          musica: false,
-          efectos_sonido: true,
-          vibracion: true,
           tema
         });
 
@@ -429,49 +427,71 @@ describe('user/schema/user', () => {
     );
 
 
-    test('error: una preferencia faltante', () => {
+    /*
+     * Las preferencias son ahora opcionales individualmente.
+     *
+     * Esto permite actualizar una sola preferencia sin
+     * modificar las demás.
+     */
+    test('ok: permite actualizar únicamente una preferencia', () => {
       const out = S.validateUpdateUserPreferences({
         email: 'a@a.com',
-        recordatorios: true,
-        mensajes: false,
-        promociones: true,
-        musica: false,
-        efectos_sonido: true,
-        tema: 'system'
-
-        /*
-         * vibracion falta intencionalmente.
-         */
+        recordatorios: true
       });
 
-      expect(out.success).toBe(false);
+      expect(out.success).toBe(true);
+
+      expect(out.data).toEqual({
+        email: 'a@a.com',
+        recordatorios: true
+      });
     });
 
 
-    test('error: tema faltante', () => {
+    /*
+     * Caso utilizado por AparienciaActivity.
+     *
+     * Android podrá enviar solamente email + tema.
+     */
+    test('ok: permite actualizar únicamente el tema', () => {
       const out = S.validateUpdateUserPreferences({
         email: 'a@a.com',
-        recordatorios: true,
-        mensajes: false,
-        promociones: true,
-        musica: false,
-        efectos_sonido: true,
-        vibracion: true
+        tema: 'dark'
+      });
+
+      expect(out.success).toBe(true);
+
+      expect(out.data).toEqual({
+        email: 'a@a.com',
+        tema: 'dark'
+      });
+    });
+
+
+    /*
+     * Aunque las preferencias sean opcionales individualmente,
+     * el PATCH debe modificar al menos una.
+     */
+    test('error: rechaza email sin ninguna preferencia para actualizar', () => {
+      const out = S.validateUpdateUserPreferences({
+        email: 'a@a.com'
       });
 
       expect(out.success).toBe(false);
+
+      const issue = out.error.issues.find(
+        (i) => i.path.join('.') === 'update'
+      );
+
+      expect(
+        issue?.message
+      ).toBe('At least one preference to update is required.');
     });
 
 
     test('error: rechaza un tema no permitido', () => {
       const out = S.validateUpdateUserPreferences({
         email: 'a@a.com',
-        recordatorios: true,
-        mensajes: false,
-        promociones: true,
-        musica: false,
-        efectos_sonido: true,
-        vibracion: true,
         tema: 'blue'
       });
 
@@ -482,13 +502,7 @@ describe('user/schema/user', () => {
     test('error: no acepta strings "true" o "false" como booleanos', () => {
       const out = S.validateUpdateUserPreferences({
         email: 'a@a.com',
-        recordatorios: 'true',
-        mensajes: false,
-        promociones: true,
-        musica: false,
-        efectos_sonido: true,
-        vibracion: true,
-        tema: 'light'
+        recordatorios: 'true'
       });
 
       expect(out.success).toBe(false);
@@ -498,12 +512,6 @@ describe('user/schema/user', () => {
     test('error: email inválido', () => {
       const out = S.validateUpdateUserPreferences({
         email: 'correo-invalido',
-        recordatorios: true,
-        mensajes: false,
-        promociones: true,
-        musica: false,
-        efectos_sonido: true,
-        vibracion: true,
         tema: 'dark'
       });
 
@@ -518,12 +526,6 @@ describe('user/schema/user', () => {
     test('error: rechaza campos adicionales por ser strict', () => {
       const out = S.validateUpdateUserPreferences({
         email: 'a@a.com',
-        recordatorios: true,
-        mensajes: false,
-        promociones: true,
-        musica: false,
-        efectos_sonido: true,
-        vibracion: true,
         tema: 'system',
         campoExtra: 'no permitido'
       });

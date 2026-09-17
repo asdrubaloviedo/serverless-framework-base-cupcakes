@@ -226,31 +226,52 @@ const getUserPreferencesSchema = z.object({
 
 
 /*
- * Para actualizar las preferencias recibimos siempre el estado
- * completo de las seis opciones mostradas en la aplicación.
+ * Permite actualizar una o varias preferencias del usuario.
  *
- * Utilizamos z.boolean() intencionalmente para exigir booleanos
- * JSON reales:
+ * El email siempre es obligatorio porque identifica al usuario.
  *
- * true
- * false
+ * Las preferencias son opcionales para permitir actualizaciones
+ * parciales. Por ejemplo, Apariencia puede enviar únicamente:
  *
- * No convertimos strings como "true" o "false".
+ * {
+ *   "email": "usuario@correo.com",
+ *   "tema": "dark"
+ * }
+ *
+ * Mientras que PreferenciasActivity puede continuar enviando
+ * todas las preferencias como hasta ahora.
  */
 const updateUserPreferencesSchema = z.object({
   email: emailRequired,
-  recordatorios: z.boolean(),
-  mensajes: z.boolean(),
-  promociones: z.boolean(),
-  musica: z.boolean(),
-  efectos_sonido: z.boolean(),
-  vibracion: z.boolean(),
+
+  recordatorios: z.boolean().optional(),
+  mensajes: z.boolean().optional(),
+  promociones: z.boolean().optional(),
+  musica: z.boolean().optional(),
+  efectos_sonido: z.boolean().optional(),
+  vibracion: z.boolean().optional(),
+
   tema: z.enum([
     'system',
     'light',
     'dark'
-  ])
-}).strict();
+  ]).optional()
+})
+  .strict()
+  .refine(
+    (data) =>
+      data.recordatorios !== undefined ||
+      data.mensajes !== undefined ||
+      data.promociones !== undefined ||
+      data.musica !== undefined ||
+      data.efectos_sonido !== undefined ||
+      data.vibracion !== undefined ||
+      data.tema !== undefined,
+    {
+      message: 'At least one preference to update is required.',
+      path: ['update']
+    }
+  );
 
 
 /*
