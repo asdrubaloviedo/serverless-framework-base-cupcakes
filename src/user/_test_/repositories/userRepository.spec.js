@@ -13,7 +13,7 @@ beforeEach(() => jest.clearAllMocks());
 
 describe('UserRepository', () => {
 
-  test('create arma SQL y pasa params', async () => {
+  test('create separa primer y segundo nombre y pasa los params correctos', async () => {
     const repo = new UserRepository();
 
     await repo.create({
@@ -27,7 +27,7 @@ describe('UserRepository', () => {
     });
   });
 
-  test('create con solo un nombre usa segundo nombre indefinido', async () => {
+  test('create con solo un nombre deja segundo nombre vacío', async () => {
     const repo = new UserRepository();
 
     await repo.create({
@@ -37,11 +37,11 @@ describe('UserRepository', () => {
 
     expect(UserModel.create).toHaveBeenCalledWith({
       query: expect.stringContaining('INSERT INTO usuarios'),
-      params: ['Juan', 'indefinido', 'PER', 'a@a.com'],
+      params: ['Juan', '', 'PER', 'a@a.com'],
     });
   });
 
-  test('create sin nombre usa valores por defecto', async () => {
+  test('create sin nombre deja primer y segundo nombre vacíos', async () => {
     const repo = new UserRepository();
 
     await repo.create({
@@ -50,7 +50,7 @@ describe('UserRepository', () => {
 
     expect(UserModel.create).toHaveBeenCalledWith({
       query: expect.stringContaining('INSERT INTO usuarios'),
-      params: ['', 'indefinido', 'PER', 'a@a.com'],
+      params: ['', '', 'PER', 'a@a.com'],
     });
   });
 

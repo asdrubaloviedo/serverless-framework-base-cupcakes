@@ -10,7 +10,13 @@ class UserRepository {
             .trim()
             .replace(/\s+/g, ' ');
 
-        const [primerNombre = 'indefinido', segundoNombre = 'indefinido'] = normalized.split(' ');
+        const partes = normalized.split(' ');
+
+        const primerNombre =
+            partes[0] || '';
+
+        const segundoNombre =
+            partes.slice(1).join(' ');
 
         return {
             primerNombre,
