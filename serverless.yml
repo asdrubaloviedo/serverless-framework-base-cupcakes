@@ -28,12 +28,12 @@ custom:
 
   db:
     local:
-      host: 127.0.0.1
-      port: '5432'
-      user: postgres
-      password: postgres
-      name: cupcakes
-      sslmode: disable
+      host: ${env:DB_HOST}
+      port: ${env:DB_PORT}
+      user: ${env:DB_USER}
+      password: ${env:DB_PASSWORD}
+      name: ${env:DB_NAME}
+      sslmode: ${env:PGSSLMODE}
 
   ssmPrefixByStage:
     dev: /cupcakes/dev
