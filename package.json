@@ -21,12 +21,16 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
+    "playwright:api:dev": "cross-env TEST_ENV=dev playwright test --config=playwright.config.js",
+    "playwright:api:local": "cross-env TEST_ENV=local playwright test --config=playwright.config.js",
+    "playwright:api:report": "playwright show-report",
     "create-domain:dev": "npm run check:node:dev && serverless create_domain --stage dev",
     "delete-domain:dev": "npm run check:node:dev && serverless delete_domain --stage dev",
     "check:node:local": "node -e \"const v=Number(process.versions.node.split('.')[0]); if(v !== 20){ console.error('Usa Node 20 para local'); process.exit(1) }\"",
     "check:node:dev": "node -e \"const v=Number(process.versions.node.split('.')[0]); if(v !== 22){ console.error('Usa Node 22 para dev/CI'); process.exit(1) }\"",
     "check:node": "node -e \"const v=Number(process.versions.node.split('.')[0]); if(![20,22].includes(v)){ console.error('Usa Node 20 o 22'); process.exit(1) }\"",
-    "logs:cupcake": "npm run check:node:dev && serverless logs -f cupcake -t --stage dev"
+    "logs:cupcake": "npm run check:node:dev && serverless logs -f cupcake -t --stage dev",
+    "playwright:api": "playwright test --config=playwright.config.js"
   },
   "dependencies": {
     "aws-sdk": "^2.1691.0",
@@ -43,6 +47,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "cross-env": "^7.0.3",
     "jest": "^30.0.4",
     "serverless": "3.40.0",
     "serverless-domain-manager": "^8.0.0",
