@@ -1,0 +1,3 @@
+projectId: ${ssm:/cupcakes/dev/FIREBASE_PROJECT_ID}
+clientEmail: ${ssm:/cupcakes/dev/FIREBASE_CLIENT_EMAIL}
+privateKey: ${ssm:/cupcakes/dev/FIREBASE_PRIVATE_KEY}

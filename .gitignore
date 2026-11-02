@@ -21,8 +21,11 @@ jest-stare/
 jest-html-reporters-*.html
 
 # Env / credenciales
+.env.local
+.env.dev
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 

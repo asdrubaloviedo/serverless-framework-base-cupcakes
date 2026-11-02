@@ -10,6 +10,7 @@ params:
 
 custom:
   stage: ${opt:stage, 'local'}
+  firebaseConfig: ${file(./config/firebase.${self:custom.stage}.yml)}
 
   runtimeByStage:
     local: nodejs20.x
@@ -123,9 +124,9 @@ provider:
     # Correo remitente utilizado para emails personalizados.
     SES_FROM_EMAIL: ${env:SES_FROM_EMAIL}
 
-    FIREBASE_PROJECT_ID: ${ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/FIREBASE_PROJECT_ID}
-    FIREBASE_CLIENT_EMAIL: ${ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/FIREBASE_CLIENT_EMAIL}
-    FIREBASE_PRIVATE_KEY: ${ssm:${self:custom.ssmPrefixByStage.${self:custom.stage}}/FIREBASE_PRIVATE_KEY}
+    FIREBASE_PROJECT_ID: ${self:custom.firebaseConfig.projectId}
+    FIREBASE_CLIENT_EMAIL: ${self:custom.firebaseConfig.clientEmail}
+    FIREBASE_PRIVATE_KEY: ${self:custom.firebaseConfig.privateKey}
 
   versionFunctions: true
 
