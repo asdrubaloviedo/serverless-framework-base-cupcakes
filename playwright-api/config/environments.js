@@ -14,6 +14,7 @@ const appName = 'cupcakeslife';
 
 const modules = {
   category: 'categorias',
+  cupcake: 'cupcakes',
 };
 
 const environment = process.env.TEST_ENV || 'dev';
