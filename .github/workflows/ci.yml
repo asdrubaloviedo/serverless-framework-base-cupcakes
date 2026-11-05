@@ -16,6 +16,20 @@ permissions:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+  # Valores ficticios exclusivos para CI
+  DB_HOST: localhost
+  DB_PORT: "5432"
+  DB_USER: ci_user
+  DB_PASSWORD: ci_dummy_password
+  DB_NAME: cupcakeslife_ci
+  PGSSLMODE: disable
+
+  SES_FROM_EMAIL: ci@example.com
+
+  FIREBASE_PROJECT_ID: cupcakeslife-ci
+  FIREBASE_CLIENT_EMAIL: ci@cupcakeslife-ci.iam.gserviceaccount.com
+  FIREBASE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nCI_DUMMY_KEY\n-----END PRIVATE KEY-----\n"
+
 jobs:
   ci:
     runs-on: ubuntu-latest
