@@ -2,6 +2,10 @@
 const { test, expect } = require('@playwright/test');
 const { modules } = require('./config/environments');
 
+const EMAIL_USUARIO =
+  process.env.TEST_USER_EMAIL || 'asdrubaloviedo@gmail.com';
+const EMAIL_INEXISTENTE = 'usuario-inexistente-qa@example.com';
+
 function validarEstructuraCategorias(categorias) {
   expect(Array.isArray(categorias)).toBe(true);
 
@@ -41,7 +45,7 @@ test.describe('API - Categorías', () => {
       `${modules.category}/categorias-imagen-cantidad/usuario`,
       {
         params: {
-          email: process.env.TEST_USER_EMAIL || 'asdrubaloviedo@gmail.com',
+          email: EMAIL_USUARIO,
         },
       }
     );
@@ -54,35 +58,34 @@ test.describe('API - Categorías', () => {
     validarEstructuraCategorias(body);
   });
 
-  
-    test('GET categorías disponibles para un usuario sin email', async ({ request }) => {
-        const response = await request.get(
-            `${modules.category}/categorias-imagen-cantidad/usuario`
-        );
+  test('GET categorías disponibles para un usuario sin email', async ({ request }) => {
+    const response = await request.get(
+      `${modules.category}/categorias-imagen-cantidad/usuario`
+    );
 
-        expect(response.status()).toBe(200);
-        expect(response.headers()['content-type']).toContain('application/json');
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('application/json');
 
-        const body = await response.json();
+    const body = await response.json();
 
-        validarEstructuraCategorias(body);
-    });
-    
-    test('GET categorías para un usuario inexistente', async ({ request }) => {
-        const response = await request.get(
-            `${modules.category}/categorias-imagen-cantidad/usuario`,
-            {
-            params: {
-                email: 'usuario-inexistente-qa@example.com',
-            },
-            }
-        );
+    validarEstructuraCategorias(body);
+  });
 
-        expect(response.status()).toBe(200);
-        expect(response.headers()['content-type']).toContain('application/json');
+  test('GET categorías para un usuario inexistente', async ({ request }) => {
+    const response = await request.get(
+      `${modules.category}/categorias-imagen-cantidad/usuario`,
+      {
+        params: {
+          email: EMAIL_INEXISTENTE,
+        },
+      }
+    );
 
-        const body = await response.json();
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('application/json');
 
-        expect(body).toEqual([]);
-    });
+    const body = await response.json();
+
+    expect(body).toEqual([]);
+  });
 });
