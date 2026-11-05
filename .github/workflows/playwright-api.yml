@@ -1,0 +1,52 @@
+
+name: CI - Playwright API Testing
+
+on:
+  push:
+    branches:
+      - development
+      - 'feature/**'
+  pull_request:
+    branches:
+      - development
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  playwright-api:
+    name: Playwright API Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Playwright API tests
+        env:
+          CI: "true"
+        run: npm run playwright:api:dev
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-api-report
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: warn

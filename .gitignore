@@ -34,3 +34,12 @@ jest-html-reporters-*.html
 .idea/
 .DS_Store
 Thumbs.db
+
+# Playwright - Reportes y resultados
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/
+
+# Playwright - Sesiones y credenciales locales
+/playwright/.auth/
