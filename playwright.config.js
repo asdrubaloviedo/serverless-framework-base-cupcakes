@@ -8,7 +8,8 @@ module.exports = defineConfig({
 
   timeout: 30000,
   retries: 0,
-  workers: 1,
+  workers: 6,
+  fullyParallel: true,
 
   reporter: [['list'], ['html', { open: 'never' }]],
 
