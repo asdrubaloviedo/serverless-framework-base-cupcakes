@@ -1,7 +1,15 @@
+
 // jest.config.js
 module.exports = {
   verbose: true,
   testEnvironment: 'node',
+
+  // Excluir las pruebas de Playwright de las ejecuciones de Jest
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/playwright-api/'
+  ],
+
   moduleNameMapper: {
     '^@environment/(.*)$': '<rootDir>/environment/$1',
     '^@src/(.*)$': '<rootDir>/src/$1',
@@ -15,8 +23,11 @@ module.exports = {
     '^@db$': '<rootDir>/db',
     '^@db/(.*)$': '<rootDir>/db/$1'
   },
+
   setupFiles: ['<rootDir>/test/setup-db-mock.js'],
+
   collectCoverage: true,
+
   // Limita la cobertura a estas carpetas
   collectCoverageFrom: [
     'src/category/**/*.js',
@@ -28,8 +39,15 @@ module.exports = {
     'src/recipe/**/*.js',
     'src/user/**/*.js'
   ],
+
   coverageReporters: ['text', 'lcov'],
+
   coverageThreshold: {
-    global: { statements: 90, branches: 80, functions: 90, lines: 90 }
+    global: {
+      statements: 90,
+      branches: 80,
+      functions: 90,
+      lines: 90
+    }
   }
 };
