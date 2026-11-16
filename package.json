@@ -30,7 +30,8 @@
     "check:node:dev": "node -e \"const v=Number(process.versions.node.split('.')[0]); if(v !== 22){ console.error('Usa Node 22 para dev/CI'); process.exit(1) }\"",
     "check:node": "node -e \"const v=Number(process.versions.node.split('.')[0]); if(![20,22].includes(v)){ console.error('Usa Node 20 o 22'); process.exit(1) }\"",
     "logs:cupcake": "npm run check:node:dev && serverless logs -f cupcake -t --stage dev",
-    "playwright:api": "playwright test --config=playwright.config.js"
+    "playwright:api": "playwright test --config=playwright.config.js",
+    "general:tests": "npm run test:coverage && npm run playwright:api:dev"
   },
   "dependencies": {
     "aws-sdk": "^2.1691.0",

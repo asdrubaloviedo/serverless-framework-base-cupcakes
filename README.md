@@ -33,8 +33,9 @@ El backend incluye:
 - Amazon SES para el envío de correos electrónicos.
 - Configuración diferenciada para los entornos `local`, `dev` y `prod`.
 - Gestión de secretos mediante variables de entorno y AWS Systems Manager Parameter Store.
-- Pruebas automatizadas con Jest.
-- Workflow de integración continua mediante GitHub Actions.
+- Pruebas unitarias automatizadas con Jest y cobertura de código.
+- Pruebas automatizadas de API con Playwright (97 casos validados contra `dev`).
+- Dos workflows independientes de integración continua mediante GitHub Actions: Jest + Serverless y Playwright API Testing.
 
 ### Estado de los entornos
 
@@ -213,13 +214,35 @@ npm run check:node:local
 npm run check:node:dev
 ```
 
-### Pruebas automatizadas existentes
+### Pruebas automatizadas
 
 ```bash
+# Jest: pruebas unitarias
 npm test
+
+# Jest: cobertura
 npm run test:coverage
+
+# Jest: modo observación
 npm run test:watch
+
+# Playwright: API desplegada en AWS dev
+npm run playwright:api:dev
+
+# Playwright: API local (requiere backend local disponible y configuración adecuada)
+npm run playwright:api:local
+
+# Playwright: usa la configuración y el entorno predeterminado de Playwright
+npm run playwright:api
+
+# Abrir el último reporte HTML de Playwright
+npm run playwright:api:report
+
+# Ejecutar Jest con cobertura y luego Playwright API en dev
+npm run general:tests
 ```
+
+`general:tests` utiliza `&&`: Playwright solo se ejecuta si Jest termina correctamente. Las pruebas de API contra `dev` interactúan con el backend desplegado y pueden afectar datos de prueba según los casos implementados.
 
 ### Ejecución local
 
@@ -412,53 +435,89 @@ Los archivos de configuración versionados deben contener referencias, nunca cla
 
 ## Pruebas y CI
 
-### Jest
+### Jest: pruebas unitarias
 
-El proyecto incluye Jest como herramienta de pruebas automatizadas.
-
-Ejecutar:
+Jest ejecuta las pruebas unitarias del backend. Su configuración está en `jest.config.js` y excluye el directorio `playwright-api/` para evitar que Jest intente interpretar las pruebas de Playwright.
 
 ```bash
 npm test
-```
-
-Generar cobertura:
-
-```bash
 npm run test:coverage
+npm run test:watch
 ```
 
-### GitHub Actions
+El proyecto dispone de umbrales de cobertura definidos en `jest.config.js`. El workflow de CI ejecuta Jest con cobertura.
 
-Existe un workflow de integración continua en:
+### Playwright: pruebas automatizadas de API
+
+Se implementaron **97 pruebas automatizadas de API** con Playwright, validadas contra el backend desplegado en AWS `dev`. Las pruebas permiten comprobar respuestas HTTP, códigos de estado, estructuras JSON y comportamientos de los endpoints.
+
+Archivos y carpetas principales:
 
 ```text
-.github/workflows/ci.yml
+playwright-api/
+playwright.config.js
+.github/workflows/playwright-api.yml
 ```
 
-Está configurado para ejecutarse ante:
+Ejecutar contra AWS `dev`:
 
-- Push a `development`.
-- Push a ramas `feature/**`.
-- Pull requests hacia `development`.
+```bash
+npm run playwright:api:dev
+```
 
-El workflow incluye instalación de dependencias, validación de Node.js, ejecución de Jest y pasos de verificación y empaquetado de Serverless.
+Ejecutar contra el entorno local:
 
-**Importante:** los pasos de Serverless que resuelven variables locales pueden requerir configuración adicional de variables y secretos en GitHub Actions. La existencia del workflow no implica que todas sus ejecuciones estén validadas con la configuración actual.
+```bash
+npm run playwright:api:local
+```
 
-### Próxima etapa: Playwright API Testing
+Para las pruebas locales, el backend debe estar iniciado y el entorno de Playwright debe apuntar a la URL local correcta. No se garantiza que todos los casos puedan ejecutarse sin configurar PostgreSQL y los servicios dependientes.
 
-Está previsto incorporar pruebas automatizadas de API con Playwright dentro de este mismo repositorio.
+Ejecutar Playwright con la configuración predeterminada:
 
-El objetivo es:
+```bash
+npm run playwright:api
+```
 
-- Verificar respuestas HTTP y códigos de estado.
-- Validar estructuras y contenidos de respuesta.
-- Probar endpoints de consulta y operaciones de escritura.
-- Utilizar AWS `dev` como entorno inicial de pruebas.
-- Incorporar las pruebas API al proceso de integración continua.
+Este último script **no establece `TEST_ENV`**: utiliza el valor predeterminado definido por la configuración de Playwright. Para elegir explícitamente el entorno, usar `playwright:api:dev` o `playwright:api:local`.
 
-Esta implementación todavía está pendiente y no debe considerarse parte de las pruebas existentes.
+Abrir el reporte HTML generado por la ejecución más reciente:
+
+```bash
+npm run playwright:api:report
+```
+
+### Ejecutar todas las pruebas desde la terminal
+
+```bash
+npm run general:tests
+```
+
+Este script ejecuta primero `npm run test:coverage` y, si termina correctamente, continúa con `npm run playwright:api:dev`. No incluye un despliegue.
+
+### GitHub Actions: integración continua
+
+El repositorio tiene **dos workflows independientes**:
+
+| Workflow | Archivo | Validaciones |
+|---|---|---|
+| CI – Serverless (Node + Jest) | `.github/workflows/ci.yml` | Dependencias, Node.js 22, Jest con cobertura, Serverless print y package para `local`. |
+| CI – Playwright API Testing | `.github/workflows/playwright-api.yml` | Instalación de dependencias, pruebas Playwright API contra `dev` y publicación del reporte como artifact. |
+
+Los workflows se ejecutan automáticamente ante cambios en las ramas y pull requests configurados en sus respectivos archivos YAML. El workflow de Serverless también admite ejecución manual mediante `workflow_dispatch`.
+
+Ambos workflows finalizaron correctamente en GitHub Actions para el commit `10b5ca8` de `development`.
+
+**Importante:** el workflow de Serverless valida la configuración y genera un paquete, pero **no despliega automáticamente** a AWS. La publicación de reportes de Playwright permite descargar evidencias de cada ejecución desde GitHub Actions.
+
+El workflow de Serverless utiliza valores ficticios de entorno exclusivos para CI, necesarios para resolver la configuración local. Estos valores no son credenciales reales ni sustituyen los secretos de un entorno de despliegue.
+
+### Recomendaciones de ejecución
+
+- Durante el desarrollo, ejecutar Jest para validar cambios de lógica y Playwright para comprobar la API desplegada.
+- Antes de integrar cambios importantes, utilizar `npm run general:tests` cuando el entorno `dev` esté disponible y los datos de prueba sean adecuados.
+- Revisar los logs y artifacts de GitHub Actions cuando falle una ejecución.
+- No ejecutar pruebas que modifiquen datos contra producción sin una estrategia específica de aislamiento y limpieza.
 
 ## Seguridad
 
@@ -475,6 +534,8 @@ node_modules/
 .env.*
 .serverless/
 coverage/
+playwright-report/
+test-results/
 dist/
 ```
 
@@ -492,7 +553,8 @@ No utilizar `serverless print` para generar evidencias públicas sin eliminar pr
 - No ejecutar `npm audit fix --force` sin revisar previamente las consecuencias.
 - El entorno `local` utiliza Node.js 20.
 - Los entornos `dev` y `prod` utilizan Node.js 22.
-- AWS `dev` es el entorno previsto para las primeras pruebas API.
+- AWS `dev` es el entorno utilizado para las pruebas API automatizadas con Playwright.
+- Los dos workflows de CI fueron validados correctamente en GitHub Actions para el commit `10b5ca8`.
 - El despliegue de producción continúa pendiente de validación.
 - No modificar la lógica de los endpoints existentes como parte de la configuración inicial de pruebas automatizadas.
 
@@ -500,7 +562,7 @@ No utilizar `serverless print` para generar evidencias públicas sin eliminar pr
 
 Tecnologías principales:
 
-Node.js, JavaScript, Serverless Framework, AWS Lambda, API Gateway, PostgreSQL, AWS RDS, AWS Systems Manager Parameter Store, Firebase Admin, Amazon SES, Jest, Joi y Zod.
+Node.js, JavaScript, Serverless Framework, AWS Lambda, API Gateway, PostgreSQL, AWS RDS, AWS Systems Manager Parameter Store, Firebase Admin, Amazon SES, Jest, Playwright, GitHub Actions, Joi y Zod.
 
 ## Autores
 
