@@ -2860,6 +2860,254 @@ ON usuarios
 FOR EACH ROW
 EXECUTE FUNCTION crear_preferencias_usuario();
 
+
+-- ============================================================
+-- DOCUMENTOS LEGALES
+-- ============================================================
+-- Almacena las diferentes versiones de los documentos legales
+-- de CupcakesLife.
+--
+-- Tipos de documentos:
+--   terminos_condiciones
+--   politica_privacidad
+--
+-- Cada tipo de documento puede tener varias versiones,
+-- pero solamente una puede estar vigente al mismo tiempo.
+--
+-- Las versiones anteriores se conservan para mantener
+-- el historial de aceptaciones de los usuarios.
+-- ============================================================
+
+CREATE SEQUENCE documento_legal_id;
+
+CREATE TABLE IF NOT EXISTS documentos_legales (
+    documento_legal_id INTEGER PRIMARY KEY NOT NULL
+        DEFAULT nextval('documento_legal_id'),
+
+    tipo VARCHAR(30) NOT NULL
+        CHECK (
+            tipo IN (
+                'terminos_condiciones',
+                'politica_privacidad'
+            )
+        ),
+
+    version VARCHAR(20) NOT NULL,
+
+    url TEXT NOT NULL,
+
+    fecha_publicacion TIMESTAMPTZ NOT NULL,
+
+    vigente BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT uq_documento_legal_tipo_version
+        UNIQUE (tipo, version)
+);
+
+ALTER SEQUENCE documento_legal_id
+OWNED BY documentos_legales.documento_legal_id;
+
+-- ============================================================
+-- RESTRICCION DE DOCUMENTOS LEGALES VIGENTES
+-- ============================================================
+-- Garantiza que solamente exista una version vigente
+-- por cada tipo de documento legal.
+-- ============================================================
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_documento_legal_vigente
+ON documentos_legales (tipo)
+WHERE vigente = TRUE;
+
+SELECT setval(
+    'documento_legal_id',
+    COALESCE(
+        (
+            SELECT MAX(documento_legal_id)
+            FROM documentos_legales
+        ),
+        1
+    ),
+    EXISTS (
+        SELECT 1
+        FROM documentos_legales
+    )
+);
+
+-- ============================================================
+-- ACEPTACIONES LEGALES DE USUARIOS
+-- ============================================================
+-- Almacena el historial de aceptaciones de los documentos
+-- legales por parte de cada usuario.
+--
+-- Un usuario puede aceptar diferentes versiones de un mismo
+-- documento, pero no puede aceptar dos veces la misma version.
+--
+-- Metodos de aceptacion:
+--   tradicional  = Registro mediante correo y contraseña.
+--   google       = Registro mediante Google.
+--   actualizacion = Aceptacion posterior al registro.
+--   migracion_dev = Aceptacion ficticia para pruebas.
+--
+-- La fecha de aceptacion se genera automaticamente
+-- desde PostgreSQL.
+-- ============================================================
+
+CREATE SEQUENCE usuario_aceptacion_legal_id;
+
+CREATE TABLE IF NOT EXISTS usuario_aceptaciones_legales (
+    usuario_aceptacion_legal_id INTEGER PRIMARY KEY NOT NULL
+        DEFAULT nextval('usuario_aceptacion_legal_id'),
+
+    usuario_id INTEGER NOT NULL,
+    documento_legal_id INTEGER NOT NULL,
+
+    fecha_aceptacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    metodo_aceptacion VARCHAR(20) NOT NULL
+        CHECK (
+            metodo_aceptacion IN (
+                'tradicional',
+                'google',
+                'actualizacion',
+                'migracion_dev'
+            )
+        ),
+
+    FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(usuario_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (documento_legal_id)
+        REFERENCES documentos_legales(documento_legal_id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT uq_usuario_aceptacion_legal
+        UNIQUE (usuario_id, documento_legal_id)
+);
+
+ALTER SEQUENCE usuario_aceptacion_legal_id
+OWNED BY usuario_aceptaciones_legales.usuario_aceptacion_legal_id;
+
+SELECT setval(
+    'usuario_aceptacion_legal_id',
+    COALESCE(
+        (
+            SELECT MAX(usuario_aceptacion_legal_id)
+            FROM usuario_aceptaciones_legales
+        ),
+        1
+    ),
+    EXISTS (
+        SELECT 1
+        FROM usuario_aceptaciones_legales
+    )
+);
+
+
+-- ============================================================
+-- DOCUMENTOS LEGALES INICIALES
+-- ============================================================
+-- Se registra la primera version de los documentos legales
+-- de CupcakesLife.
+--
+-- Ambos documentos comienzan con la version 1.0.0
+-- y se encuentran vigentes.
+--
+-- El documento de eliminacion de cuenta no se incluye
+-- porque es informativo y no requiere aceptacion.
+-- ============================================================
+
+INSERT INTO documentos_legales (
+    documento_legal_id,
+    tipo,
+    version,
+    url,
+    fecha_publicacion,
+    vigente
+)
+    VALUES
+        (
+            1,
+            'terminos_condiciones',
+            '1.0.0',
+            'https://www.thecupcakelife.com/terminos/',
+            NOW(),
+            TRUE
+        ),
+        (
+            2,
+            'politica_privacidad',
+            '1.0.0',
+            'https://www.thecupcakelife.com/privacidad/',
+            NOW(),
+            TRUE
+        );
+
+SELECT setval(
+    'documento_legal_id',
+    COALESCE(
+        (
+            SELECT MAX(documento_legal_id)
+            FROM documentos_legales
+        ),
+        1
+    ),
+    EXISTS (
+        SELECT 1
+        FROM documentos_legales
+    )
+);
+
+
+-- ============================================================
+-- DATOS DE PRUEBA: ACEPTACIONES LEGALES
+-- ============================================================
+-- Se generan aceptaciones ficticias para todos los usuarios
+-- existentes en la base de datos al ejecutar esta semilla.
+--
+-- Cada usuario tendra una aceptacion por cada documento
+-- legal vigente.
+--
+-- El metodo migracion_dev permite diferenciar las
+-- aceptaciones ficticias de las aceptaciones reales.
+--
+-- Este bloque es exclusivo del ambiente de desarrollo.
+-- NUNCA debe ejecutarse en produccion.
+-- ============================================================
+
+INSERT INTO usuario_aceptaciones_legales (
+    usuario_id,
+    documento_legal_id,
+    fecha_aceptacion,
+    metodo_aceptacion
+)
+SELECT
+    u.usuario_id,
+    dl.documento_legal_id,
+    NOW(),
+    'migracion_dev'
+FROM usuarios u
+CROSS JOIN documentos_legales dl
+WHERE dl.vigente = TRUE
+ON CONFLICT (usuario_id, documento_legal_id) DO NOTHING;
+
+
+SELECT setval(
+    'usuario_aceptacion_legal_id',
+    COALESCE(
+        (
+            SELECT MAX(usuario_aceptacion_legal_id)
+            FROM usuario_aceptaciones_legales
+        ),
+        1
+    ),
+    EXISTS (
+        SELECT 1
+        FROM usuario_aceptaciones_legales
+    )
+);
+
+
 CREATE SEQUENCE cupcake_categoria_id;
 CREATE TABLE IF NOT EXISTS cupcake_categorias (
     cupcake_categoria_id INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('cupcake_categoria_id'),
