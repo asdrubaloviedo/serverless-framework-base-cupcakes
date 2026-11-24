@@ -15,6 +15,9 @@
  */
 
 module.exports = {
+    get GoogleAuthUser() {
+        return require('@user/services/user/GoogleAuthUser');
+    },
 
     /*
      * Servicio para crear un usuario en nuestra base de datos.

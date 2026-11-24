@@ -7,6 +7,7 @@ const {
   validatePatchUserMedalLeage,
   validateCreateUserPackage,
   validateCreateUser,
+  validateGoogleAuthUser,
   validateUpdateUser,
   validateGetUserPreferences,
   validateUpdateUserPreferences,
@@ -293,6 +294,9 @@ const routes = {
         )
       ),
 
+
+  'POST /google-auth':
+    (e) => UserController.googleAuthUser(validBody(e, validateGoogleAuthUser)),
 
   'POST /insertar-usuario-nuevo':
     (e) =>

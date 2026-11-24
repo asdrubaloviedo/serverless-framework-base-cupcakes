@@ -344,7 +344,14 @@ const validateSendPasswordResetEmail = (o) =>
  * EXPORTS
  * =========================================================
  */
+const validateGoogleAuthUser = (o) => z.object({
+  idToken: z.string().min(20),
+  action: z.enum(['register', 'login']),
+  nombre: z.string().trim().max(50).optional()
+}).strict().safeParse(o);
+
 module.exports = {
+  validateGoogleAuthUser,
   validateCreateUserMedalLeage,
   validatePatchUserMedalLeage,
   validateCreateUserPackage,

@@ -104,3 +104,41 @@ Content-Type: application/json
 {
   "email": "asdrubaloviedo@gmail.com"
 }
+
+### POST Inicio de sesión con Google.
+### Local
+POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{userModule}}/google-auth
+Content-Type: application/json
+
+{
+    "idToken": "valid-test-token-123456789",
+    "action": "login"
+}
+
+### Desarrollo
+POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{userModule}}/google-auth
+Content-Type: application/json
+
+{
+    "idToken": "valid-test-token-123456789",
+    "action": "login"
+}
+
+### POST Registro de usuarios con Google.
+### Local
+POST {{rootUrlLocal}}/{{stageLocal}}/{{appName}}/{{userModule}}/google-auth
+Content-Type: application/json
+
+{
+    "idToken": "valid-test-token-123456789",
+    "action": "register"
+}
+
+### Desarrollo
+POST {{rootUrlDev}}/{{stageDev}}/{{appName}}/{{userModule}}/google-auth
+Content-Type: application/json
+
+{
+    "idToken": "valid-test-token-123456789",
+    "action": "register"
+}

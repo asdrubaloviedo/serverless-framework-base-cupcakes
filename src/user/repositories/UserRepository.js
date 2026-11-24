@@ -51,6 +51,27 @@ class UserRepository {
         return UserModel.create({ query, params });
     }
 
+    // Registra exclusivamente usuarios nuevos de Google; la restricción UNIQUE
+    // sobre email evita duplicados incluso ante solicitudes simultáneas.
+    async registerGoogle({ nombre, email }) {
+        const { primerNombre, segundoNombre } = this.splitName(nombre);
+        const query = `
+            INSERT INTO usuarios (
+                primer_nombre, segundo_nombre, primer_apellido,
+                segundo_apellido, pais, edad, sexo, email, rol_id, estado_id
+            ) VALUES ($1, $2, 'indefinido', 'indefinido', 'PER', 1, 'i', LOWER($3), 7, 1)
+            ON CONFLICT (email) DO NOTHING
+            RETURNING usuario_id
+        `;
+        return UserModel.create({ query, params: [primerNombre, segundoNombre, email] });
+    }
+
+    async existsByEmail({ email }) {
+        const query = 'SELECT usuario_id FROM usuarios WHERE email = LOWER($1) LIMIT 1';
+        const rows = await UserModel.getCreated({ query, params: [email] });
+        return rows.length > 0;
+    }
+
     // Actualiza el nombre y avatar del usuario.
     async update({ nombre, email, avatarId }) {
         const { primerNombre, segundoNombre } = this.splitName(nombre);

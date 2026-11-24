@@ -106,6 +106,11 @@ class UserController {
      * =====================================================
      */
 
+    static async googleAuthUser(params = {}) {
+        const { GoogleAuthUser } = require('@user/services/user');
+        return GoogleAuthUser.execute(params);
+    }
+
     static async createOneUser(params = {}) {
 
         const {
