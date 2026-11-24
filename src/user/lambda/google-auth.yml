@@ -1,0 +1,36 @@
+google-auth:
+  handler: ./src/user/handlers/google-auth.handler
+
+  # Desactiva la VPC heredada del provider.
+  vpc: ~
+
+  timeout: 25
+  memorySize: 512
+
+  # Rol exclusivo para esta Lambda.
+  role:
+    Fn::GetAtt:
+      - GoogleAuthLambdaRole
+      - Arn
+
+  environment:
+    APP_STAGE: ${self:custom.stage}
+    GOOGLE_AUTH_DB_FUNCTION: ${self:service}-${self:custom.stage}-google-auth-db
+
+    DB_HOST: ${self:custom.googleAuthDbEnv.${self:custom.stage}.host}
+    DB_PORT: ${self:custom.googleAuthDbEnv.${self:custom.stage}.port}
+    DB_USER: ${self:custom.googleAuthDbEnv.${self:custom.stage}.user}
+    DB_PASSWORD: ${self:custom.googleAuthDbEnv.${self:custom.stage}.password}
+    DB_NAME: ${self:custom.googleAuthDbEnv.${self:custom.stage}.name}
+    PGSSLMODE: ${self:custom.googleAuthDbEnv.${self:custom.stage}.sslmode}
+
+  events:
+
+    # =========================================================
+    # GOOGLE AUTH
+    # =========================================================
+
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.userModule}/google-auth
+        method: post
+        cors: ${self:custom.corsCommon}

@@ -7,3 +7,5 @@ package: ${file(./src/package/lambda/package.yml):package}
 recipe: ${file(./src/recipe/lambda/recipe.yml):recipe}
 user: ${file(./src/user/lambda/user.yml):user}
 password-reset: ${file(./src/user/lambda/password-reset.yml):password-reset}
+google-auth: ${file(./src/user/lambda/google-auth.yml):google-auth}
+google-auth-db: ${file(./src/user/lambda/google-auth-db.yml):google-auth-db}

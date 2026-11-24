@@ -35,6 +35,25 @@ custom:
       name: ${env:DB_NAME}
       sslmode: ${env:PGSSLMODE}
 
+  googleAuthDbEnv:
+    local: ${self:custom.db.local}
+
+    dev:
+      host: ""
+      port: ""
+      user: ""
+      password: ""
+      name: ""
+      sslmode: ""
+
+    prod:
+      host: ""
+      port: ""
+      user: ""
+      password: ""
+      name: ""
+      sslmode: ""
+
   ssmPrefixByStage:
     dev: /cupcakes/dev
     prod: /cupcakes/prod
@@ -144,6 +163,40 @@ resources:
         - dev
 
   Resources:
+
+    # =========================================================
+    # GOOGLE AUTH IAM ROLE
+    # =========================================================
+
+    GoogleAuthLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action:
+                - sts:AssumeRole
+
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+        Policies:
+          - PolicyName: GoogleAuthDatabaseInvoke
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - lambda:InvokeFunction
+                  Resource:
+                    Fn::Sub: "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${self:service}-${self:custom.stage}-google-auth-db"
+
+
     MyDbSubnetGroup:
       Type: AWS::RDS::DBSubnetGroup
       Condition: IsDev
