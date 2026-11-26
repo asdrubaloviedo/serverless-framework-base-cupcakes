@@ -1,3 +1,4 @@
+
 user:
   handler: ./src/user/handlers/user.handler
 
@@ -33,11 +34,6 @@ user:
     # =========================================================
 
     - http:
-        path: ${self:custom.endpointRoot}/${self:custom.userModule}/insertar-usuario-nuevo
-        method: post
-        cors: ${self:custom.corsCommon}
-
-    - http:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/actualizar-usuario
         method: patch
         cors: ${self:custom.corsCommon}
@@ -54,4 +50,14 @@ user:
     - http:
         path: ${self:custom.endpointRoot}/${self:custom.userModule}/actualizar-preferencias
         method: patch
+        cors: ${self:custom.corsCommon}
+
+
+    # =========================================================
+    # LEGAL DOCUMENTS
+    # =========================================================
+
+    - http:
+        path: ${self:custom.endpointRoot}/${self:custom.userModule}/documentos-legales-vigentes
+        method: get
         cors: ${self:custom.corsCommon}

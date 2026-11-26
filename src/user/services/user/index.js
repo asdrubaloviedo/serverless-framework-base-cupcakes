@@ -1,3 +1,4 @@
+
 /*
  * =========================================================
  * USER SERVICES
@@ -28,6 +29,20 @@ module.exports = {
     get CreateOneUser() {
         return require(
             '@user/services/user/CreateOneUser'
+        );
+    },
+
+    /*
+     * Servicio para consultar los datos del perfil y avatar
+     * de un usuario existente mediante su Firebase UID.
+     *
+     * Esta operación es exclusivamente de lectura.
+     *
+     * No crea usuarios ni registra aceptaciones legales.
+     */
+    get GetUserProfile() {
+        return require(
+            '@user/services/user/GetUserProfile'
         );
     },
 
@@ -78,6 +93,35 @@ module.exports = {
     get SendPasswordResetEmail() {
         return require(
             '@user/services/user/SendPasswordResetEmail'
+        );
+    },
+
+    /*
+     * Servicio para obtener los documentos legales vigentes.
+     */
+    get GetActiveLegalDocuments() {
+        return require(
+            '@user/services/user/GetActiveLegalDocuments'
+        );
+    },
+
+    /*
+     * Servicio para consultar los documentos legales
+     * pendientes de aceptación de un usuario.
+     */
+    get GetPendingLegalAcceptances() {
+        return require(
+            '@user/services/user/GetPendingLegalAcceptances'
+        );
+    },
+
+    /*
+     * Servicio para registrar las aceptaciones legales
+     * posteriores a la creación de una cuenta.
+     */
+    get RegisterLegalAcceptances() {
+        return require(
+            '@user/services/user/RegisterLegalAcceptances'
         );
     }
 };

@@ -1,4 +1,3 @@
-
 const { defineConfig } = require('@playwright/test');
 const { baseURL } = require('./playwright-api/config/environments');
 
@@ -11,10 +10,18 @@ module.exports = defineConfig({
   workers: 6,
   fullyParallel: true,
 
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+  ],
 
   use: {
     baseURL,
+
+    trace: 'off',
+    screenshot: 'off',
+    video: 'off',
+
     extraHTTPHeaders: {
       Accept: 'application/json',
     },

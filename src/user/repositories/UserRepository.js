@@ -1,3 +1,4 @@
+
 "use strict"
 
 const { UserModel } = require("@user/models/user");
@@ -24,8 +25,14 @@ class UserRepository {
         };
     }
 
-    // Crea un nuevo usuario.
-    async create({ nombre, email, pais = 'PER' }) {
+    // Crea un nuevo usuario mediante registro tradicional.
+    async create({
+        nombre,
+        email,
+        firebaseUid,
+        pais = 'PER',
+        transaction
+    }) {
         const { primerNombre, segundoNombre } = this.splitName(nombre);
 
         const query =
@@ -39,37 +46,177 @@ class UserRepository {
                     edad,
                     sexo,
                     email,
+                    firebase_uid,
                     rol_id,
                     estado_id
                 )
-                VALUES ($1, $2, 'indefinido', 'indefinido', UPPER($3), 1, 'i', LOWER($4), 7, 1)
-                ON CONFLICT (email) DO NOTHING;
+                VALUES (
+                    $1, $2, 'indefinido', 'indefinido',
+                    UPPER($3), 1, 'i', LOWER($4), $5, 7, 1
+                )
+                ON CONFLICT DO NOTHING
+                RETURNING usuario_id;
             `;
 
-        const params = [primerNombre, segundoNombre, pais, email];
+        const params = [
+            primerNombre,
+            segundoNombre,
+            pais,
+            email,
+            firebaseUid
+        ];
 
-        return UserModel.create({ query, params });
+        return UserModel.create({
+            query,
+            params,
+            transaction
+        });
     }
 
-    // Registra exclusivamente usuarios nuevos de Google; la restricción UNIQUE
-    // sobre email evita duplicados incluso ante solicitudes simultáneas.
-    async registerGoogle({ nombre, email }) {
+    // Registra exclusivamente usuarios nuevos de Google.
+    // Las restricciones UNIQUE sobre email y firebase_uid
+    // evitan registros duplicados.
+    async registerGoogle({
+        nombre,
+        email,
+        firebaseUid,
+        transaction
+    }) {
         const { primerNombre, segundoNombre } = this.splitName(nombre);
+
         const query = `
             INSERT INTO usuarios (
-                primer_nombre, segundo_nombre, primer_apellido,
-                segundo_apellido, pais, edad, sexo, email, rol_id, estado_id
-            ) VALUES ($1, $2, 'indefinido', 'indefinido', 'PER', 1, 'i', LOWER($3), 7, 1)
-            ON CONFLICT (email) DO NOTHING
-            RETURNING usuario_id
+                primer_nombre,
+                segundo_nombre,
+                primer_apellido,
+                segundo_apellido,
+                pais,
+                edad,
+                sexo,
+                email,
+                firebase_uid,
+                rol_id,
+                estado_id
+            )
+            VALUES (
+                $1, $2, 'indefinido', 'indefinido',
+                'PER', 1, 'i', LOWER($3), $4, 7, 1
+            )
+            ON CONFLICT DO NOTHING
+            RETURNING usuario_id;
         `;
-        return UserModel.create({ query, params: [primerNombre, segundoNombre, email] });
+
+        const params = [
+            primerNombre,
+            segundoNombre,
+            email,
+            firebaseUid
+        ];
+
+        return UserModel.create({
+            query,
+            params,
+            transaction
+        });
     }
 
-    async existsByEmail({ email }) {
-        const query = 'SELECT usuario_id FROM usuarios WHERE email = LOWER($1) LIMIT 1';
-        const rows = await UserModel.getCreated({ query, params: [email] });
+    // Verifica si existe un usuario con el correo indicado.
+    async existsByEmail({ email, transaction }) {
+        const query = `
+            SELECT usuario_id
+            FROM usuarios
+            WHERE email = LOWER($1)
+            LIMIT 1;
+        `;
+
+        const rows = await UserModel.getCreated({
+            query,
+            params: [email],
+            transaction
+        });
+
         return rows.length > 0;
+    }
+
+    // Obtiene el identificador interno mediante el correo.
+    async getIdByEmail({ email, transaction }) {
+        const query = `
+            SELECT usuario_id
+            FROM usuarios
+            WHERE email = LOWER($1)
+            LIMIT 1;
+        `;
+
+        const rows = await UserModel.getCreated({
+            query,
+            params: [email],
+            transaction
+        });
+
+        return rows.length > 0
+            ? rows[0].usuario_id
+            : null;
+    }
+
+    // Verifica si existe un usuario vinculado al UID de Firebase.
+    async existsByFirebaseUid({ firebaseUid, transaction }) {
+        const usuarioId = await this.getIdByFirebaseUid({
+            firebaseUid,
+            transaction
+        });
+
+        return usuarioId !== null;
+    }
+
+    // Obtiene el identificador interno mediante el UID de Firebase.
+    async getIdByFirebaseUid({ firebaseUid, transaction }) {
+        const query = `
+            SELECT usuario_id
+            FROM usuarios
+            WHERE firebase_uid = $1
+            LIMIT 1;
+        `;
+
+        const rows = await UserModel.getByFirebaseUid({
+            query,
+            params: [firebaseUid],
+            transaction
+        });
+
+        return rows.length > 0
+            ? rows[0].usuario_id
+            : null;
+    }
+
+    // Obtiene el usuario y su avatar mediante el UID de Firebase.
+    async getByFirebaseUid({ firebaseUid, transaction }) {
+        const query = `
+            SELECT
+                u.usuario_id,
+                u.primer_nombre,
+                u.segundo_nombre,
+                u.primer_apellido,
+                u.segundo_apellido,
+                u.pais,
+                u.edad,
+                u.sexo,
+                u.email,
+                u.avatar_id,
+                u.rol_id,
+                u.estado_id,
+                a.nombre AS avatar_nombre,
+                a.codigo AS avatar_url
+            FROM usuarios u
+            INNER JOIN avatares a
+                ON a.avatar_id = u.avatar_id
+            WHERE u.firebase_uid = $1;
+        `;
+
+        return UserModel.getByFirebaseUid({
+            query,
+            params: [firebaseUid],
+            transaction
+        });
     }
 
     // Actualiza el nombre y avatar del usuario.
@@ -97,11 +244,22 @@ class UserRepository {
     }
 
     // Obtiene el usuario junto con la información de su avatar.
-    async getCreated({ email }) {
+    async getCreated({ email, transaction }) {
         const query =
             `
                 SELECT
-                    u.*,
+                    u.usuario_id,
+                    u.primer_nombre,
+                    u.segundo_nombre,
+                    u.primer_apellido,
+                    u.segundo_apellido,
+                    u.pais,
+                    u.edad,
+                    u.sexo,
+                    u.email,
+                    u.avatar_id,
+                    u.rol_id,
+                    u.estado_id,
                     a.nombre AS avatar_nombre,
                     a.codigo AS avatar_url
                 FROM usuarios u
@@ -112,7 +270,11 @@ class UserRepository {
 
         const params = [email];
 
-        return UserModel.getCreated({ query, params });
+        return UserModel.getCreated({
+            query,
+            params,
+            transaction
+        });
     }
 
     // Obtiene las preferencias asociadas al usuario.

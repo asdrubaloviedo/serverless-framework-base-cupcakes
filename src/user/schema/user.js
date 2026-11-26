@@ -1,3 +1,4 @@
+
 const z = require('zod');
 
 
@@ -111,6 +112,33 @@ const countryOptional = z.string()
 
 
 /*
+ * Documentos legales obligatorios durante el registro.
+ *
+ * Actualmente se requiere aceptar:
+ * - Términos y condiciones.
+ * - Política de privacidad.
+ *
+ * Los identificadores deben ser números enteros,
+ * positivos y no pueden estar duplicados.
+ */
+const registrationLegalDocumentIdsRequired = z.array(
+  z.number()
+    .int()
+    .positive()
+)
+  .length(
+    2,
+    'Debe aceptar los dos documentos legales obligatorios'
+  )
+  .refine(
+    (ids) => new Set(ids).size === ids.length,
+    {
+      message: 'Los documentos legales no pueden estar duplicados'
+    }
+  );
+
+
+/*
  * =========================================================
  * USER MEDAL
  * =========================================================
@@ -182,7 +210,8 @@ const createUserPackageSchema = z.object({
 const createUserSchema = z.object({
   nombre: nameRequired,
   email: emailRequired,
-  pais: paisOptional.default('PER')
+  pais: paisOptional.default('PER'),
+  documentoLegalIds: registrationLegalDocumentIdsRequired
 }).strict();
 
 
@@ -295,6 +324,35 @@ const sendPasswordResetEmailSchema = z.object({
 
 /*
  * =========================================================
+ * GOOGLE AUTH
+ * =========================================================
+ *
+ * El inicio de sesión conserva sus parámetros existentes.
+ *
+ * El registro requiere adicionalmente los identificadores
+ * de los documentos legales aceptados.
+ */
+const googleAuthUserSchema = z.discriminatedUnion(
+  'action',
+  [
+    z.object({
+      idToken: z.string().min(20),
+      action: z.literal('login'),
+      nombre: z.string().trim().max(50).optional()
+    }).strict(),
+
+    z.object({
+      idToken: z.string().min(20),
+      action: z.literal('register'),
+      nombre: z.string().trim().max(50).optional(),
+      documentoLegalIds: registrationLegalDocumentIdsRequired
+    }).strict()
+  ]
+);
+
+
+/*
+ * =========================================================
  * VALIDADORES
  * =========================================================
  */
@@ -340,15 +398,18 @@ const validateSendPasswordResetEmail = (o) =>
 
 
 /*
+ * Valida las solicitudes de inicio de sesión
+ * y registro mediante Google.
+ */
+const validateGoogleAuthUser = (o) =>
+  googleAuthUserSchema.safeParse(o);
+
+
+/*
  * =========================================================
  * EXPORTS
  * =========================================================
  */
-const validateGoogleAuthUser = (o) => z.object({
-  idToken: z.string().min(20),
-  action: z.enum(['register', 'login']),
-  nombre: z.string().trim().max(50).optional()
-}).strict().safeParse(o);
 
 module.exports = {
   validateGoogleAuthUser,

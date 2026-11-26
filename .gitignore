@@ -43,3 +43,13 @@ Thumbs.db
 
 # Playwright - Sesiones y credenciales locales
 /playwright/.auth/
+
+# Playwright - Validaciones temporales de seguridad
+/security-validation-*/
+/security-functional-*/
+/security-final-*/
+/security-validation*.log
+/playwright-api/security-validation.api.spec.js
+
+# Archivos comprimidos del proyecto
+/*.zip

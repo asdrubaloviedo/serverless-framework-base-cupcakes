@@ -29,14 +29,33 @@ const originalEnv = {
     ...process.env
 };
 
+const firebaseUid = 'AbCdEf123FirebaseUID';
+
+const documentoLegalIds = [12, 35];
+
 const params = {
     action: 'login',
-    email: 'user@example.com'
+    email: 'user@example.com',
+    firebaseUid
+};
+
+const registerParams = {
+    action: 'register',
+    email: 'user@example.com',
+    firebaseUid,
+    nombre: 'Nombre Google',
+    documentoLegalIds
 };
 
 const successResponse = {
     success: true,
     action: 'login',
+    email: 'user@example.com'
+};
+
+const registerSuccessResponse = {
+    success: true,
+    action: 'register',
     email: 'user@example.com'
 };
 
@@ -72,253 +91,1072 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-    process.env = originalEnv;
+    process.env = { ...originalEnv };
 });
 
 describe('GoogleAuthLambdaService', () => {
 
-    test('LOCAL: ejecuta directamente el servicio de base de datos', async () => {
+    describe('Validaciones existentes readaptadas', () => {
 
-        process.env.APP_STAGE = 'local';
+        test('LOCAL: ejecuta directamente el servicio de base de datos', async () => {
 
-        GoogleAuthDatabase.execute.mockResolvedValue(
-            successResponse
-        );
+            process.env.APP_STAGE = 'local';
 
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).resolves.toEqual(successResponse);
+            GoogleAuthDatabase.execute.mockResolvedValue(
+                successResponse
+            );
 
-        expect(
-            GoogleAuthDatabase.execute
-        ).toHaveBeenCalledWith(params);
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).resolves.toEqual(successResponse);
 
-        expect(AWS.Lambda).not.toHaveBeenCalled();
-    });
+            expect(
+                GoogleAuthDatabase.execute
+            ).toHaveBeenCalledWith(params);
 
-
-    test('Serverless Offline: no realiza invocaciones AWS', async () => {
-
-        process.env.IS_OFFLINE = 'true';
-
-        GoogleAuthDatabase.execute.mockResolvedValue(
-            successResponse
-        );
-
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).resolves.toEqual(successResponse);
-
-        expect(
-            GoogleAuthDatabase.execute
-        ).toHaveBeenCalledWith(params);
-
-        expect(AWS.Lambda).not.toHaveBeenCalled();
-    });
-
-
-    test('LOCAL: propaga errores de base de datos', async () => {
-
-        process.env.APP_STAGE = 'local';
-
-        GoogleAuthDatabase.execute.mockRejectedValue({
-            statusCode: 404,
-            message: 'Usuario no registrado'
+            expect(AWS.Lambda).not.toHaveBeenCalled();
         });
 
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).rejects.toMatchObject({
-            statusCode: 404
+        test('Serverless Offline: no realiza invocaciones AWS', async () => {
+
+            process.env.IS_OFFLINE = 'true';
+
+            GoogleAuthDatabase.execute.mockResolvedValue(
+                successResponse
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).resolves.toEqual(successResponse);
+
+            expect(
+                GoogleAuthDatabase.execute
+            ).toHaveBeenCalledWith(params);
+
+            expect(AWS.Lambda).not.toHaveBeenCalled();
         });
 
-        expect(AWS.Lambda).not.toHaveBeenCalled();
+        test('LOCAL: propaga errores de base de datos', async () => {
+
+            process.env.APP_STAGE = 'local';
+
+            GoogleAuthDatabase.execute.mockRejectedValue({
+                statusCode: 404,
+                message: 'Usuario no registrado'
+            });
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toMatchObject({
+                statusCode: 404
+            });
+
+            expect(AWS.Lambda).not.toHaveBeenCalled();
+        });
+
+        test('DEV: invoca correctamente la Lambda interna', async () => {
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).resolves.toEqual(successResponse);
+
+            expect(AWS.Lambda).toHaveBeenCalledWith({
+                region: 'us-east-2',
+                maxRetries: 0,
+                httpOptions: {
+                    connectTimeout: 3000,
+                    timeout: 12000
+                }
+            });
+
+            expect(invoke).toHaveBeenCalledWith({
+                FunctionName:
+                    'hello-world-dev-google-auth-db',
+                InvocationType: 'RequestResponse',
+                Payload: JSON.stringify(params)
+            });
+
+            expect(
+                GoogleAuthDatabase.execute
+            ).not.toHaveBeenCalled();
+        });
+
+        test('utiliza la región predeterminada cuando AWS_REGION no existe', async () => {
+
+            delete process.env.AWS_REGION;
+
+            await GoogleAuthLambdaService.execute(params);
+
+            expect(AWS.Lambda).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    region: 'us-east-2'
+                })
+            );
+        });
+
+        test('acepta un Payload recibido como Buffer', async () => {
+
+            promise.mockResolvedValue({
+                StatusCode: 200,
+                Payload: Buffer.from(
+                    JSON.stringify(successResponse)
+                )
+            });
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).resolves.toEqual(successResponse);
+        });
+
+        test('sin nombre de Lambda configurado: responde 500', async () => {
+
+            delete process.env.GOOGLE_AUTH_DB_FUNCTION;
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toMatchObject({
+                statusCode: 500
+            });
+
+            expect(AWS.Lambda).not.toHaveBeenCalled();
+        });
+
+        test.each([
+            [400, 'Parámetros internos inválidos'],
+            [404, 'No existe una cuenta registrada con este correo'],
+            [409, 'Este correo ya se encuentra registrado']
+        ])('propaga error de negocio: %s', async (
+            statusCode,
+            message
+        ) => {
+
+            promise.mockResolvedValue(
+                awsResponse({
+                    success: false,
+                    statusCode,
+                    message
+                })
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toEqual({
+                statusCode,
+                message
+            });
+        });
+
+        test.each([
+            [500],
+            [999]
+        ])('oculta detalles de errores internos: %s', async (
+            statusCode
+        ) => {
+
+            promise.mockResolvedValue(
+                awsResponse({
+                    success: false,
+                    statusCode,
+                    message: 'Sensitive internal error'
+                })
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toEqual({
+                statusCode: 500,
+                message: 'Error interno del servidor'
+            });
+        });
+
+        test('error de comunicación con AWS: responde 502', async () => {
+
+            promise.mockRejectedValue(
+                new Error('Network timeout')
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toMatchObject({
+                statusCode: 502
+            });
+        });
+
+        test.each([
+            [{
+                StatusCode: 500,
+                Payload: '{}'
+            }],
+            [{
+                StatusCode: 200,
+                FunctionError: 'Unhandled',
+                Payload: '{}'
+            }],
+            [{
+                StatusCode: 200
+            }],
+            [{
+                StatusCode: 200,
+                Payload: '{invalid'
+            }]
+        ])('respuesta AWS inválida: responde 502', async (
+            response
+        ) => {
+
+            promise.mockResolvedValue(response);
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toMatchObject({
+                statusCode: 502
+            });
+        });
+
+        test.each([
+            [null],
+            [{}],
+            [{ success: 'true' }]
+        ])('respuesta interna inválida: responde 502', async (
+            payload
+        ) => {
+
+            promise.mockResolvedValue(
+                awsResponse(payload)
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toEqual({
+                statusCode: 502,
+                message: 'Respuesta interna inválida'
+            });
+        });
     });
 
+    describe('Transmisión de Firebase UID', () => {
 
-    test('DEV: invoca correctamente la Lambda interna', async () => {
+        test.each([
+            'local',
+            'dev',
+            'prod'
+        ])('conserva el Firebase UID durante el login en %s', async stage => {
 
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).resolves.toEqual(successResponse);
+            process.env.APP_STAGE = stage;
 
-        expect(AWS.Lambda).toHaveBeenCalledWith({
-            region: 'us-east-2',
-            maxRetries: 0,
-            httpOptions: {
-                connectTimeout: 3000,
-                timeout: 12000
+            GoogleAuthDatabase.execute.mockResolvedValue(
+                successResponse
+            );
+
+            await GoogleAuthLambdaService.execute(params);
+
+            if (stage === 'local') {
+
+                expect(
+                    GoogleAuthDatabase.execute
+                ).toHaveBeenCalledTimes(1);
+
+                expect(
+                    GoogleAuthDatabase.execute
+                ).toHaveBeenCalledWith(params);
+
+                expect(invoke).not.toHaveBeenCalled();
+
+            } else {
+
+                const invocation =
+                    invoke.mock.calls[0][0];
+
+                const payload =
+                    JSON.parse(invocation.Payload);
+
+                expect(payload).toEqual(params);
+
+                expect(payload.firebaseUid)
+                    .toBe(firebaseUid);
+
+                expect(invoke).toHaveBeenCalledTimes(1);
+
+                expect(
+                    GoogleAuthDatabase.execute
+                ).not.toHaveBeenCalled();
             }
         });
 
-        expect(invoke).toHaveBeenCalledWith({
-            FunctionName:
-                'hello-world-dev-google-auth-db',
-            InvocationType: 'RequestResponse',
-            Payload: JSON.stringify(params)
+        test.each([
+            'login',
+            'register'
+        ])('conserva mayúsculas y minúsculas del UID durante %s', async action => {
+
+            const originalUid = 'AbCdEf123XyZ';
+
+            const requestParams = {
+                ...(action === 'login'
+                    ? params
+                    : registerParams),
+                firebaseUid: originalUid
+            };
+
+            promise.mockResolvedValue(
+                awsResponse(
+                    action === 'login'
+                        ? successResponse
+                        : registerSuccessResponse
+                )
+            );
+
+            await GoogleAuthLambdaService.execute(
+                requestParams
+            );
+
+            const payload = JSON.parse(
+                invoke.mock.calls[0][0].Payload
+            );
+
+            expect(payload.firebaseUid)
+                .toBe(originalUid);
         });
 
-        expect(
-            GoogleAuthDatabase.execute
-        ).not.toHaveBeenCalled();
+        test.each([
+            'login',
+            'register'
+        ])('transmite un UID de 128 caracteres durante %s', async action => {
+
+            const maximumUid = 'A'.repeat(128);
+
+            const requestParams = {
+                ...(action === 'login'
+                    ? params
+                    : registerParams),
+                firebaseUid: maximumUid
+            };
+
+            promise.mockResolvedValue(
+                awsResponse(
+                    action === 'login'
+                        ? successResponse
+                        : registerSuccessResponse
+                )
+            );
+
+            await GoogleAuthLambdaService.execute(
+                requestParams
+            );
+
+            const payload = JSON.parse(
+                invoke.mock.calls[0][0].Payload
+            );
+
+            expect(payload.firebaseUid)
+                .toBe(maximumUid);
+
+            expect(payload.firebaseUid)
+                .toHaveLength(128);
+        });
     });
 
+    describe('Documentos legales durante el registro', () => {
 
-    test('utiliza la región predeterminada cuando AWS_REGION no existe', async () => {
+        test.each([
+            'local',
+            'dev',
+            'prod'
+        ])('transmite el registro completo en %s', async stage => {
 
-        delete process.env.AWS_REGION;
+            process.env.APP_STAGE = stage;
 
-        await GoogleAuthLambdaService.execute(params);
+            GoogleAuthDatabase.execute.mockResolvedValue(
+                registerSuccessResponse
+            );
 
-        expect(AWS.Lambda).toHaveBeenCalledWith(
-            expect.objectContaining({
-                region: 'us-east-2'
-            })
-        );
-    });
+            promise.mockResolvedValue(
+                awsResponse(registerSuccessResponse)
+            );
 
+            await expect(
+                GoogleAuthLambdaService.execute(
+                    registerParams
+                )
+            ).resolves.toEqual(registerSuccessResponse);
 
-    test('acepta un Payload recibido como Buffer', async () => {
+            if (stage === 'local') {
 
-        promise.mockResolvedValue({
-            StatusCode: 200,
-            Payload: Buffer.from(
-                JSON.stringify(successResponse)
-            )
+                expect(
+                    GoogleAuthDatabase.execute
+                ).toHaveBeenCalledWith(registerParams);
+
+                expect(
+                    GoogleAuthDatabase.execute
+                ).toHaveBeenCalledTimes(1);
+
+                expect(AWS.Lambda)
+                    .not.toHaveBeenCalled();
+
+            } else {
+
+                const payload = JSON.parse(
+                    invoke.mock.calls[0][0].Payload
+                );
+
+                expect(payload).toEqual({
+                    action: 'register',
+                    email: 'user@example.com',
+                    firebaseUid,
+                    nombre: 'Nombre Google',
+                    documentoLegalIds
+                });
+
+                expect(invoke)
+                    .toHaveBeenCalledTimes(1);
+
+                expect(
+                    GoogleAuthDatabase.execute
+                ).not.toHaveBeenCalled();
+            }
         });
 
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).resolves.toEqual(successResponse);
-    });
+        test('Serverless Offline: transmite los documentos legales directamente', async () => {
 
+            process.env.IS_OFFLINE = 'true';
 
-    test('sin nombre de Lambda configurado: responde 500', async () => {
+            GoogleAuthDatabase.execute.mockResolvedValue(
+                registerSuccessResponse
+            );
 
-        delete process.env.GOOGLE_AUTH_DB_FUNCTION;
+            await expect(
+                GoogleAuthLambdaService.execute(
+                    registerParams
+                )
+            ).resolves.toEqual(registerSuccessResponse);
 
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).rejects.toMatchObject({
-            statusCode: 500
+            expect(
+                GoogleAuthDatabase.execute
+            ).toHaveBeenCalledWith(registerParams);
+
+            expect(AWS.Lambda)
+                .not.toHaveBeenCalled();
         });
 
-        expect(AWS.Lambda).not.toHaveBeenCalled();
+        test('transmite identificadores de futuras versiones legales', async () => {
+
+            const updatedDocumentIds = [48, 52];
+
+            promise.mockResolvedValue(
+                awsResponse(registerSuccessResponse)
+            );
+
+            await GoogleAuthLambdaService.execute({
+                ...registerParams,
+                documentoLegalIds: updatedDocumentIds
+            });
+
+            const payload = JSON.parse(
+                invoke.mock.calls[0][0].Payload
+            );
+
+            expect(payload.documentoLegalIds)
+                .toEqual(updatedDocumentIds);
+        });
+
+        test('conserva el orden original de los documentos legales', async () => {
+
+            const documentIds = [52, 48];
+
+            promise.mockResolvedValue(
+                awsResponse(registerSuccessResponse)
+            );
+
+            await GoogleAuthLambdaService.execute({
+                ...registerParams,
+                documentoLegalIds: documentIds
+            });
+
+            const payload = JSON.parse(
+                invoke.mock.calls[0][0].Payload
+            );
+
+            expect(payload.documentoLegalIds)
+                .toEqual([52, 48]);
+        });
+
+        test('conserva los caracteres Unicode del nombre durante el registro', async () => {
+
+            const nombre = 'María José Muñoz';
+
+            promise.mockResolvedValue(
+                awsResponse(registerSuccessResponse)
+            );
+
+            await GoogleAuthLambdaService.execute({
+                ...registerParams,
+                nombre
+            });
+
+            const payload = JSON.parse(
+                invoke.mock.calls[0][0].Payload
+            );
+
+            expect(payload.nombre).toBe(nombre);
+        });
+
+        test('no agrega documentos legales al payload de login', async () => {
+
+            await GoogleAuthLambdaService.execute(params);
+
+            const payload = JSON.parse(
+                invoke.mock.calls[0][0].Payload
+            );
+
+            expect(payload).toEqual(params);
+
+            expect(payload)
+                .not.toHaveProperty('documentoLegalIds');
+
+            expect(payload)
+                .not.toHaveProperty('nombre');
+        });
+
+        test('no modifica los parámetros originales durante la serialización', async () => {
+
+            const immutableParams = Object.freeze({
+                ...registerParams,
+                documentoLegalIds: Object.freeze([
+                    ...documentoLegalIds
+                ])
+            });
+
+            promise.mockResolvedValue(
+                awsResponse(registerSuccessResponse)
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(
+                    immutableParams
+                )
+            ).resolves.toEqual(registerSuccessResponse);
+
+            expect(immutableParams)
+                .toEqual(registerParams);
+
+            const payload = JSON.parse(
+                invoke.mock.calls[0][0].Payload
+            );
+
+            expect(payload).toEqual(registerParams);
+        });
     });
 
+    describe('Configuración de ejecución local y remota', () => {
 
-    test.each([
-        [400, 'Parámetros internos inválidos'],
-        [404, 'No existe una cuenta registrada con este correo'],
-        [409, 'Este correo ya se encuentra registrado']
-    ])('propaga error de negocio: %s', async (
-        statusCode,
-        message
-    ) => {
+        test('LOCAL: funciona sin configuración de la Lambda interna', async () => {
 
-        promise.mockResolvedValue(
-            awsResponse({
-                success: false,
-                statusCode,
-                message
-            })
-        );
+            process.env.APP_STAGE = 'local';
 
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).rejects.toEqual({
+            delete process.env.GOOGLE_AUTH_DB_FUNCTION;
+
+            GoogleAuthDatabase.execute.mockResolvedValue(
+                successResponse
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).resolves.toEqual(successResponse);
+
+            expect(AWS.Lambda)
+                .not.toHaveBeenCalled();
+
+            expect(invoke)
+                .not.toHaveBeenCalled();
+        });
+
+        test('Serverless Offline: funciona sin configuración de la Lambda interna', async () => {
+
+            process.env.IS_OFFLINE = 'true';
+
+            delete process.env.GOOGLE_AUTH_DB_FUNCTION;
+
+            GoogleAuthDatabase.execute.mockResolvedValue(
+                successResponse
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).resolves.toEqual(successResponse);
+
+            expect(AWS.Lambda)
+                .not.toHaveBeenCalled();
+        });
+
+        test('PROD: utiliza el nombre de Lambda configurado para producción', async () => {
+
+            process.env.APP_STAGE = 'prod';
+
+            process.env.GOOGLE_AUTH_DB_FUNCTION =
+                'hello-world-prod-google-auth-db';
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).resolves.toEqual(successResponse);
+
+            expect(invoke).toHaveBeenCalledWith({
+                FunctionName:
+                    'hello-world-prod-google-auth-db',
+                InvocationType: 'RequestResponse',
+                Payload: JSON.stringify(params)
+            });
+
+            expect(
+                GoogleAuthDatabase.execute
+            ).not.toHaveBeenCalled();
+        });
+
+        test('utiliza una región AWS personalizada', async () => {
+
+            process.env.AWS_REGION = 'us-west-2';
+
+            await GoogleAuthLambdaService.execute(params);
+
+            expect(AWS.Lambda).toHaveBeenCalledWith({
+                region: 'us-west-2',
+                maxRetries: 0,
+                httpOptions: {
+                    connectTimeout: 3000,
+                    timeout: 12000
+                }
+            });
+        });
+
+        test('utiliza la región predeterminada cuando AWS_REGION está vacía', async () => {
+
+            process.env.AWS_REGION = '';
+
+            await GoogleAuthLambdaService.execute(params);
+
+            expect(AWS.Lambda).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    region: 'us-east-2'
+                })
+            );
+        });
+
+        test('rechaza una configuración vacía del nombre de Lambda', async () => {
+
+            process.env.GOOGLE_AUTH_DB_FUNCTION = '';
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toEqual({
+                statusCode: 500,
+                message: 'Error interno del servidor'
+            });
+
+            expect(AWS.Lambda)
+                .not.toHaveBeenCalled();
+
+            expect(invoke)
+                .not.toHaveBeenCalled();
+        });
+
+        test('realiza una sola invocación síncrona de la Lambda interna', async () => {
+
+            await GoogleAuthLambdaService.execute(params);
+
+            expect(AWS.Lambda)
+                .toHaveBeenCalledTimes(1);
+
+            expect(invoke)
+                .toHaveBeenCalledTimes(1);
+
+            expect(promise)
+                .toHaveBeenCalledTimes(1);
+
+            expect(invoke).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    InvocationType: 'RequestResponse'
+                })
+            );
+        });
+    });
+
+    describe('Propagación de errores de identidad y documentos legales', () => {
+
+        test.each([
+            'login',
+            'register'
+        ])('propaga el error 401 de Firebase UID durante %s', async action => {
+
+            const requestParams =
+                action === 'login'
+                    ? params
+                    : registerParams;
+
+            const error = {
+                statusCode: 401,
+                message: 'Identidad de usuario no válida'
+            };
+
+            promise.mockResolvedValue(
+                awsResponse({
+                    success: false,
+                    ...error
+                })
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(
+                    requestParams
+                )
+            ).rejects.toEqual(error);
+        });
+
+        test.each([
+            [400, 'Documentos legales inválidos'],
+            [409, 'Los documentos legales han cambiado'],
+            [503, 'Documentos legales no disponibles']
+        ])('propaga el error legal %i durante el registro remoto', async (
             statusCode,
             message
-        });
-    });
+        ) => {
 
+            promise.mockResolvedValue(
+                awsResponse({
+                    success: false,
+                    statusCode,
+                    message
+                })
+            );
 
-    test.each([
-        [500],
-        [999]
-    ])('oculta detalles de errores internos: %s', async (
-        statusCode
-    ) => {
-
-        promise.mockResolvedValue(
-            awsResponse({
-                success: false,
+            await expect(
+                GoogleAuthLambdaService.execute(
+                    registerParams
+                )
+            ).rejects.toEqual({
                 statusCode,
-                message: 'Sensitive internal error'
-            })
-        );
+                message
+            });
 
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).rejects.toEqual({
-            statusCode: 500,
-            message: 'Error interno del servidor'
+            expect(invoke)
+                .toHaveBeenCalledTimes(1);
+
+            expect(
+                GoogleAuthDatabase.execute
+            ).not.toHaveBeenCalled();
+        });
+
+        test.each([
+            400,
+            401,
+            409,
+            503
+        ])('LOCAL: propaga sin modificar el error %i durante el registro', async statusCode => {
+
+            process.env.APP_STAGE = 'local';
+
+            const error = {
+                statusCode,
+                message: 'Internal legal operation error'
+            };
+
+            GoogleAuthDatabase.execute
+                .mockRejectedValue(error);
+
+            await expect(
+                GoogleAuthLambdaService.execute(
+                    registerParams
+                )
+            ).rejects.toBe(error);
+
+            expect(AWS.Lambda)
+                .not.toHaveBeenCalled();
+        });
+
+        test('oculta detalles de un error 500 durante el registro remoto', async () => {
+
+            promise.mockResolvedValue(
+                awsResponse({
+                    success: false,
+                    statusCode: 500,
+                    message: 'Sensitive database information'
+                })
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(
+                    registerParams
+                )
+            ).rejects.toEqual({
+                statusCode: 500,
+                message: 'Error interno del servidor'
+            });
+        });
+
+        test.each([
+            403,
+            422,
+            429,
+            502,
+            '401',
+            null,
+            undefined
+        ])('normaliza el código interno no permitido %s a 500', async statusCode => {
+
+            promise.mockResolvedValue(
+                awsResponse({
+                    success: false,
+                    statusCode,
+                    message: 'Sensitive internal error'
+                })
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(
+                    registerParams
+                )
+            ).rejects.toEqual({
+                statusCode: 500,
+                message: 'Error interno del servidor'
+            });
         });
     });
 
+    describe('Validación adicional de respuestas remotas', () => {
 
-    test('error de comunicación con AWS: responde 502', async () => {
+        test.each([
+            null,
+            undefined,
+            {
+                StatusCode: 200,
+                Payload: ''
+            },
+            {
+                StatusCode: 200,
+                Payload: null
+            },
+            {
+                StatusCode: 200,
+                Payload: Buffer.alloc(0)
+            },
+            {
+                StatusCode: '200',
+                Payload: '{}'
+            },
+            {
+                StatusCode: 202,
+                Payload: '{}'
+            }
+        ])('rechaza una respuesta AWS inválida adicional: %p', async response => {
 
-        promise.mockRejectedValue(
-            new Error('Network timeout')
-        );
+            promise.mockResolvedValue(response);
 
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).rejects.toMatchObject({
-            statusCode: 502
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toEqual({
+                statusCode: 502,
+                message: 'No fue posible completar la operación'
+            });
+        });
+
+        test.each([
+            false,
+            true,
+            [],
+            'success',
+            123,
+            { success: null },
+            { success: 1 }
+        ])('rechaza una estructura interna inválida: %p', async payload => {
+
+            promise.mockResolvedValue(
+                awsResponse(payload)
+            );
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toEqual({
+                statusCode: 502,
+                message: 'Respuesta interna inválida'
+            });
+        });
+
+        test.each([
+            'NetworkingError',
+            'TimeoutError',
+            'AccessDeniedException',
+            'ResourceNotFoundException',
+            'TooManyRequestsException'
+        ])('controla el error de invocación AWS %s', async code => {
+
+            const error = Object.assign(
+                new Error('Sensitive AWS error'),
+                { code }
+            );
+
+            promise.mockRejectedValue(error);
+
+            await expect(
+                GoogleAuthLambdaService.execute(
+                    registerParams
+                )
+            ).rejects.toEqual({
+                statusCode: 502,
+                message: 'No fue posible completar la operación'
+            });
+
+            expect(invoke)
+                .toHaveBeenCalledTimes(1);
+
+            expect(promise)
+                .toHaveBeenCalledTimes(1);
+
+            expect(
+                GoogleAuthDatabase.execute
+            ).not.toHaveBeenCalled();
+        });
+
+        test('controla un error síncrono durante lambda.invoke', async () => {
+
+            invoke.mockImplementation(() => {
+                throw new Error('Invocation failed');
+            });
+
+            await expect(
+                GoogleAuthLambdaService.execute(params)
+            ).rejects.toEqual({
+                statusCode: 502,
+                message: 'No fue posible completar la operación'
+            });
+
+            expect(promise)
+                .not.toHaveBeenCalled();
         });
     });
 
+    describe('Contrato de respuesta y payload interno', () => {
 
-    test.each([
-        [{
-            StatusCode: 500,
-            Payload: '{}'
-        }],
-        [{
-            StatusCode: 200,
-            FunctionError: 'Unhandled',
-            Payload: '{}'
-        }],
-        [{
-            StatusCode: 200
-        }],
-        [{
-            StatusCode: 200,
-            Payload: '{invalid'
-        }]
-    ])('respuesta AWS inválida: responde 502', async (
-        response
-    ) => {
+        test.each([
+            'login',
+            'register'
+        ])('conserva el contrato de respuesta remota durante %s', async action => {
 
-        promise.mockResolvedValue(response);
+            const requestParams =
+                action === 'login'
+                    ? params
+                    : registerParams;
 
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).rejects.toMatchObject({
-            statusCode: 502
+            const response =
+                action === 'login'
+                    ? successResponse
+                    : registerSuccessResponse;
+
+            promise.mockResolvedValue(
+                awsResponse(response)
+            );
+
+            const result =
+                await GoogleAuthLambdaService.execute(
+                    requestParams
+                );
+
+            expect(result).toEqual(response);
+
+            expect(result)
+                .not.toHaveProperty('firebaseUid');
+
+            expect(result)
+                .not.toHaveProperty('firebase_uid');
+
+            expect(result)
+                .not.toHaveProperty('documentoLegalIds');
+
+            expect(result)
+                .not.toHaveProperty('idToken');
         });
-    });
 
+        test.each([
+            'login',
+            'register'
+        ])('LOCAL: conserva el contrato de respuesta durante %s', async action => {
 
-    test.each([
-        [null],
-        [{}],
-        [{ success: 'true' }]
-    ])('respuesta interna inválida: responde 502', async (
-        payload
-    ) => {
+            process.env.APP_STAGE = 'local';
 
-        promise.mockResolvedValue(
-            awsResponse(payload)
-        );
+            const requestParams =
+                action === 'login'
+                    ? params
+                    : registerParams;
 
-        await expect(
-            GoogleAuthLambdaService.execute(params)
-        ).rejects.toEqual({
-            statusCode: 502,
-            message: 'Respuesta interna inválida'
+            const response =
+                action === 'login'
+                    ? successResponse
+                    : registerSuccessResponse;
+
+            GoogleAuthDatabase.execute
+                .mockResolvedValue(response);
+
+            const result =
+                await GoogleAuthLambdaService.execute(
+                    requestParams
+                );
+
+            expect(result).toBe(response);
+
+            expect(AWS.Lambda)
+                .not.toHaveBeenCalled();
+        });
+
+        test.each([
+            'login',
+            'register'
+        ])('no incorpora credenciales al payload recibido durante %s', async action => {
+
+            const requestParams =
+                action === 'login'
+                    ? params
+                    : registerParams;
+
+            promise.mockResolvedValue(
+                awsResponse(
+                    action === 'login'
+                        ? successResponse
+                        : registerSuccessResponse
+                )
+            );
+
+            await GoogleAuthLambdaService.execute(
+                requestParams
+            );
+
+            const payload = JSON.parse(
+                invoke.mock.calls[0][0].Payload
+            );
+
+            expect(payload).toEqual(requestParams);
+
+            expect(payload)
+                .not.toHaveProperty('idToken');
+
+            expect(payload)
+                .not.toHaveProperty('token');
+
+            expect(payload)
+                .not.toHaveProperty('authorization');
+
+            expect(payload)
+                .not.toHaveProperty('password');
+        });
+
+        test('acepta una respuesta de registro recibida como Buffer', async () => {
+
+            promise.mockResolvedValue({
+                StatusCode: 200,
+                Payload: Buffer.from(
+                    JSON.stringify(registerSuccessResponse)
+                )
+            });
+
+            await expect(
+                GoogleAuthLambdaService.execute(
+                    registerParams
+                )
+            ).resolves.toEqual(registerSuccessResponse);
         });
     });
 });

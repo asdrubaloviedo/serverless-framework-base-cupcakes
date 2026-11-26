@@ -249,7 +249,8 @@ describe('user/schema/user', () => {
     test('ok: nombre y email válidos', () => {
       const out = S.validateCreateUser({
         nombre: 'Juan Perez',
-        email: 'A@A.COM'
+        email: 'A@A.COM',
+        documentoLegalIds: [1, 2]
       });
 
       expect(out.success).toBe(true);
@@ -257,14 +258,16 @@ describe('user/schema/user', () => {
       expect(out.data).toEqual({
         nombre: 'Juan Perez',
         email: 'a@a.com',
-        pais: 'PER'
+        pais: 'PER',
+        documentoLegalIds: [1, 2]
       });
     });
 
 
     test('error: nombre faltante', () => {
       const out = S.validateCreateUser({
-        email: 'a@a.com'
+        email: 'a@a.com',
+        documentoLegalIds: [1, 2]
       });
 
       expect(out.success).toBe(false);
@@ -279,7 +282,8 @@ describe('user/schema/user', () => {
 
     test('error: email faltante', () => {
       const out = S.validateCreateUser({
-        nombre: 'Juan Perez'
+        nombre: 'Juan Perez',
+        documentoLegalIds: [1, 2]
       });
 
       expect(out.success).toBe(false);
@@ -293,7 +297,8 @@ describe('user/schema/user', () => {
     test('createUserSchema asigna PER cuando pais no viene', () => {
       const result = S.validateCreateUser({
         nombre: 'Juan Perez',
-        email: 'test@test.com'
+        email: 'test@test.com',
+        documentoLegalIds: [1, 2]
       });
 
       expect(result.success).toBe(true);
@@ -305,12 +310,51 @@ describe('user/schema/user', () => {
       const result = S.validateCreateUser({
         nombre: 'Juan Perez',
         email: 'test@test.com',
-        pais: ''
+        pais: '',
+        documentoLegalIds: [1, 2]
       });
 
       expect(result.success).toBe(true);
       expect(result.data.pais).toBe('PER');
     });
+    test('ok: acepta dos IDs distintos sin exigir valores fijos', () => {
+      const out = S.validateCreateUser({
+        nombre: 'Juan Perez', email: 'a@a.com', documentoLegalIds: [12, 35]
+      });
+      expect(out.success).toBe(true);
+      expect(out.data.documentoLegalIds).toEqual([12, 35]);
+    });
+
+    test.each([
+      ['faltantes', undefined],
+      ['null', null],
+      ['vacíos', []],
+      ['uno solo', [1]],
+      ['tres IDs', [1, 2, 3]],
+      ['duplicados', [1, 1]],
+      ['cero', [0, 2]],
+      ['negativo', [-1, 2]],
+      ['decimal', [1.5, 2]],
+      ['string', ['1', 2]],
+      ['no array', '1,2']
+    ])('error: documentos legales %s', (_, documentoLegalIds) => {
+      const out = S.validateCreateUser({
+        nombre: 'Juan Perez', email: 'a@a.com', documentoLegalIds
+      });
+      expect(out.success).toBe(false);
+      expect(out.error.issues.some(i => i.path[0] === 'documentoLegalIds')).toBe(true);
+    });
+
+    test.each(['firebaseUid', 'firebase_uid', 'usuarioId', 'metodoAceptacion'])(
+      'error: rechaza campo no autorizado %s', (campo) => {
+        const out = S.validateCreateUser({
+          nombre: 'Juan Perez', email: 'a@a.com', documentoLegalIds: [1, 2],
+          [campo]: 'valor-no-autorizado'
+        });
+        expect(out.success).toBe(false);
+        expect(out.error.issues.some(i => i.code === 'unrecognized_keys' && i.keys.includes(campo))).toBe(true);
+      }
+    );
   });
 
 

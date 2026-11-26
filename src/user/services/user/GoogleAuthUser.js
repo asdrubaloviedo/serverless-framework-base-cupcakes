@@ -1,3 +1,4 @@
+
 const FirebaseAuthService = require(
     '@user/services/user/FirebaseAuthService'
 );
@@ -8,7 +9,12 @@ const GoogleAuthLambdaService = require(
 
 class GoogleAuthUser {
 
-    static async execute({ idToken, action, nombre }) {
+    static async execute({
+        idToken,
+        action,
+        nombre,
+        documentoLegalIds
+    }) {
 
         console.log(
             '[GoogleAuth] 01 - Inicio de ejecución',
@@ -66,6 +72,30 @@ class GoogleAuthUser {
                 ? decoded.email.trim().toLowerCase()
                 : '';
 
+        // Obtiene el UID directamente del token
+        // autenticado por Firebase.
+        const firebaseUid =
+            typeof decoded.uid === 'string'
+                ? decoded.uid
+                : '';
+
+        // El UID distingue mayúsculas y minúsculas.
+        // No debe normalizarse ni modificarse.
+        if (
+            !firebaseUid.trim() ||
+            firebaseUid.length > 128
+        ) {
+
+            console.warn(
+                '[GoogleAuth] UID de Firebase no válido'
+            );
+
+            throw {
+                statusCode: 401,
+                message: 'Identidad de usuario no válida'
+            };
+        }
+
         if (
             provider !== 'google.com' ||
             !decoded.email_verified ||
@@ -88,7 +118,8 @@ class GoogleAuthUser {
 
         const params = {
             action,
-            email
+            email,
+            firebaseUid
         };
 
         if (action === 'register') {
@@ -98,6 +129,9 @@ class GoogleAuthUser {
                 decoded.name ||
                 email.split('@')[0]
             ).trim();
+
+            // Documentos legales aceptados durante el registro.
+            params.documentoLegalIds = documentoLegalIds;
         }
 
         console.log(

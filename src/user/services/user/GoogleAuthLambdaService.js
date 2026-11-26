@@ -1,3 +1,4 @@
+
 class GoogleAuthLambdaService {
 
     static async execute(params) {
@@ -104,9 +105,11 @@ class GoogleAuthLambdaService {
 
             const allowedCodes = [
                 400,
+                401,
                 404,
                 409,
-                500
+                500,
+                503
             ];
 
             const statusCode = allowedCodes.includes(

@@ -1,3 +1,4 @@
+
 require('module-alias/register');
 
 const z = require('zod');
@@ -14,7 +15,19 @@ const GoogleAuthDatabase = require(
  *
  * Valida exclusivamente los parámetros enviados
  * por la Lambda de autenticación con Google.
+ *
+ * El UID procede del token validado por Firebase.
  */
+
+const firebaseUidSchema = z.string()
+    .min(1)
+    .max(128)
+    .refine(
+        (value) => value.trim().length > 0,
+        {
+            message: 'Identidad de usuario no válida'
+        }
+    );
 
 const internalSchema = z.discriminatedUnion(
     'action',
@@ -28,7 +41,9 @@ const internalSchema = z.discriminatedUnion(
                 .email()
                 .transform(
                     (value) => value.toLowerCase()
-                )
+                ),
+
+            firebaseUid: firebaseUidSchema
 
         }).strict(),
 
@@ -43,9 +58,24 @@ const internalSchema = z.discriminatedUnion(
                     (value) => value.toLowerCase()
                 ),
 
+            firebaseUid: firebaseUidSchema,
+
             nombre: z.string()
                 .trim()
-                .min(1)
+                .min(1),
+
+            documentoLegalIds: z.array(
+                z.number()
+                    .int()
+                    .positive()
+            )
+                .length(2)
+                .refine(
+                    (ids) => new Set(ids).size === ids.length,
+                    {
+                        message: 'Los documentos legales no pueden estar duplicados'
+                    }
+                )
 
         }).strict()
     ]
@@ -77,9 +107,10 @@ const fail = (statusCode, message) => ({
  * Responsabilidades:
  *
  * 1. Validar los parámetros internos.
- * 2. Consultar usuarios registrados.
- * 3. Registrar nuevos usuarios.
- * 4. Devolver el resultado a la Lambda de Google Auth.
+ * 2. Consultar usuarios registrados mediante Firebase UID.
+ * 3. Registrar nuevos usuarios junto con su Firebase UID.
+ * 4. Gestionar las aceptaciones legales iniciales.
+ * 5. Devolver el resultado a la Lambda de Google Auth.
  *
  * La autorización de la invocación se controla mediante IAM.
  */
@@ -128,8 +159,10 @@ const handler = async (event) => {
 
         const allowedCodes = [
             400,
+            401,
             404,
-            409
+            409,
+            503
         ];
 
         const statusCode =

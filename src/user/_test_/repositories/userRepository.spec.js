@@ -2,6 +2,7 @@ jest.mock('@user/models/user', () => ({
   UserModel: {
     create: jest.fn(),
     getCreated: jest.fn(),
+    getByFirebaseUid: jest.fn(),
     update: jest.fn()
   },
 }));
@@ -18,12 +19,14 @@ describe('UserRepository', () => {
 
     await repo.create({
       nombre: 'Juan Perez',
+      firebaseUid: 'TestUidABC',
       email: 'a@a.com'
     });
 
     expect(UserModel.create).toHaveBeenCalledWith({
       query: expect.stringContaining('INSERT INTO usuarios'),
-      params: ['Juan', 'Perez', 'PER', 'a@a.com'],
+      params: ['Juan', 'Perez', 'PER', 'a@a.com', 'TestUidABC'],
+      transaction: undefined,
     });
   });
 
@@ -32,12 +35,14 @@ describe('UserRepository', () => {
 
     await repo.create({
       nombre: 'Juan',
+      firebaseUid: 'TestUidABC',
       email: 'a@a.com'
     });
 
     expect(UserModel.create).toHaveBeenCalledWith({
       query: expect.stringContaining('INSERT INTO usuarios'),
-      params: ['Juan', '', 'PER', 'a@a.com'],
+      params: ['Juan', '', 'PER', 'a@a.com', 'TestUidABC'],
+      transaction: undefined,
     });
   });
 
@@ -45,12 +50,14 @@ describe('UserRepository', () => {
     const repo = new UserRepository();
 
     await repo.create({
+      firebaseUid: 'TestUidABC',
       email: 'a@a.com'
     });
 
     expect(UserModel.create).toHaveBeenCalledWith({
       query: expect.stringContaining('INSERT INTO usuarios'),
-      params: ['', '', 'PER', 'a@a.com'],
+      params: ['', '', 'PER', 'a@a.com', 'TestUidABC'],
+      transaction: undefined,
     });
   });
 
@@ -59,13 +66,15 @@ describe('UserRepository', () => {
 
     await repo.create({
       nombre: 'Juan Perez',
+      firebaseUid: 'TestUidABC',
       email: 'a@a.com',
       pais: 'FRA',
     });
 
     expect(UserModel.create).toHaveBeenCalledWith({
       query: expect.stringContaining('INSERT INTO usuarios'),
-      params: ['Juan', 'Perez', 'FRA', 'a@a.com'],
+      params: ['Juan', 'Perez', 'FRA', 'a@a.com', 'TestUidABC'],
+      transaction: undefined,
     });
   });
 
@@ -83,6 +92,8 @@ describe('UserRepository', () => {
       params
     } = UserModel.getCreated.mock.calls[0][0];
 
+    expect(query).not.toMatch(/u\.\*/);
+    expect(query.split(/FROM usuarios u/i)[0]).not.toContain('firebase_uid');
     expect(query).toContain('FROM usuarios u');
     expect(query).toContain('INNER JOIN avatares a');
     expect(query).toContain('ON a.avatar_id = u.avatar_id');
@@ -264,5 +275,65 @@ describe('UserRepository', () => {
       'dark',
       'asdrubaloviedo@gmail.com'
     ]);
+  });
+  test('create transmite la transacción y conserva el UID', async () => {
+    const transaction = { query: jest.fn() };
+    const rows = [{ usuario_id: 10 }];
+    UserModel.create.mockResolvedValueOnce(rows);
+    const result = await new UserRepository().create({
+      nombre: 'Juan Perez', email: 'a@a.com',
+      firebaseUid: 'TestUidABC', transaction
+    });
+    expect(UserModel.create).toHaveBeenCalledWith({
+      query: expect.stringContaining('firebase_uid'),
+      params: ['Juan', 'Perez', 'PER', 'a@a.com', 'TestUidABC'],
+      transaction
+    });
+    expect(result).toEqual(rows);
+  });
+
+  test.each([[ [{ usuario_id: 10 }], 10 ], [ [], null ]])(
+    'getIdByFirebaseUid devuelve el identificador o null (%j)',
+    async (rows, expected) => {
+      const transaction = { query: jest.fn() };
+      UserModel.getByFirebaseUid.mockResolvedValueOnce(rows);
+      expect(await new UserRepository().getIdByFirebaseUid({
+        firebaseUid: 'TestUidABC', transaction
+      })).toBe(expected);
+      expect(UserModel.getByFirebaseUid).toHaveBeenCalledWith({
+        query: expect.stringContaining('WHERE firebase_uid = $1'),
+        params: ['TestUidABC'], transaction
+      });
+    }
+  );
+
+  test.each([[ [{ usuario_id: 10 }], true ], [ [], false ]])(
+    'existsByFirebaseUid comprueba la existencia (%j)',
+    async (rows, expected) => {
+      UserModel.getByFirebaseUid.mockResolvedValueOnce(rows);
+      expect(await new UserRepository().existsByFirebaseUid({
+        firebaseUid: 'TestUidABC'
+      })).toBe(expected);
+    }
+  );
+
+  test('getByFirebaseUid obtiene usuario y avatar sin exponer UID', async () => {
+    const transaction = { query: jest.fn() };
+    const rows = [{ usuario_id: 10, avatar_nombre: 'Avatar' }];
+    UserModel.getByFirebaseUid.mockResolvedValueOnce(rows);
+    const result = await new UserRepository().getByFirebaseUid({
+      firebaseUid: 'TestUidABC', transaction
+    });
+    const { query, params, transaction: received } =
+      UserModel.getByFirebaseUid.mock.calls[0][0];
+    expect(query).toContain('WHERE u.firebase_uid = $1');
+    expect(query).toContain('INNER JOIN avatares a');
+    expect(query).toContain('a.nombre AS avatar_nombre');
+    expect(query).toContain('a.codigo AS avatar_url');
+    expect(query).not.toMatch(/u\.\*/);
+    expect(query.split(/FROM usuarios u/i)[0]).not.toContain('firebase_uid');
+    expect(params).toEqual(['TestUidABC']);
+    expect(received).toBe(transaction);
+    expect(result).toEqual(rows);
   });
 });

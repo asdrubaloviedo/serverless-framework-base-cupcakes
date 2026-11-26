@@ -1,3 +1,4 @@
+
 hello-world: ${file(./src/category/lambda/category.yml):hello-world}
 category: ${file(./src/category/lambda/category.yml):category}
 cupcake: ${file(./src/cupcake/lambda/cupcake.yml):cupcake}
@@ -9,3 +10,5 @@ user: ${file(./src/user/lambda/user.yml):user}
 password-reset: ${file(./src/user/lambda/password-reset.yml):password-reset}
 google-auth: ${file(./src/user/lambda/google-auth.yml):google-auth}
 google-auth-db: ${file(./src/user/lambda/google-auth-db.yml):google-auth-db}
+legal-auth: ${file(./src/user/lambda/legal-auth.yml):legal-auth}
+legal-auth-db: ${file(./src/user/lambda/legal-auth-db.yml):legal-auth-db}

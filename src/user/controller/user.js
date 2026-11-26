@@ -1,3 +1,4 @@
+
 /*
  * =========================================================
  * USER CONTROLLER
@@ -120,13 +121,44 @@ class UserController {
         const {
             nombre,
             email,
-            pais = 'PER'
+            firebaseUid,
+            pais = 'PER',
+            documentoLegalIds
         } = params;
 
         return CreateOneUser.execute({
             nombre,
             email,
-            pais
+            firebaseUid,
+            pais,
+            documentoLegalIds
+        });
+    }
+
+
+    /*
+     * Consulta los datos del perfil de un usuario existente.
+     *
+     * El firebaseUid debe proceder de una identidad
+     * previamente verificada mediante Firebase.
+     *
+     * Esta operación es exclusivamente de lectura.
+     *
+     * No crea usuarios, no modifica sus datos y no
+     * registra aceptaciones legales.
+     */
+    static async getUserProfile(params = {}) {
+
+        const {
+            GetUserProfile
+        } = require('@user/services/user');
+
+        const {
+            firebaseUid
+        } = params;
+
+        return GetUserProfile.execute({
+            firebaseUid
         });
     }
 
@@ -208,6 +240,75 @@ class UserController {
             efectos_sonido,
             vibracion,
             tema
+        });
+    }
+
+
+    /*
+     * =====================================================
+     * LEGAL DOCUMENTS AND ACCEPTANCES
+     * =====================================================
+     */
+
+    /*
+     * Obtiene los documentos legales vigentes.
+     *
+     * Esta operación no requiere autenticación.
+     */
+    static async getActiveLegalDocuments() {
+
+        const {
+            GetActiveLegalDocuments
+        } = require('@user/services/user');
+
+        return GetActiveLegalDocuments.execute();
+    }
+
+
+    /*
+     * Consulta los documentos legales pendientes
+     * de aceptación de un usuario.
+     *
+     * El firebaseUid debe proceder de una identidad
+     * previamente verificada mediante Firebase.
+     */
+    static async getPendingLegalAcceptances(params = {}) {
+
+        const {
+            GetPendingLegalAcceptances
+        } = require('@user/services/user');
+
+        const {
+            firebaseUid
+        } = params;
+
+        return GetPendingLegalAcceptances.execute({
+            firebaseUid
+        });
+    }
+
+
+    /*
+     * Registra las aceptaciones legales posteriores
+     * a la creación de una cuenta.
+     *
+     * El firebaseUid debe proceder de una identidad
+     * previamente verificada mediante Firebase.
+     */
+    static async registerLegalAcceptances(params = {}) {
+
+        const {
+            RegisterLegalAcceptances
+        } = require('@user/services/user');
+
+        const {
+            firebaseUid,
+            documentoLegalIds
+        } = params;
+
+        return RegisterLegalAcceptances.execute({
+            firebaseUid,
+            documentoLegalIds
         });
     }
 

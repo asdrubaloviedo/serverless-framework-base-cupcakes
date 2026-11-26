@@ -1,3 +1,4 @@
+
 require('module-alias/register');
 
 const UserController = require('@user/controller/user');
@@ -6,7 +7,6 @@ const {
   validateCreateUserMedalLeage,
   validatePatchUserMedalLeage,
   validateCreateUserPackage,
-  validateCreateUser,
   validateUpdateUser,
   validateGetUserPreferences,
   validateUpdateUserPreferences,
@@ -259,8 +259,10 @@ const validBody = (e, validator) => {
  * ROUTES
  * =========================================================
  *
- * Todas las operaciones del módulo usuario se concentran
- * aquí y luego son resueltas por el mismo Lambda.
+ * Operaciones gestionadas por la Lambda de usuarios.
+ *
+ * El registro tradicional y las aceptaciones legales
+ * autenticadas se gestionan mediante legal-auth.
  */
 const routes = {
 
@@ -290,17 +292,6 @@ const routes = {
         validBody(
           e,
           validateCreateUserPackage
-        )
-      ),
-
-
-
-  'POST /insertar-usuario-nuevo':
-    (e) =>
-      UserController.createOneUser(
-        validBody(
-          e,
-          validateCreateUser
         )
       ),
 
@@ -356,6 +347,22 @@ const routes = {
           validateUpdateUserPreferences
         )
       ),
+
+
+  /*
+   * =========================================================
+   * LEGAL DOCUMENTS
+   * =========================================================
+   *
+   * Obtiene los documentos legales obligatorios vigentes.
+   *
+   * Esta operación es pública y no requiere autenticación,
+   * porque los usuarios deben consultar los documentos
+   * antes de crear una cuenta.
+   */
+  'GET /documentos-legales-vigentes':
+    () =>
+      UserController.getActiveLegalDocuments(),
 
 
   /*

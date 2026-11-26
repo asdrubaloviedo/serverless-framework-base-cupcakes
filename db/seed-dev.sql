@@ -2721,6 +2721,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     edad INTEGER CHECK (edad >= 1 AND edad <= 150),
     sexo VARCHAR(1) DEFAULT 'i',
     email VARCHAR(50) UNIQUE,
+    firebase_uid VARCHAR(128) UNIQUE,
 
     -- Todos los usuarios comienzan con el avatar genérico.
     avatar_id INTEGER NOT NULL DEFAULT 1,
@@ -2761,6 +2762,27 @@ SELECT setval(
     COALESCE((SELECT MAX(usuario_id) FROM usuarios), 1),
     EXISTS (SELECT 1 FROM usuarios)
 );      -- PostgreSQL buscará automáticamente el ID máximo y dejará la secuencia lista para la siguiente insercion
+
+-- Vinculación de usuarios DEV con Firebase Authentication
+
+UPDATE usuarios
+SET firebase_uid = CASE email
+    WHEN 'asdrubaloviedo@gmail.com' THEN 'RoVLIS2aJFQpi73aTkVZfaAthw92'
+    WHEN 'katyorman.10@gmail.com' THEN 'UC3WdbeB5jbKXU3yULwazmGLD6V2'
+    WHEN 'evert.ortiz.m@gmail.com' THEN '2pw8p2BibvXaisvFRfQybtZ9K1R2'
+    WHEN 'almindao@gmail.com' THEN 'dLKouba0vHUsnR38zShkEjS4oAx2'
+    WHEN 'cunesmac24@gmail.com' THEN 'iRHw88LErPfDoQQIF922ioPRLlQ2'
+    WHEN 'asdrubaloviedo2@gmail.com' THEN 'D6DPhmAQVSbip9Y9gjaddwMjdOt1'
+END
+WHERE email IN (
+    'asdrubaloviedo@gmail.com',
+    'katyorman.10@gmail.com',
+    'evert.ortiz.m@gmail.com',
+    'almindao@gmail.com',
+    'cunesmac24@gmail.com',
+    'asdrubaloviedo2@gmail.com'
+)
+AND firebase_uid IS NULL;
 
 -- ============================================================
 -- PREFERENCIAS DE USUARIO

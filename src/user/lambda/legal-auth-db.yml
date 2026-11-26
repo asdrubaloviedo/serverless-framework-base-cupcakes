@@ -1,0 +1,17 @@
+
+legal-auth-db:
+  handler: ./src/user/handlers/legal-auth-db.handler
+
+  # Hereda la configuración VPC del provider.
+  # En DEV tendrá acceso a PostgreSQL.
+
+  timeout: 10
+  memorySize: 512
+
+  environment:
+    APP_STAGE: ${self:custom.stage}
+
+    # Esta función no necesita credenciales de Firebase.
+    FIREBASE_PROJECT_ID: ""
+    FIREBASE_CLIENT_EMAIL: ""
+    FIREBASE_PRIVATE_KEY: ""
