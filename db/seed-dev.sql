@@ -1,5 +1,9 @@
+BEGIN;
+
 -- Limpieza previa
 -- Limpieza previa de tablas
+DROP TABLE IF EXISTS usuario_aceptaciones_legales CASCADE;
+DROP TABLE IF EXISTS documentos_legales CASCADE;
 DROP TABLE IF EXISTS festividades CASCADE;
 DROP TABLE IF EXISTS dificultades CASCADE;
 DROP TABLE IF EXISTS cupcake_accesos CASCADE;
@@ -34,6 +38,8 @@ DROP TABLE IF EXISTS coleccion_cupcakes CASCADE;
 DROP TABLE IF EXISTS colecciones CASCADE;
 
 -- Limpieza de secuencias
+DROP SEQUENCE IF EXISTS usuario_aceptacion_legal_id CASCADE;
+DROP SEQUENCE IF EXISTS documento_legal_id CASCADE;
 DROP SEQUENCE IF EXISTS festividad_id CASCADE;
 DROP SEQUENCE IF EXISTS dificultad_id CASCADE;
 DROP SEQUENCE IF EXISTS cupcake_acceso_id CASCADE;
@@ -3774,3 +3780,5 @@ SELECT setval(
         FROM coleccion_cupcakes
     )
 );
+
+COMMIT;
