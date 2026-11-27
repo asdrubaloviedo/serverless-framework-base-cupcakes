@@ -3052,7 +3052,7 @@ INSERT INTO documentos_legales (
             1,
             'terminos_condiciones',
             '1.0.0',
-            'https://www.thecupcakelife.com/terminos/',
+            'https://thecupcakelife.com/terminos/',
             NOW(),
             TRUE
         ),
@@ -3060,7 +3060,7 @@ INSERT INTO documentos_legales (
             2,
             'politica_privacidad',
             '1.0.0',
-            'https://www.thecupcakelife.com/privacidad/',
+            'https://thecupcakelife.com/privacidad/',
             NOW(),
             TRUE
         );

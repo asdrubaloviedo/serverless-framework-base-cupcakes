@@ -22,14 +22,14 @@ describe('LegalDocumentRepository', () => {
       documento_legal_id: 1,
       tipo: 'terminos_condiciones',
       version: '1.0.0',
-      url: 'https://www.thecupcakelife.com/terminos/',
+      url: 'https://thecupcakelife.com/terminos/',
       vigente: true
     },
     {
       documento_legal_id: 2,
       tipo: 'politica_privacidad',
       version: '1.0.0',
-      url: 'https://www.thecupcakelife.com/privacidad/',
+      url: 'https://thecupcakelife.com/privacidad/',
       vigente: true
     }
   ];
@@ -218,7 +218,7 @@ describe('LegalDocumentRepository', () => {
         documento_legal_id: 2,
         tipo: 'politica_privacidad',
         version: '1.0.0',
-        url: 'https://www.thecupcakelife.com/privacidad/'
+        url: 'https://thecupcakelife.com/privacidad/'
       }
     ];
 

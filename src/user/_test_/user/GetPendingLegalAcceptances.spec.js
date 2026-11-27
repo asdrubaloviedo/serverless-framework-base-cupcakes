@@ -23,13 +23,13 @@ describe('GetPendingLegalAcceptances', () => {
       documento_legal_id: 12,
       tipo: 'terminos_condiciones',
       version: '2.0.0',
-      url: 'https://www.thecupcakelife.com/terminos/'
+      url: 'https://thecupcakelife.com/terminos/'
     },
     {
       documento_legal_id: 35,
       tipo: 'politica_privacidad',
       version: '2.0.0',
-      url: 'https://www.thecupcakelife.com/privacidad/'
+      url: 'https://thecupcakelife.com/privacidad/'
     }
   ];
 
